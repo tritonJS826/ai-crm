@@ -1,0 +1,150 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum QuestionType {
+  RADIO
+  CHECKBOX
+  TEXT
+}
+
+enum Role {
+  PATIENT
+  DOCTOR
+}
+
+enum Plan {
+  FREE
+  BASIC
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  hashed_password String
+  name            String
+  role            Role     @default(PATIENT)
+  createdAt       DateTime @default(now())
+
+  sessions      TestSession[]
+  subscriptions Subscription[]
+
+  // Personal data fields
+  // e.g. "Dresden, Germany"
+  city     String?
+  // e.g. "+49 151 23456789"
+  phone    String?
+  // e.g. "Deutsch, English"
+  language String?
+}
+
+model Topic {
+  id      String   @id @default(cuid())
+  title   String
+  tests   Test[]
+  createdAt DateTime @default(now())
+}
+
+model Test {
+  id          String        @id @default(cuid())
+  title       String
+  topicId   String
+  topic     Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  description String
+  questions   Question[]
+  sessions    TestSession[]
+  createdAt   DateTime      @default(now())
+}
+
+model Question {
+  id        String         @id @default(cuid())
+  test      Test           @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId    String
+  text      String
+  type      QuestionType
+  options   AnswerOption[]
+  nextYesId String?
+  nextNoId  String?
+  createdAt DateTime       @default(now())
+  answers   GivenAnswer[]
+}
+
+model AnswerOption {
+  id         String        @id @default(cuid())
+  question   Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String
+  text       String
+  isCorrect  Boolean
+  createdAt  DateTime      @default(now())
+  answers    GivenAnswer[]
+}
+
+model TestSession {
+  id         String        @id @default(cuid())
+  test       Test          @relation(fields: [testId], references: [id], onDelete: Cascade)
+  testId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  createdAt  DateTime      @default(now())
+  finishedAt DateTime?
+  isFinished Boolean  @default(false) //session auto-closes on bulk submit
+  answers    GivenAnswer[]
+  stats      SessionStat[]
+}
+
+model SessionStat {
+  id        String       @id @default(cuid())
+  session   TestSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+  key       String
+  value     Int
+  createdAt DateTime     @default(now())
+
+  @@unique([sessionId, key]) // One metric = one row per session
+}
+
+model GivenAnswer {
+  id             String        @id @default(cuid())
+  session        TestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId      String
+  question       Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId     String
+  answerOption   AnswerOption? @relation(fields: [answerOptionId], references: [id], onDelete: SetNull)
+  answerOptionId String?
+  freeText       String?
+  createdAt      DateTime      @default(now())
+}
+
+model EmailLog {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  // optional: store raw body or rendered HTML
+  template  String?
+  // e.g. "SENT", "FAILED"
+  body      String?
+  // error message if failed
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  userId                String
+  plan                  Plan     @default(FREE)
+  startedAt             DateTime @default(now())
+  endsAt                DateTime
+  consultationsIncluded Int      @default(0)
+  consultationsUsed     Int      @default(0)
+  createdAt             DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}

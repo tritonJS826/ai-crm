@@ -1,0 +1,151 @@
+@use "src/styles/variables" as vars;
+
+.page {
+  max-width: vars.$container-max;
+  margin: 0 auto;
+  padding: vars.$pad-lg vars.$container-gap;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.header {
+  display: grid;
+  gap: vars.$gap-sm;
+}
+
+.title {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$title-size;
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 0;
+  color: vars.$color-text;
+  font-size: vars.$subtitle-size;
+  line-height: 1.5;
+}
+
+.card {
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+  padding: vars.$pad-lg;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.form {
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.label {
+  display: grid;
+  gap: 6px;
+  color: vars.$color-primary;
+  font-weight: 600;
+}
+
+.input {
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  padding: 12px 14px;
+  font-size: vars.$font-md;
+  color: vars.$color-primary;
+}
+
+.textarea {
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  padding: 12px 14px;
+  font-size: vars.$font-md;
+  color: vars.$color-primary;
+  resize: vertical;
+}
+
+.err {
+  color: vars.$color-error;
+  font-size: vars.$font-sm;
+}
+
+.actions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: vars.$gap-sm;
+  align-items: center;
+  justify-content: start;
+}
+
+.submit {
+  padding: 12px 18px;
+  border-radius: vars.$radius-pill;
+  border: 2px solid vars.$color-primary;
+  background: vars.$color-bg;
+  color: vars.$color-primary;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color vars.$transition-fast;
+}
+
+.submit:hover {
+  background: vars.$color-cta-bg;
+}
+
+.secondary {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: vars.$radius-pill;
+  border: 1px solid vars.$color-border;
+  text-decoration: none;
+  color: vars.$color-primary;
+}
+
+.result {
+  display: grid;
+  gap: 12px;
+}
+
+.resultTitle {
+  font-weight: 800;
+  color: vars.$color-primary;
+  font-size: vars.$font-xl;
+}
+
+.resultText {
+  color: vars.$color-text-secondary;
+}
+
+.resultActions {
+  display: grid;
+  grid-auto-flow: column;
+  gap: vars.$gap-sm;
+  align-items: center;
+  justify-content: start;
+}
+
+.linkBtn {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: vars.$radius-pill;
+  border: 1px solid vars.$color-border;
+  text-decoration: none;
+  color: vars.$color-primary;
+}
+
+@media (width <= 560px) {
+  .actions,
+  .resultActions {
+    grid-auto-flow: row;
+    justify-items: start;
+  }
+
+  .submit {
+    width: 100%;
+  }
+}

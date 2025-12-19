@@ -1,0 +1,43 @@
+services:
+  br-postgres-general:
+    build:
+      context: .
+      dockerfile: ./postgres/postgres-general.Dockerfile
+    ports:
+      - "5432:5432"
+    volumes:
+      - br-postgres-general:/var/lib/postgresql/data
+    env_file:
+      - ./pt-general/.env
+    networks:
+      - app-network
+
+  br-grafana:
+    build:
+      context: .
+      dockerfile: ./grafana/Dockerfile
+    ports:
+      - "9876:3000"
+    env_file:
+      - ./grafana/.env
+    networks:
+      - app-network
+
+  br-gateway:
+    image: nginx:1.24.0-alpine
+    ports:
+      - "5173:80"
+    volumes:
+      - ./gateway/local.nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  br-postgres-general:
+
+
+networks:
+  app-network:
+    driver: bridge

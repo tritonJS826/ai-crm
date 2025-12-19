@@ -1,0 +1,21 @@
+@use "src/styles/variables" as vars;
+
+.head {
+  display: grid;
+  gap: vars.$gap-sm;
+}
+
+.title {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$title-size;
+  line-height: 1.08;
+}
+
+.subtitle {
+  margin: 0;
+  color: vars.$color-text;
+  font-size: vars.$subtitle-size;
+  line-height: 1.5;
+}

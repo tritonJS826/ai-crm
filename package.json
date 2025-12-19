@@ -1,0 +1,41 @@
+{
+  "name": "phototours",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "web:start": "pnpm --filter pt-web run start",
+    "web:build": "pnpm --filter pt-web build",
+    "web:install": "pnpm --filter pt-web install",
+    "web:type-check": "pnpm --filter pt-web type-check",
+    "web:lint-staged": "pnpm --filter pt-web lint-staged",
+    "web:build-storybook": "pnpm --filter pt-web build-storybook",
+    "web:cypress:component:run": "pnpm --filter pt-web cypress:component:run",
+    "web:cypress:e2e:run": "pnpm --filter pt-web cypress:e2e:run",
+    "web:test": "pnpm --filter pt-web test",
+    "prepare": "husky",
+    "br-general-python:prisma:migrate": "pnpm --filter br-general-python prisma:migrate",
+    "br-general-python:prisma:generate": "pnpm --filter br-general-python prisma:generate",
+    "swag": "pnpm --stream --recursive --workspace-concurrency 100 swag",
+    "start": "pnpm  --stream --recursive --workspace-concurrency 100 start",
+    "build": "pnpm  --stream --recursive --workspace-concurrency 100 build",
+    "serve": "pnpm --stream --recursive --workspace-concurrency 100 serve",
+    "install:all": "pnpm --stream --recursive --workspace-concurrency 100 installAll",
+    "py:lint": "ruff check br-general-python",
+    "py:lint:fix": "ruff check --fix br-general-python",
+    "py:format": "ruff format br-general-python --diff"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "concurrently": "8.2.2",
+    "husky": "9.0.11"
+  },
+  "engines": {
+    "node": "22.7.0",
+    "pnpm": "9.8.0"
+  },
+  "packageManager": "pnpm@9.8.0"
+}

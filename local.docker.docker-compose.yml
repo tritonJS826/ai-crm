@@ -1,0 +1,51 @@
+services:
+  br-postgres-general:
+    build:
+      context: .
+      dockerfile: ./postgres/postgres-general.Dockerfile
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - br-postgres-general:/var/lib/postgresql/data
+    env_file:
+      - ./br-general-python/.env
+    networks:
+      - app-network
+
+  br-general-python:
+    build:
+      context: .
+      dockerfile: br-general-python/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - br-postgres-general
+    networks:
+      - app-network
+
+  br-web:
+    build:
+      context: .
+      dockerfile: ./pt-web/Dockerfile
+    ports:
+      - "127.0.0.1:5174:80"
+    networks:
+      - app-network
+
+  br-gateway:
+    image: nginx:1.24.0-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./gateway/local.docker.nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - app-network
+
+
+volumes:
+  br-postgres-general:
+
+networks:
+  app-network:
+    driver: bridge

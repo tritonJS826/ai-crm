@@ -1,0 +1,20 @@
+@use "src/styles/variables" as vars;
+
+.container {
+  max-width: 1220px;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+@media (width <= 980px) {
+  .container {
+    padding-inline: vars.$gap-md;
+  }
+}
+
+@media (width <= 420px) {
+  .container {
+    padding-inline: vars.$gap-sm;
+  }
+}

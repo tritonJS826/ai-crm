@@ -1,0 +1,88 @@
+{
+  "name": "pt-web",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host --port 5174",
+    "dev": "vite",
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "serve": "pnpm build && vite preview --port 5174 --host 0.0.0.0",
+    "lint-check": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "lint-staged": "lint-staged",
+    "format": "prettier --write \"**/*.{css,scss,json,md}\"",
+    "stylelint-fix": "stylelint \"**/*.scss\" --fix"
+  },
+  "dependencies": {
+    "axios": "1.11.0",
+    "jotai": "2.14.0",
+    "lucide-react": "0.544.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-router-dom": "7.7.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.32.0",
+    "@stylistic/eslint-plugin": "5.2.2",
+    "@stylistic/stylelint-plugin": "2.1.3",
+    "@types/node": "22.12.0",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "@typescript-eslint/eslint-plugin": "8.38.0",
+    "@typescript-eslint/parser": "8.38.0",
+    "@vitejs/plugin-react-swc": "3.10.2",
+    "envalid": "8.1.0",
+    "eslint": "9.32.0",
+    "eslint-plugin-jsdoc": "51.4.1",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-react-refresh": "0.4.20",
+    "eslint-plugin-simple-import-sort": "12.1.1",
+    "eslint-plugin-vitest": "0.5.4",
+    "globals": "16.3.0",
+    "husky": "9.0.11",
+    "lint-staged": "15.2.2",
+    "prettier": "3.3.3",
+    "sass": "1.89.2",
+    "stylelint": "16.8.1",
+    "stylelint-config-prettier-scss": "1.0.0",
+    "stylelint-config-standard-scss": "13.1.0",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "8.38.0",
+    "vite": "7.0.4",
+    "vite-plugin-eslint": "1.8.1",
+    "vite-plugin-pwa": "1.0.2",
+    "vite-tsconfig-paths": "5.1.4"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx}": [
+      "pnpm run lint-fix"
+    ],
+    "**/*.{scss,module.scss}": [
+      "pnpm run format",
+      "pnpm run stylelint-fix"
+    ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "extends": "../tsconfig.json",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "packageManager": "pnpm@9.8.0"
+}

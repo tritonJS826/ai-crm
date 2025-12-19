@@ -1,0 +1,32 @@
+@use "src/styles/variables" as vars;
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 18px;
+  font-weight: 700;
+  font-size: vars.$font-sm;
+  color: vars.$color-primary;
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-pill;
+  text-decoration: none;
+  transition: background-color vars.$transition-fast;
+
+  &:hover {
+    background: vars.$color-cta-bg;
+    color: vars.$color-primary-hover;
+  }
+}
+
+@media (width <= 600px) {
+  .wrap {
+    padding-inline: 12px;
+  }
+
+  .ctaButton {
+    width: 100%;
+  }
+}

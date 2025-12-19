@@ -1,0 +1,254 @@
+@use "src/styles/variables" as vars;
+
+$hero-container: 1220px;
+
+.hero {
+  width: 100%;
+  min-height: 960px;
+  background: url("src/assets/pictures/hero.avif") no-repeat 58% center;
+  background-size: cover;
+  display: grid;
+  align-items: stretch;
+}
+
+.heroInner {
+  max-width: $hero-container;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: vars.$container-gap;
+  min-height: inherit;
+  display: grid;
+  align-items: center;
+}
+
+.heroContent {
+  display: grid;
+  align-content: start;
+  gap: vars.$gap-lg;
+}
+
+.heroEyebrow {
+  margin: 120px 0 0;
+  color: vars.$color-bg;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(vars.$font-sm, 1.2vw, vars.$font-lg);
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(vars.$font-xl, 3.6vw, vars.$font-4xl);
+  color: vars.$color-bg;
+  font-weight: 800;
+  line-height: vars.$line-height-tight;
+}
+
+.heroSubtitle {
+  margin: 0;
+  font-size: clamp(vars.$font-md, 1.8vw, vars.$font-2xl);
+  color: vars.$color-bg;
+  line-height: vars.$line-height-base;
+  max-width: 52ch;
+}
+
+.heroList {
+  margin: vars.$gap-xs 0 0;
+  list-style: none;
+  display: grid;
+  gap: vars.$gap-sm;
+  font-size: clamp(vars.$font-sm, 1.4vw, vars.$font-md);
+}
+
+.heroListItem {
+  position: relative;
+  padding-left: 28px;
+  color: vars.$color-bg;
+  font-weight: 600;
+}
+
+.heroListItem::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translateY(1px);
+  color: vars.$color-bg;
+  font-weight: 700;
+}
+
+.heroCta {
+  display: grid;
+  gap: vars.$gap-sm;
+  margin-top: vars.$gap-sm;
+}
+
+.heroLabel {
+  margin: 0;
+  font-weight: 700;
+  color: vars.$color-bg;
+  font-size: clamp(vars.$font-sm, 1.4vw, vars.$font-md);
+}
+
+.heroControls {
+  max-width: 720px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: vars.$gap-sm;
+}
+
+.heroSelect {
+  appearance: none;
+  padding: vars.$pad-sm;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-bg;
+  font-weight: 600;
+  color: vars.$color-primary;
+  font-size: vars.$font-md;
+  min-height: 44px;
+}
+
+.heroButton {
+  padding: vars.$pad-sm vars.$pad-md;
+  border: none;
+  border-radius: vars.$radius-pill;
+  background: vars.$color-cta-bg;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$font-md;
+  transition:
+    transform 0.06s ease,
+    color vars.$transition-fast;
+  white-space: nowrap;
+  min-height: 44px;
+}
+
+.heroButton:hover {
+  transform: translateY(-1px);
+  color: vars.$color-primary-hover;
+}
+
+@media (width >= 2000px) {
+  .hero {
+    background-position: 50% 20%;
+  }
+}
+
+@media (width <= 1280px) {
+  .heroInner {
+    padding-inline: vars.$container-gap;
+  }
+}
+
+@media (width <= 1440px) {
+  .hero {
+    min-height: 900px;
+    background-position: 60% center;
+  }
+
+  .heroEyebrow {
+    margin-top: 90px;
+  }
+}
+
+@media (width <= 1080px) {
+  .hero {
+    min-height: 780px;
+    background-position: 62% center;
+  }
+
+  .heroContent {
+    gap: vars.$gap-md;
+  }
+
+  .heroControls {
+    max-width: 600px;
+  }
+}
+
+@media (width <= 860px) {
+  .hero {
+    min-height: 720px;
+    background-position: 68% center;
+  }
+
+  .heroEyebrow {
+    margin-top: 70px;
+  }
+
+  .heroControls {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+  }
+
+  .heroButton {
+    width: 100%;
+  }
+}
+
+@media (width <= 600px) {
+  .hero {
+    min-height: 640px;
+    background-position: 74% center;
+  }
+
+  .heroEyebrow {
+    margin-top: 44px;
+  }
+
+  .heroTitle {
+    font-size: clamp(vars.$font-lg, 8vw, vars.$font-3xl);
+  }
+
+  .heroSubtitle {
+    font-size: clamp(vars.$font-sm, 4.4vw, vars.$font-lg);
+  }
+
+  .heroListItem {
+    padding-left: 22px;
+  }
+}
+
+@media (width <= 420px) {
+  .hero {
+    min-height: 560px;
+  }
+
+  .heroContent {
+    gap: vars.$gap-sm;
+  }
+
+  .heroLabel {
+    line-height: 1.35;
+  }
+
+  .heroSelect {
+    font-size: vars.$font-sm;
+    padding: 10px 12px;
+  }
+
+  .heroButton {
+    font-size: vars.$font-sm;
+    padding: 10px 14px;
+  }
+}
+
+@media (width <= 340px) {
+  .hero {
+    min-height: 520px;
+    background-position: 82% center;
+  }
+
+  .heroEyebrow {
+    margin-top: 24px;
+  }
+
+  .heroTitle {
+    font-size: vars.$font-xl;
+  }
+
+  .heroSubtitle {
+    font-size: vars.$font-sm;
+  }
+}

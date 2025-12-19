@@ -1,0 +1,470 @@
+@use "src/styles/variables" as vars;
+
+.page {
+  --btn-h: 48px;
+  --btn-pad-x: 16px;
+  --btn-gap: 10px;
+  --chip-h: 40px;
+  --chip-pad-x: 12px;
+
+  max-width: vars.$container-max;
+  margin: 0 auto;
+  padding: vars.$pad-lg vars.$container-gap;
+  display: grid;
+  gap: vars.$gap-lg;
+}
+
+.grid {
+  display: grid;
+  gap: vars.$gap-lg;
+}
+
+.card {
+  position: relative;
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+  padding: vars.$pad-lg;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.userHeader,
+.cardTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--chip-h);
+}
+
+.cardTitle {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$font-xl;
+  line-height: 1.1;
+}
+
+.cardHead {
+  display: grid;
+  gap: 6px;
+}
+
+.cardSub {
+  color: vars.$color-text-secondary;
+  font-size: vars.$font-sm;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chip-h);
+  padding: 0 14px;
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  font-weight: 700;
+  border-radius: vars.$radius-pill;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast,
+    color vars.$transition-fast;
+}
+
+.logoutBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+  color: #fff;
+}
+
+.userList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.userItem {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: #fff;
+}
+
+.userLabel {
+  color: vars.$color-text-secondary;
+  font-weight: 700;
+}
+
+.userValue {
+  color: vars.$color-primary;
+  justify-self: start;
+}
+
+.editPlaceholder {
+  width: 24px;
+  height: 24px;
+}
+
+.editBtn {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: vars.$radius-pill;
+  transition: background-color vars.$transition-fast;
+}
+
+.editBtn:hover {
+  background: #f3f4f6;
+}
+
+.editIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.userInput {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  font: inherit;
+  color: vars.$color-primary;
+  box-sizing: border-box;
+}
+
+.inlineActions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.saveBtn,
+.cancelBtn {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: vars.$radius-pill;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast,
+    color vars.$transition-fast;
+}
+
+.saveBtn:hover,
+.cancelBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+  color: #fff;
+}
+
+.planHeader {
+  display: grid;
+  gap: vars.$gap-sm;
+}
+
+.planStatusInline {
+  display: flex;
+  align-items: center;
+  gap: vars.$gap-sm;
+}
+
+.planDefault,
+.planBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--chip-h);
+  padding: 0 var(--chip-pad-x);
+  border-radius: vars.$radius-pill;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.planDefault {
+  background: #f3f4f6;
+  color: vars.$color-primary;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.planBadge {
+  gap: 8px;
+  border: 1px solid transparent;
+}
+
+.planSupport {
+  color: #fff;
+  background: #0e7490;
+  border-color: #0e7490;
+}
+
+.planPrimaryActions {
+  display: grid;
+  gap: vars.$gap-sm;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.planSecondaryActions {
+  display: grid;
+  gap: vars.$gap-sm;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.planPrimaryActions > *,
+.planSecondaryActions > * {
+  min-height: var(--btn-h);
+  padding: 0 var(--btn-pad-x);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--btn-gap);
+  border-radius: vars.$radius-pill;
+  box-sizing: border-box;
+}
+
+.upgradeBtn {
+  border: 2px solid vars.$color-primary;
+  background: vars.$color-bg;
+  color: vars.$color-primary;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: vars.$radius-pill;
+  transition:
+    background-color vars.$transition-fast,
+    color vars.$transition-fast,
+    border-color vars.$transition-fast;
+}
+
+.upgradeBtn:hover {
+  background: vars.$color-cta-bg;
+  color: #fff;
+}
+
+.fakeBtn {
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: vars.$radius-pill;
+}
+
+.inlineIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.planBody {
+  display: grid;
+  gap: vars.$gap-sm;
+}
+
+.statActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: vars.$gap-sm;
+}
+
+.statBtn {
+  appearance: none;
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  border-radius: vars.$radius-pill;
+  padding: 14px 16px;
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  font-weight: 700;
+  cursor: default;
+}
+
+.statBtn:hover {
+  background: #fff;
+}
+
+.statBtnValue {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statBtnLabel {
+  font-size: vars.$font-sm;
+  color: vars.$color-text-secondary;
+}
+
+.planDesc {
+  color: vars.$color-text-secondary;
+}
+
+.ghostBtn {
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast,
+    color vars.$transition-fast;
+}
+
+.ghostBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+  color: #fff;
+}
+
+.btnDisabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid vars.$color-border;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table thead th {
+  background: #fafafa;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$font-sm;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: vars.$color-primary;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (width <= 640px) {
+  .planPrimaryActions {
+    grid-template-columns: 1fr;
+  }
+
+  .planSecondaryActions {
+    grid-template-columns: 1fr;
+  }
+
+  .statActions {
+    grid-template-columns: 1fr;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 1px solid vars.$color-border;
+  }
+
+  .table td {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 10px 12px;
+  }
+
+  .table tr td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: vars.$color-primary;
+    flex: 0 0 44%;
+    max-width: 220px;
+  }
+}
+
+@media (640px < width <= 991px) {
+  .planPrimaryActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planSecondaryActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 992px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .planPrimaryActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .planSecondaryActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1440px) {
+  .page {
+    --btn-h: 52px;
+    --chip-h: 44px;
+  }
+}

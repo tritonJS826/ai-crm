@@ -1,0 +1,24 @@
+apiVersion: 1
+providers:
+  - name: 'General'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: true
+    editable: false
+    allowUiUpdates: true
+    uid: 'general-dashboards'
+    options:
+      path: /var/lib/grafana/dashboards/general
+
+  - name: 'Databases'
+    orgId: 1
+    folder: 'Database Metrics'
+    folderUid: 'db'
+    type: file
+    disableDeletion: true
+    editable: false
+    allowUiUpdates: true
+    uid: 'database-dashboards'
+    options:
+      path: /var/lib/grafana/dashboards/databases

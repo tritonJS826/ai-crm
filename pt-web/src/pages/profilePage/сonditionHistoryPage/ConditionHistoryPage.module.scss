@@ -1,0 +1,118 @@
+@use "src/styles/variables" as vars;
+
+.page {
+  max-width: vars.$container-max;
+  margin: 0 auto;
+  padding: vars.$pad-lg vars.$container-gap;
+  display: grid;
+  gap: vars.$gap-lg;
+}
+
+.card {
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+  padding: vars.$pad-lg;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.errorMessage {
+  color: crimson;
+  font-weight: 600;
+}
+
+.sessionBlock {
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: #fff;
+  overflow: hidden;
+}
+
+.sessionSummary {
+  display: block;
+  padding: 12px 14px;
+  font-weight: 700;
+  color: vars.$color-primary;
+  cursor: pointer;
+  background: #fafafa;
+  user-select: none;
+}
+
+.sessionEmpty {
+  padding: 12px 14px;
+  color: vars.$color-text-secondary;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid vars.$color-border;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  background: vars.$color-bg;
+  font-weight: 700;
+  color: vars.$color-primary;
+}
+
+.table td {
+  color: vars.$color-text-secondary;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (width <= 640px) {
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid vars.$color-border;
+    border-radius: vars.$radius-md;
+    margin: 12px 0;
+    background: #fff;
+  }
+
+  .table td {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid vars.$color-border;
+    padding: 10px 12px;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: vars.$color-primary;
+    flex: 0 0 44%;
+    max-width: 220px;
+  }
+
+  .table tr td:last-child {
+    border-bottom: 0;
+  }
+}

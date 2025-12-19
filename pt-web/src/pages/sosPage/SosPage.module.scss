@@ -1,0 +1,194 @@
+@use "src/styles/variables" as vars;
+
+.page {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: vars.$pad-lg vars.$container-gap;
+  display: grid;
+  gap: vars.$gap-xl;
+}
+
+.card,
+.cardHero {
+  background: vars.$color-bg;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+  padding: vars.$pad-lg;
+  display: grid;
+  gap: vars.$gap-md;
+  width: 100%;
+  justify-items: center;
+  text-align: center;
+}
+
+.card {
+  border: 1px solid vars.$color-border;
+}
+
+.cardHero {
+  border: 2px solid vars.$color-error;
+}
+
+.cardTitle,
+.cardTitleHero {
+  margin: 0;
+  font-weight: 900;
+  color: vars.$color-primary;
+}
+
+.cardTitle {
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.cardTitleHero {
+  font-size: clamp(22px, 3.5vw, 32px);
+}
+
+.heroRow {
+  display: grid;
+  gap: vars.$gap-sm;
+  justify-items: center;
+  width: 100%;
+}
+
+.callNowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-radius: vars.$radius-pill;
+  border: 2px solid transparent;
+  font-weight: 900;
+  font-size: vars.$font-md;
+  text-decoration: none;
+  transition: all vars.$transition-fast;
+  width: 100%;
+  max-width: 420px;
+  cursor: pointer;
+}
+
+.callNowOk {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #fff;
+}
+
+.callNowOk:hover {
+  opacity: 0.9;
+}
+
+.callNowBad {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #fff;
+}
+
+.callNowBad:hover {
+  opacity: 0.9;
+}
+
+.callNowIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.secondaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: vars.$radius-pill;
+  border: 1px solid vars.$color-border;
+  background: vars.$color-bg;
+  color: vars.$color-primary;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast;
+  width: 100%;
+  max-width: 260px;
+}
+
+.secondaryBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+}
+
+.primaryAction {
+  padding: 14px 22px;
+  border-radius: vars.$radius-pill;
+  border: 2px solid vars.$color-primary;
+  background: vars.$color-bg;
+  color: vars.$color-primary;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color vars.$transition-fast;
+}
+
+.primaryAction:hover {
+  background: vars.$color-cta-bg;
+}
+
+.lead {
+  color: vars.$color-text-secondary;
+  margin: 0 auto;
+  max-width: 640px;
+}
+
+.topics {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: vars.$gap-md;
+  width: 100%;
+}
+
+.topic {
+  display: grid;
+  gap: 6px;
+  padding: vars.$pad-md;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-bg;
+  text-align: left;
+}
+
+.topicDesc {
+  margin: 0;
+  color: vars.$color-text-secondary;
+  font-size: vars.$font-sm;
+}
+
+.notice {
+  margin: 8px 0 0;
+  color: vars.$color-error;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (width >= 720px) {
+  .heroRow {
+    grid-auto-flow: column;
+    justify-content: center;
+    gap: vars.$gap-md;
+  }
+
+  .callNowBtn,
+  .secondaryBtn {
+    width: auto;
+  }
+}
+
+@media (width >= 860px) {
+  .topics {
+    grid-template-columns: repeat(3, 1fr);
+    gap: vars.$gap-lg;
+  }
+
+  .topic {
+    text-align: center;
+  }
+}

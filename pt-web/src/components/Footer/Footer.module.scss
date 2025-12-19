@@ -1,0 +1,145 @@
+@use "src/styles/variables" as vars;
+
+.footer {
+  width: 100%;
+  margin: 50px auto 0;
+  background: vars.$color-primary;
+  color: #fff;
+  padding-block: clamp(28px, 5vw, 56px) clamp(20px, 4vw, 36px);
+}
+
+.grid {
+  max-width: vars.$container-max;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 24px);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: clamp(20px, 3vw, 40px);
+}
+
+.col {
+  display: grid;
+  gap: 16px;
+  min-width: 150px;
+}
+
+.colTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cfe0ff;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.item {
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  display: inline-block;
+  text-decoration: none;
+  color: #fff;
+  font-size: 16px;
+  border-bottom: 1px solid transparent;
+  padding-block: 6px;
+}
+
+.link:hover {
+  color: vars.$color-cta-bg;
+  border-bottom-color: vars.$color-cta-bg;
+}
+
+.link:focus-visible {
+  outline: 2px solid vars.$color-cta-bg;
+  outline-offset: 2px;
+  border-bottom-color: transparent;
+}
+
+.divider {
+  height: 1px;
+  background: rgb(255 255 255 / 24%);
+  margin: clamp(20px, 4vw, 32px) 0 clamp(12px, 2.5vw, 20px);
+}
+
+.bottom {
+  max-width: vars.$container-max;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3vw, 28px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.socials {
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.socialItem {
+  margin: 0;
+  padding: 0;
+}
+
+.socialLink {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  border-radius: vars.$radius-md;
+  align-items: center;
+  justify-content: center;
+  background: rgb(255 255 255 / 10%);
+}
+
+.socialLink:hover {
+  background: rgb(255 255 255 / 18%);
+}
+
+.socialLink:focus-visible {
+  outline: 2px solid vars.$color-cta-bg;
+  outline-offset: 2px;
+}
+
+.socialIcon {
+  width: 18px;
+  height: 18px;
+  color: #fff;
+}
+
+.copy {
+  margin: 0;
+  font-size: 14px;
+  color: #e6ecff;
+  text-align: right;
+}
+
+@media (width <= 768px) {
+  .grid {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .bottom {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .copy {
+    text-align: center;
+  }
+}

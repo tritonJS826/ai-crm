@@ -1,0 +1,233 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  name          String?
+  password      String
+  role          Role     @default(CLIENT)
+  profilePicUrl String?
+  bio           String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  guide         Guide?
+  bookings      Booking[]
+  reviews       Review[]
+  photoDiaries  PhotoDiary[]
+  processedPhotos UserProcessedPhoto[]
+}
+
+model Guide {
+  id            Int      @id @default(autoincrement())
+  userId        Int      @unique
+  user          User     @relation(fields: [userId], references: [id])
+  experience    String?
+  specializations String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tours         Tour[]
+}
+
+model Tour {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String
+  region        String
+  difficulty    DifficultyLevel
+  price         Float
+  program       Json
+  guideId       Int
+  guide         Guide    @relation(fields: [guideId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  categories    Category[] @relation("TourCategories")
+  tags          Tag[]      @relation("TourTags")
+  dates         TourDate[]
+  reviews       Review[]
+  photos        Photo[]
+  videos        Video[]
+  materials     TourMaterial[]
+  bookings      Booking[]
+}
+
+model Category {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  
+  tours         Tour[]   @relation("TourCategories")
+}
+
+model Tag {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+
+  tours         Tour[]   @relation("TourTags")
+}
+
+model TourDate {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  date          DateTime
+  isAvailable   Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Review {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  rating        Int
+  comment       String?
+  createdAt     DateTime @default(now())
+}
+
+model Photo {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  url           String
+  description   String?
+  createdAt     DateTime @default(now())
+}
+
+model Video {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  url           String
+  description   String?
+  createdAt     DateTime @default(now())
+}
+
+model Booking {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  status        BookingStatus @default(PENDING)
+  participants  Int
+  totalPrice    Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  payments      Payment[]
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  bookingId     Int
+  booking       Booking  @relation(fields: [bookingId], references: [id])
+  amount        Float
+  paymentMethod PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model PromoCode {
+  id            Int      @id @default(autoincrement())
+  code          String   @unique
+  discount      Float
+  expiresAt     DateTime
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model TourMaterial {
+  id            Int      @id @default(autoincrement())
+  tourId        Int
+  tour          Tour     @relation(fields: [tourId], references: [id])
+  title         String
+  url           String
+  type          MaterialType
+  createdAt     DateTime @default(now())
+}
+
+model PhotoDiary {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  title         String
+  notes         String?
+  photos        Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model UserProcessedPhoto {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  rawUrl        String
+  processedUrl  String?
+  status        ProcessingStatus @default(UPLOADED)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum Role {
+  CLIENT
+  GUIDE
+  ADMIN
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  EXPERIENCED
+  PRO
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  WAITING_LIST
+}
+
+enum PaymentMethod {
+  STRIPE
+  PAYPAL
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum MaterialType {
+  PDF
+  VIDEO
+  ROUTE
+  TIPS
+}
+
+enum ProcessingStatus {
+  UPLOADED
+  PROCESSING
+  COMPLETED
+  FAILED
+}

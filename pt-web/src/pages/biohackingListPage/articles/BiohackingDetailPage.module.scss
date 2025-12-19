@@ -1,0 +1,181 @@
+@use "src/styles/variables" as vars;
+
+.wrap {
+  max-width: 1220px;
+  margin-inline: auto;
+  padding: clamp(16px, 3vw, 28px) vars.$container-gap;
+  display: grid;
+  gap: clamp(16px, 3vw, 28px);
+  background: #fff;
+}
+
+.figure {
+  margin: 0;
+  border-radius: vars.$radius;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgb(2 6 23 / 10%);
+}
+
+.cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+}
+
+.head {
+  display: grid;
+  gap: 10px;
+}
+
+.eyebrow {
+  margin: 0;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: vars.$color-primary;
+  font-size: clamp(12px, 1.2vw, 14px);
+}
+
+.title {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: clamp(28px, 4.2vw, 44px);
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 0;
+  color: vars.$color-text;
+  font-size: clamp(15px, 1.8vw, 18px);
+  line-height: 1.5;
+}
+
+.metaRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.back {
+  color: vars.$color-cta-bg;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.content {
+  display: grid;
+  gap: clamp(14px, 2.2vw, 22px);
+}
+
+.p {
+  margin: 0;
+  color: vars.$color-primary;
+  font-size: clamp(16px, 1.8vw, 18px);
+  line-height: 1.7;
+}
+
+.listBlock {
+  display: grid;
+  gap: 8px;
+}
+
+.h2 {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: clamp(18px, 2.2vw, 22px);
+}
+
+.ul {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 6px;
+}
+
+.li {
+  color: vars.$color-primary;
+  font-size: clamp(15px, 1.8vw, 17px);
+  line-height: 1.6;
+}
+
+.quote {
+  margin: 8px 0;
+  padding: 14px 16px;
+  border-left: 4px solid vars.$color-cta-bg;
+  background: #f8fbff;
+  border-radius: vars.$radius;
+}
+
+.q {
+  margin: 0;
+  font-style: italic;
+  color: vars.$color-primary;
+  font-size: clamp(16px, 1.8vw, 18px);
+  line-height: 1.7;
+}
+
+.caption {
+  margin-top: 8px;
+  color: vars.$color-text;
+  font-size: 13px;
+}
+
+.empty {
+  padding: 24px;
+  text-align: center;
+  color: vars.$color-text;
+  border: 1px dashed vars.$color-border;
+  border-radius: vars.$radius;
+}
+
+.btn {
+  margin: 50px 0;
+  display: inline-grid;
+  place-items: center;
+  min-height: 40px;
+  padding: 10px 16px;
+  border-radius: vars.$radius-pill;
+  background: vars.$color-cta-bg;
+  color: vars.$color-primary;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.paywall {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.paywallTitle {
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.paywallText {
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.paywallBtn {
+  display: inline-block;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 2px solid #0e7490;
+  color: #0e7490;
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.paywallBtn:hover {
+  background: #0e7490;
+  color: #fff;
+}
