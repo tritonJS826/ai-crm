@@ -3,6 +3,7 @@ import {createRoot} from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
 import {Provider as JotaiProvider} from "jotai";
 import {App} from "src/App";
+import {SocketProvider} from "src/providers/SocketProvider";
 import "src/styles/main.scss";
 
 const container = document.getElementById("root");
@@ -14,9 +15,11 @@ if (!container) {
 createRoot(container).render(
   <StrictMode>
     <BrowserRouter>
-      <JotaiProvider>
-        <App />
-      </JotaiProvider>
+      <SocketProvider>
+        <JotaiProvider>
+          <App />
+        </JotaiProvider>
+      </SocketProvider>
     </BrowserRouter>
   </StrictMode>,
 );
