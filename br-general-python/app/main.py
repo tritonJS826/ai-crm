@@ -5,7 +5,6 @@ from fastapi import FastAPI
 from app.db import db
 from app.api import api_router
 
-
 from fastapi.middleware.cors import CORSMiddleware
 from app.settings import settings
 
@@ -17,6 +16,7 @@ async def lifespan(app: FastAPI):
     yield
     # shutdown
     await db.disconnect()
+    # pass
 
 
 app = FastAPI(lifespan=lifespan)
@@ -33,5 +33,6 @@ app.add_middleware(
         "X-Requested-With",
     ],
 )
+
 
 app.include_router(api_router)
