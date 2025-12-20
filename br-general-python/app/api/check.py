@@ -4,13 +4,14 @@ from app.ws.events import ws_event
 from datetime import datetime
 import uuid
 
-router = APIRouter(prefix="/check", tags=["check"])
+router = APIRouter()
 
 
 @router.post("/ping")
 async def ping(payload: dict):
     await ws_manager.broadcast(ws_event("check_event", payload))
-    return {"status": "ok"}
+    timestamp = datetime.utcnow().isoformat()
+    return {"status": "ok", "timestamp": timestamp}
 
 
 @router.post("/inbound-message")
