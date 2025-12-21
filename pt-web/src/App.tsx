@@ -1,36 +1,27 @@
 import {useEffect} from "react";
-import {Footer} from "src/components/Footer/Footer";
-import {Header} from "src/components/Header/Header";
-import {useSocket} from "src/providers/SocketProvider";
-import {DevApi} from "src/services/health";
+import {Navigation} from "src/pages/Navigation";
+import {useOnSocketMessage} from "src/socket/useOnSocketMessage";
+import {useSocket} from "src/socket/useSocket";
 import "src/styles/_globals.scss";
 
 export function App() {
-  const {socket, isConnected, error} = useSocket();
+  const {isConnected, error, emit} = useSocket();
+  useOnSocketMessage("health_ping", (msg) => {
+    // eslint-disable-next-line no-console
+    console.log("Received:", msg);
+  });
 
-  // TODO: remove this temporal check server integration
   useEffect(() => {
-    DevApi.checkHealth();
-  }, []);
-
-  useEffect(() => {
-    if (!socket) {
-      return;
-    }
-
-    socket.on("message", (msg) => {
-      // eslint-disable-next-line no-console
-      console.log("Received:", msg);
+    emit("health_ping", {
+      v: 1,
+      type: "health_ping",
+      ts: new Date(),
+      data: {value: "someValue"},
     });
-
-    return () => {
-      socket.off("message");
-    };
-  }, [socket]);
+  }, []);
 
   return (
     <div className="page">
-      <Header />
       <main className="main">
         <p>
           {`Status: ${isConnected ? "Socket Connected" : "Disconnected"}`}
@@ -38,8 +29,8 @@ export function App() {
         <p>
           {`Socket Error: ${error}`}
         </p>
+        <Navigation />
       </main>
-      <Footer />
     </div>
   );
 }

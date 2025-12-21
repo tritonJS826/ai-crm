@@ -1,5 +1,8 @@
 import {io, ManagerOptions, Socket, SocketOptions} from "socket.io-client";
+import {WsEvent} from "src/socket/WsEvent";
+import {WsEventType} from "src/socket/WsEventTypes";
 
+type WSOptions = Partial<Pick<ManagerOptions & SocketOptions, "autoConnect">>;
 class SocketService {
 
   private static instance: SocketService;
@@ -16,12 +19,9 @@ class SocketService {
     return SocketService.instance;
   }
 
-  public connect(url: string, options?: Partial<ManagerOptions & SocketOptions>) {
+  public connect(url: string, options?: WSOptions) {
     if (!this.socket) {
-      this.socket = io(url, {
-        autoConnect: false,
-        ...options,
-      });
+      this.socket = io(url, options);
     }
 
     if (!this.socket.connected) {
@@ -39,6 +39,13 @@ class SocketService {
     if (this.socket) {
       this.socket.disconnect();
     }
+  }
+
+  public socketEmit<T>(messageType: WsEventType, payload: WsEvent<T>) {
+    if (!this.socket) {
+      return;
+    }
+    this.socket?.emit(messageType, payload);
   }
 
 }
