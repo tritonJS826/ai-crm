@@ -1,13 +1,13 @@
-import {atom, Getter, Setter} from "jotai";
-import {WsEventType} from "src/constants/wsEventTypes";
-import {socketService} from "src/services/socketService";
+import { atom, Getter, Setter } from "jotai";
+import { WsEventType } from "src/constants/wsEventTypes";
+import { socketService } from "src/services/websocketService";
 import {
   isConnectedAtom,
   socketAtom,
   socketErrorAtom,
 } from "src/socket/socketAtoms";
-import {WsEvent} from "src/socket/WsEvent";
-import {env} from "src/utils/env/env";
+import { WsEvent } from "src/socket/WsEvent";
+import { env } from "src/utils/env/env";
 
 export const connectSocketAtom = atom(null, (get, set) => {
   const existingSocket = get(socketAtom);
@@ -15,19 +15,19 @@ export const connectSocketAtom = atom(null, (get, set) => {
     return;
   }
 
-  const socket = socketService.connect(env.WS_PATH, {autoConnect: false});
+  const socket = socketService.connect(env.WS_PATH);
 
-  socket.on("connect", () => {
+  socket.onopen = (() => {
     set(isConnectedAtom, true);
     set(socketErrorAtom, null);
   });
 
-  socket.on("disconnect", () => {
+  socket.onclose = (() => {
     set(isConnectedAtom, false);
   });
 
-  socket.on("connect_error", (err) => {
-    set(socketErrorAtom, err.message);
+  socket.onerror = ((err) => {
+    set(socketErrorAtom, String(err));
     set(isConnectedAtom, false);
   });
 
@@ -45,8 +45,9 @@ export const emitSocketAtom = atom(
   <T>(
     _get: Getter,
     _set: Setter,
-    params: {messageType: WsEventType; payload: WsEvent<T>},
+    params: { messageType: WsEventType; payload: WsEvent<T> },
   ) => {
     socketService.socketEmit(params.messageType, params.payload);
   },
+
 );
