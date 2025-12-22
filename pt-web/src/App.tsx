@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {WsEventType} from "src/constants/wsEventTypes";
 import {Navigation} from "src/pages/Navigation";
 import {useOnSocketMessage} from "src/socket/useOnSocketMessage";
 import {useSocket} from "src/socket/useSocket";
@@ -6,15 +7,15 @@ import "src/styles/_globals.scss";
 
 export function App() {
   const {isConnected, error, emit} = useSocket();
-  useOnSocketMessage("health_ping", (msg) => {
+  useOnSocketMessage(WsEventType.HEALTH_PING, (msg) => {
     // eslint-disable-next-line no-console
     console.log("Received:", msg);
   });
 
   useEffect(() => {
-    emit("health_ping", {
+    emit(WsEventType.HEALTH_PING, {
       v: 1,
-      type: "health_ping",
+      type: WsEventType.HEALTH_PING,
       ts: new Date(),
       data: {value: "someValue"},
     });

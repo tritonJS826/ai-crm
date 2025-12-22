@@ -1,6 +1,6 @@
 import {io, ManagerOptions, Socket, SocketOptions} from "socket.io-client";
+import {WsEventType} from "src/constants/wsEventTypes";
 import {WsEvent} from "src/socket/WsEvent";
-import {WsEventType} from "src/socket/WsEventTypes";
 
 type WSOptions = Partial<Pick<ManagerOptions & SocketOptions, "autoConnect">>;
 class SocketService {

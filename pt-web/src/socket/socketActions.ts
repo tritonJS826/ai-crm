@@ -1,4 +1,5 @@
 import {atom, Getter, Setter} from "jotai";
+import {WsEventType} from "src/constants/wsEventTypes";
 import {socketService} from "src/services/socketService";
 import {
   isConnectedAtom,
@@ -6,7 +7,6 @@ import {
   socketErrorAtom,
 } from "src/socket/socketAtoms";
 import {WsEvent} from "src/socket/WsEvent";
-import {WsEventType} from "src/socket/WsEventTypes";
 import {env} from "src/utils/env/env";
 
 export const connectSocketAtom = atom(null, (get, set) => {

@@ -1,4 +1,4 @@
-import {WsEventType} from "src/socket/WsEventTypes";
+import {WsEventType} from "src/constants/wsEventTypes";
 
 export interface WsEvent<T> {
   v: number;
