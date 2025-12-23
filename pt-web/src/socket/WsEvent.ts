@@ -4,5 +4,5 @@ export interface WsEvent<T> {
   v: number;
   type: WsEventType;
   ts: Date;
-  data: Record<string, T>;
+  data: T;
 }

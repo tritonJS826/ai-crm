@@ -1,6 +1,5 @@
 import {useEffect} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
-import {WsEventType} from "src/constants/wsEventTypes";
 import {
   connectSocketAtom,
   disconnectSocketAtom,
@@ -16,8 +15,8 @@ export function useSocket() {
   const disconnect = useSetAtom(disconnectSocketAtom);
   const emitRaw = useSetAtom(emitSocketAtom);
 
-  const emit = <T>(messageType: WsEventType, payload: WsEvent<T>) => {
-    emitRaw({messageType, payload});
+  const emit = <T>(payload: WsEvent<T>) => {
+    emitRaw(payload);
   };
 
   useEffect(() => {
