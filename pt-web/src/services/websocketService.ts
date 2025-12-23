@@ -30,8 +30,6 @@ class SocketService {
     return this.socket;
   }
 
-  /* ---------------- CONNECT ---------------- */
-
   public connect(url: string) {
     if (
       this.socket &&
@@ -52,9 +50,6 @@ class SocketService {
     });
 
     this.socket.addEventListener("close", () => {
-      // eslint-disable-next-line no-console
-      console.log("WS closed");
-
       if (!this.isManuallyClosed) {
         this.tryReconnect();
       }
@@ -68,8 +63,6 @@ class SocketService {
     return this.socket;
   }
 
-  /* ---------------- DISCONNECT ---------------- */
-
   public disconnect() {
     this.isManuallyClosed = true;
 
@@ -81,8 +74,6 @@ class SocketService {
     this.messageQueue = [];
   }
 
-  /* ---------------- SEND ---------------- */
-
   public socketEmit<T>(payload: WsEvent<T>) {
     const message = JSON.stringify(payload);
 
@@ -92,7 +83,6 @@ class SocketService {
       return;
     }
 
-    // Queue message if not open
     this.messageQueue.push(message);
   }
 
@@ -109,25 +99,18 @@ class SocketService {
     }
   }
 
-  /* ---------------- RECONNECT ---------------- */
-
   private tryReconnect() {
     if (!this.url) {
       return;
     }
 
     if (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-      // eslint-disable-next-line no-console
-      console.error("WS reconnect failed");
-
       return;
     }
 
     this.reconnectAttempts++;
 
     setTimeout(() => {
-      // eslint-disable-next-line no-console
-      console.log(`WS reconnect attempt ${this.reconnectAttempts}`);
       if (!this.url) {
         return;
       }

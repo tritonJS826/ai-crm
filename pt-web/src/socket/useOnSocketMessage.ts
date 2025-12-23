@@ -5,8 +5,8 @@ import {socketAtom} from "src/socket/socketAtoms";
 import {WsEvent} from "src/socket/WsEvent";
 
 export function useOnSocketMessage<T>(
-  messageType: WsEventType,
-  onCb: (event: WsEvent<T>) => void,
+  eventType: WsEventType,
+  eventHandler: (event: WsEvent<T>) => void,
 ) {
   const socket = useAtomValue(socketAtom);
 
@@ -18,8 +18,8 @@ export function useOnSocketMessage<T>(
     const handler = (event: MessageEvent) => {
       const parsed = JSON.parse(event.data) as WsEvent<T>;
 
-      if (parsed.type === messageType) {
-        onCb(parsed);
+      if (parsed.type === eventType) {
+        eventHandler(parsed);
       }
     };
 
@@ -28,5 +28,5 @@ export function useOnSocketMessage<T>(
     return () => {
       socket.removeEventListener("message", handler);
     };
-  }, [socket, messageType, onCb]);
+  }, [socket, eventType, eventHandler]);
 }
