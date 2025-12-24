@@ -1,11 +1,21 @@
 import {apiClient} from "src/services/apiClient";
 
-type PaymentResponse = {
-  confirmation_url: string;
+type CheckoutSessionResponse = {
+  url: string;
 };
 
-export async function getPaymentLink(): Promise<string> {
-  const response = await apiClient.post<PaymentResponse>("/payment/create");
+/**
+ * TODO: integrate with backend Stripe Checkout endpoint.
+ * Expects backend to create a session and return redirect URL.
+ */
+export async function createCheckoutSession(params: { productId: string; conversationId?: string }): Promise<string> {
+  const search = new URLSearchParams();
+  search.set("product_id", params.productId);
+  if (params.conversationId) {
+    search.set("conv_id", params.conversationId);
+  }
 
-  return response.confirmation_url;
+  const response = await apiClient.get<CheckoutSessionResponse>(`/checkout?${search.toString()}`);
+
+  return response.url;
 }

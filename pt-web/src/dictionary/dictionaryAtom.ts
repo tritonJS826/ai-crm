@@ -2,15 +2,15 @@ import {atom} from "jotai";
 import {Language} from "src/dictionary/dictionaryLoader";
 import {localStorageWorker} from "src/globalServices/localStorageWorker";
 
-export const languageAtom = atom<Language>(
-  localStorageWorker.getItemByKey<Language>("language") ?? "en",
-);
+const storedLang = localStorageWorker.getItemByKey<Language>("language");
+const initialLang: Language = storedLang === "en" ? "en" : "en";
 
-// Optional: sync with localStorage
+export const languageAtom = atom<Language>(initialLang);
+
 export const languageAtomWithPersistence = atom(
   (get) => get(languageAtom),
-  (get, set, update: Language) => {
-    set(languageAtom, update);
-    localStorageWorker.setItemByKey("language", update);
+  (_get, set) => {
+    set(languageAtom, "en");
+    localStorageWorker.setItemByKey("language", "en");
   },
 );

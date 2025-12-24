@@ -4,6 +4,8 @@ import {AboutPage} from "src/pages/aboutUsPage/AboutUsPage";
 import {AuthPage} from "src/pages/authPage/AuthPage";
 import {HomePage} from "src/pages/homePage/Homepage";
 import {NotFoundPage} from "src/pages/notFoundPage/NotFoundPage";
+import {PaymentSuccessPage} from "src/pages/PaymentSuccessPage/PaymentSuccessPage";
+import {ProfilePage} from "src/pages/profilePage/ProfilePage";
 import {PATHS} from "src/routes/routes";
 
 export function Navigation(): ReactNode {
@@ -20,6 +22,14 @@ export function Navigation(): ReactNode {
       <Route
         path={PATHS.AUTH.PAGE}
         element={<AuthPage />}
+      />
+      <Route
+        path={PATHS.PAYMENT_SUCCESS}
+        element={<PaymentSuccessPage />}
+      />
+      <Route
+        path={PATHS.PROFILE.PAGE}
+        element={<ProfilePage />}
       />
       <Route
         path={PATHS.NOT_FOUND}

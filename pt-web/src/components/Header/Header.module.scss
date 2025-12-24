@@ -18,7 +18,6 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  position: relative;
 }
 
 .logo {
@@ -27,16 +26,14 @@
   text-decoration: none;
 }
 
-.logoImg {
-  position: relative;
-  bottom: 5px;
-  height: 40px;
-  width: auto;
-  display: block;
+.logoText {
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: vars.$color-primary;
 }
 
 .navCenter {
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,15 +43,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(22px, 3vw, 56px);
+  gap: clamp(16px, 2vw, 40px);
   list-style: none;
   margin: 0;
   padding: 0;
-  flex-wrap: nowrap;
 }
 
 .navItem {
-  position: relative;
   text-align: center;
 }
 
@@ -85,657 +80,63 @@
 
 .actions {
   justify-self: end;
-  justify-content: end;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
   gap: 14px;
 }
 
-.cta {
-  order: 2;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px 12px;
-  font-size: vars.$font-md;
-  font-weight: 700;
-  color: vars.$color-primary;
-  background-color: vars.$color-bg;
-  border: 2px solid vars.$color-primary;
-  border-radius: vars.$radius-pill;
-  text-decoration: none;
-  transition: background-color vars.$transition-fast;
-  cursor: pointer;
-}
-
-.cta:hover {
-  background-color: vars.$color-cta-bg;
-}
-
 .iconBtn {
-  order: 0;
   appearance: none;
   background: vars.$color-bg;
   border: 1px solid vars.$color-border;
-  color: vars.$color-primary;
-  width: 40px;
-  height: 40px;
+  border-radius: vars.$radius-pill;
+  padding: 10px 12px;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: vars.$radius-pill;
-  padding: 0;
-  cursor: pointer;
-  text-decoration: none;
   transition:
     background-color vars.$transition-fast,
-    color vars.$transition-fast,
-    border-color vars.$transition-fast;
+    transform vars.$transition-fast;
+  text-decoration: none;
 }
 
 .iconBtn:hover {
   background-color: vars.$color-cta-bg;
-  color: vars.$color-primary-hover;
-  border-color: vars.$color-cta-bg;
+  transform: translateY(-1px);
 }
 
 .icon {
-  width: 20px;
-  height: 20px;
-}
-
-.langWrap {
-  order: 1;
-  position: relative;
-}
-
-.langBtn {
-  appearance: none;
-  background: vars.$color-bg;
-  border: 1px solid vars.$color-border;
-  color: vars.$color-primary;
-  font-weight: 700;
-  font-size: vars.$font-sm;
-  border-radius: vars.$radius-pill;
-  height: 40px;
-  width: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition:
-    background-color vars.$transition-fast,
-    color vars.$transition-fast,
-    border-color vars.$transition-fast;
-}
-
-.langBtn:hover {
-  background-color: vars.$color-cta-bg;
-  color: vars.$color-primary-hover;
-  border-color: vars.$color-cta-bg;
-}
-
-.langMenu {
-  position: absolute;
-  top: calc(100% + 32px);
-  right: 0;
-  left: auto;
-  min-width: 150px;
-  padding: 6px;
-  background: vars.$color-bg;
-  border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-md;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
-  opacity: 0;
-  transform: translateY(-6px);
-  pointer-events: none;
-  transition:
-    opacity vars.$transition-base,
-    transform vars.$transition-base;
-  display: grid;
-  gap: 4px;
-  z-index: 120;
-}
-
-.langMenuOpen {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.langMenuSide {
-  top: 50%;
-  right: auto;
-  left: calc(100% + 8px);
-  transform: translateY(-50%);
-}
-
-.langOption {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  width: 100%;
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: vars.$radius-sm;
-  font-weight: 700;
-  color: vars.$color-primary;
-  cursor: pointer;
-  text-decoration: none;
-  transition:
-    background-color vars.$transition-fast,
-    color vars.$transition-fast;
-  display: block;
-}
-
-.langOption:hover {
-  background: vars.$color-cta-bg;
-  color: vars.$color-primary-hover;
-}
-
-.burgerWrap {
-  order: 3;
-  display: none;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  z-index: 51;
-  place-self: center end;
-}
-
-.burger {
-  appearance: none;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  display: grid;
-  place-items: center;
-  line-height: 0;
-}
-
-.burgerInner {
-  width: 24px;
+  width: 18px;
   height: 18px;
-  display: grid;
-  gap: 6px;
-}
-
-.burgerInner span {
-  display: block;
-  width: 24px;
-  height: 2px;
-  background: vars.$color-primary;
-  transition:
-    transform vars.$transition-fast,
-    opacity vars.$transition-fast;
-}
-
-.burgerOpen .burgerInner span:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.burgerOpen .burgerInner span:nth-child(2) {
-  opacity: 0;
-}
-
-.burgerOpen .burgerInner span:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
-}
-
-.dock {
-  position: absolute;
-  top: vars.$header-height;
-  left: 0;
-  right: 0;
-  z-index: 55;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition:
-    opacity vars.$transition-base,
-    transform vars.$transition-base;
-}
-
-.dockOpen {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.dockInner {
-  border-top: 1px solid vars.$color-border;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  background: vars.$color-bg;
-  box-shadow: 0 20px 40px rgb(0 0 0 / 14%);
-  padding: vars.$gap-lg vars.$gap-xl;
-  max-height: clamp(320px, 60vh, 620px);
-  overflow: hidden;
-}
-
-.dockInner::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 14px;
-  height: 14px;
-  background: vars.$color-bg;
-  border-left: 1px solid vars.$color-border;
-  border-top: 1px solid vars.$color-border;
-  box-shadow: -4px -4px 12px rgb(0 0 0 / 05%);
-}
-
-.dockHeading {
-  display: inline-block;
   color: vars.$color-primary;
-  font-weight: 800;
-  font-size: vars.$font-xl;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
-}
-
-.dockHeading:hover {
-  color: vars.$color-cta-bg;
-}
-
-.dockList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: vars.$gap-sm;
-}
-
-.dockLink {
-  display: block;
-  color: vars.$color-primary;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: vars.$font-md;
-  padding: 8px 4px;
-  border-bottom: 1px dashed transparent;
-  transition: color vars.$transition-fast;
-}
-
-.dockLink:hover {
-  color: vars.$color-cta-bg;
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(0 0 0 / 45%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity vars.$transition-base;
-  z-index: 150;
-}
-
-.backdropOpen {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.drawer {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  transform: translateX(-100%);
-  background: vars.$color-bg;
-  z-index: 200;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  transition: transform vars.$transition-base;
-}
-
-.drawerOpen {
-  transform: translateX(0);
-}
-
-.drawerHead {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: vars.$gap-md;
-  padding: vars.$pad-md;
-  border-bottom: 1px solid vars.$color-border;
-}
-
-.drawerLogo {
-  height: 36px;
-}
-
-.close {
-  appearance: none;
-  background: transparent;
-  border: 0;
-  font-size: 28px;
-  line-height: 1;
-  cursor: pointer;
-  color: vars.$color-primary;
-}
-
-.drawerScroll {
-  overflow: auto;
-}
-
-.drawerList {
-  list-style: none;
-  margin: 0;
-  padding: vars.$pad-md;
-  display: grid;
-  gap: vars.$gap-md;
-}
-
-.drawerLink {
-  display: block;
-  color: vars.$color-primary;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: vars.$font-lg;
-  padding: 10px 6px;
-}
-
-.drawerLink:hover {
-  color: vars.$color-primary-hover;
-}
-
-.drawerLinkBtn {
-  width: 100%;
-  text-align: left;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-
-.drawerLinkOpen {
-  color: vars.$color-cta-bg;
-}
-
-.chevron {
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid vars.$color-primary;
-  border-bottom: 2px solid vars.$color-primary;
-  transition: transform vars.$transition-fast;
-}
-
-.chevronRight {
-  transform: rotate(-45deg);
-}
-
-.chevronDown {
-  transform: rotate(45deg);
-}
-
-.submenu {
-  list-style: none;
-  margin: 0 0 4px;
-  padding: 0 0 0 8px;
-  overflow: hidden;
-  transition: max-height vars.$transition-base;
-  display: grid;
-  gap: 8px;
-  max-height: 0;
-}
-
-.submenuOpen {
-  max-height: 520px;
-}
-
-.submenuLink {
-  display: block;
-  font-size: vars.$font-md;
-  color: vars.$color-primary;
-  text-decoration: none;
-  padding: 6px 0;
-}
-
-.submenuLink:hover {
-  color: vars.$color-primary-hover;
-}
-
-.drawerFoot {
-  position: relative;
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.drawerFoot .iconBtn {
-  width: 40px;
-  height: 40px;
-}
-
-.drawerFoot .langWrap {
-  position: relative;
-}
-
-.drawerFoot .langMenu {
-  inset: auto auto calc(100% + 8px) 0;
-  transform: translateY(6px);
-}
-
-.drawerFoot .langMenuOpen {
-  transform: translateY(0);
-}
-
-.dockLayout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: vars.$gap-lg;
-  align-items: stretch;
-}
-
-.dockLists {
-  display: grid;
-  gap: vars.$gap-md;
-  align-content: start;
-  overflow: auto;
-  padding-right: vars.$pad-sm;
-}
-
-.dockListTwoCols {
-  column-count: 2;
-  column-gap: vars.$gap-lg;
-}
-
-.dockListTwoCols > li {
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
-  -moz-column-break-inside: avoid;
-  margin-bottom: 8px;
-}
-
-.dockPromo {
-  position: relative;
-  display: block;
-  border-radius: vars.$radius-lg;
-  overflow: hidden;
-  border: 1px solid vars.$color-border;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-  text-decoration: none;
-  height: 100%;
-  min-height: 220px;
-}
-
-.dockPromoImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform vars.$transition-fast;
-}
-
-.dockPromo:hover .dockPromoImg {
-  transform: scale(1.03);
-}
-
-.dockPromoTitle {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  font-weight: 800;
-  font-size: vars.$font-lg;
-  color: #fff;
-  text-shadow: 0 2px 12px rgb(0 0 0 / 60%);
-}
-
-.sosFloat {
-  position: fixed;
-  right: 25px;
-  bottom: 60px;
-  z-index: 140;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 14px;
-  color: vars.$color-primary;
-  background: vars.$color-bg;
-  border: 2px solid vars.$color-primary;
-  box-shadow: 0 10px 20px rgb(0 0 0 / 20%);
-  text-decoration: none;
-  letter-spacing: 0.5px;
-}
-
-.sosFloat:hover {
-  background: vars.$color-cta-bg;
-  color: vars.$color-primary-hover;
-  box-shadow: 0 12px 24px rgb(0 0 0 / 24%);
-  transform: translateY(-2px);
-}
-
-.sosFloat:active {
-  transform: translateY(1px);
-}
-
-@media (width >= 1800px) {
-  .navAll {
-    gap: clamp(18px, 2vw, 36px);
-  }
 }
 
 @media (width <= 1440px) {
-  .logoImg {
-    height: 38px;
+  .logoText {
+    font-size: 20px;
   }
 
   .navAll {
-    gap: clamp(18px, 2.6vw, 48px);
+    gap: clamp(14px, 2vw, 32px);
   }
 }
 
 @media (width <= 1100px) {
   .navCenter {
-    display: none;
-  }
-
-  .cta {
-    display: none;
-  }
-
-  .burgerWrap {
-    display: grid;
-  }
-
-  .dock {
-    display: none;
-  }
-
-  .actions {
-    gap: 10px;
-    justify-content: end;
-  }
-
-  .langBtn {
-    height: 40px;
-    padding: 0 12px;
-  }
-
-  .iconBtn {
-    width: 40px;
-    height: 40px;
-  }
-
-  .icon {
-    width: 18px;
-    height: 18px;
-  }
-
-  .langMenu {
-    top: calc(100% + 6px);
-    right: 0;
-  }
-
-  .dockLayout {
-    grid-template-columns: 1fr;
-  }
-
-  .dockListTwoCols {
-    column-count: 1;
-  }
-
-  .dockPromo {
-    min-height: 180px;
-  }
-
-  .sosFloat {
-    display: inline-flex;
+    justify-content: flex-start;
   }
 }
 
 @media (width <= 600px) {
-  .logoImg {
-    height: 32px;
+  .logoText {
+    font-size: 18px;
   }
 }
 
 @media (width <= 480px) {
-  .logoImg {
-    height: 28px;
-  }
-
-  .burger span {
-    width: 20px;
-  }
-
-  .langBtn {
-    height: 34px;
-    padding: 0 10px;
-  }
-
-  .iconBtn {
-    width: 34px;
-    height: 34px;
-  }
-
-  .icon {
-    width: 17px;
-    height: 17px;
+  .logoText {
+    font-size: 16px;
   }
 }

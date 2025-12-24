@@ -13,8 +13,7 @@
   margin-inline: auto;
   padding-inline: clamp(16px, 3vw, 24px);
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  justify-content: flex-start;
   gap: clamp(20px, 3vw, 40px);
 }
 
