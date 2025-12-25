@@ -1,16 +1,15 @@
 # FastAPI and dependencies
 fastapi==0.116.2
-pydantic==2.11
+pydantic==2.12
 
 # Pydantic settings management
-pydantic-settings>=2.5
+pydantic-settings>=2.5.0
 
 # ASGI server (to run FastAPI)
-uvicorn[standard]==0.30.6
+uvicorn[standard]==0.38.0
 
 # Async HTTP client
 httpx[http2]==0.28.1
-requests==2.32.3
 
 # Prisma ORM
 prisma==0.15.0
@@ -28,7 +27,8 @@ python-multipart==0.0.20
 python-jose[cryptography]==3.5.0
 passlib[argon2]==1.7.4
 
-# Payment processing
-yookassa==2.5.0
+# Stripe Payments
+stripe==14.1.0
 
-
+# OpenAI (TODO - for AI drafting)
+# openai>=1.0.0
