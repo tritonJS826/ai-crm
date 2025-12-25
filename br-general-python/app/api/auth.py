@@ -3,7 +3,8 @@ API endpoints for authentication.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from jose import JWTError
 
 from app.db import db
 from app.schemas.user import (
@@ -17,6 +18,39 @@ from app.schemas.user import (
 )
 from app.repositories.user_repository import user_repo
 from app.services.auth_service import AuthService
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/br-general/auth/login")
+
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+) -> dict:
+    """
+    Dependency to get current authenticated user from JWT token.
+
+    Returns dict with user_id.
+    Raises HTTPException 401 if token is invalid.
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = auth_service.decode_token(token)
+        if payload is None:
+            raise credentials_exception
+
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+
+        return {"user_id": user_id}
+
+    except JWTError:
+        raise credentials_exception
+
 
 router = APIRouter()
 

@@ -1,32 +1,48 @@
+"""
+Repository for User database operations.
+"""
+
+from prisma import Prisma
+
 from app.schemas.user import Role
 
 
 class UserRepository:
-    async def get_by_email(self, db, email: str):
+    """Repository for User CRUD operations."""
+
+    async def get_by_id(self, db: Prisma, user_id: str):
+        """Get user by ID."""
+        return await db.user.find_unique(where={"id": user_id})
+
+    async def get_by_email(self, db: Prisma, email: str):
+        """Get user by email address."""
         return await db.user.find_unique(where={"email": email})
 
     async def create_user(
-        self, db, email: str, hashed_password: str, name: str, role: Role
+        self,
+        db: Prisma,
+        email: str,
+        hashed_password: str,
+        name: str,
+        role: Role = Role.AGENT,
     ):
+        """Create a new user."""
         return await db.user.create(
             data={
                 "email": email,
                 "hashed_password": hashed_password,
                 "name": name,
-                "role": role,
+                "role": role.value,
             }
         )
 
-    async def get_personal_info(self, db, user_id: str):
-        return await db.user.find_unique(
-            where={"id": user_id},
-            include={
-                "subscriptions": {"orderBy": {"createdAt": "desc"}, "take": 1},
-                "sessions": {
-                    "include": {
-                        # include test info for each session
-                        "test": True,
-                    }
-                },
-            },
+    async def list_users(self, db: Prisma, limit: int = 100, offset: int = 0):
+        """List all users with pagination."""
+        return await db.user.find_many(
+            order={"createdAt": "desc"},
+            take=limit,
+            skip=offset,
         )
+
+
+user_repo = UserRepository()
