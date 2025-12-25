@@ -15,8 +15,10 @@ from app.schemas.webhook import NormalizedMessage
 
 logger = logging.getLogger(__name__)
 
-WHATSAPP_API_BASE = "https://graph.facebook.com/v17.0"
-MESSENGER_API_BASE = "https://graph.facebook.com/v17.0/me/messages"
+META_API_VERSION = "v24.0"
+META_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}"
+WHATSAPP_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}"
+MESSENGER_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}/me/messages"
 HTTP_TIMEOUT = 15.0
 
 
@@ -303,7 +305,7 @@ class MetaService:
             logger.error("Instagram token not configured")
             return None
 
-        url = f"https://graph.facebook.com/v17.0/me/messages?access_token={token}"
+        url = f"https://graph.facebook.com/{META_API_VERSION}/me/messages?access_token={token}"
 
         if not text:
             logger.warning("Instagram DM requires text content")
@@ -370,7 +372,7 @@ class MetaService:
             logger.error(f"{platform.value} token not configured")
             return None
 
-        url = f"https://graph.facebook.com/v17.0/me/messages?access_token={token}"
+        url = f"https://graph.facebook.com/{META_API_VERSION}/me/messages?access_token={token}"
 
         element: Dict[str, Any] = {
             "title": title,
