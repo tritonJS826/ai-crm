@@ -1,7 +1,7 @@
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
-export type Role = "ADMIN" | "AGENT";
+export type Role = "ADMIN" | "PATIENT";
 export type Token = { access_token: string; refresh_token: string; token_type: string };
 export type User = { id: string; email: string; name: string; role: Role };
 export type UserWithTokens = { user: User; tokens: Token };
@@ -47,10 +47,10 @@ export async function loginByEmail(email: string, password: string): Promise<voi
 }
 
 export async function registerByEmail(email: string, password: string, fullName: string): Promise<void> {
-  const res = await fetch(`${env.API_BASE_PATH}/auth/signup`, {
+  const res = await fetch(`${env.API_BASE_PATH}/auth/register`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({email, password, name: fullName, role: "AGENT"}),
+    body: JSON.stringify({email, password, name: fullName, role: "PATIENT"}),
   });
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
