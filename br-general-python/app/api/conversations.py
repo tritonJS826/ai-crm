@@ -213,7 +213,7 @@ async def send_product_to_conversation(
         )
 
     checkout_url = (
-        f"{settings.app_base_url}/br-general/checkout"
+        f"{settings.app_base_url}/br-general/stripe/checkout"
         f"?product_id={product.id}&conv_id={conversation_id}&contact_id={contact.id}"
     )
 

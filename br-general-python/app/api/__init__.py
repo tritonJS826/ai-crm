@@ -59,8 +59,8 @@ api_router.include_router(
 # Checkout (Stripe redirect)
 api_router.include_router(
     checkout.router,
-    prefix="/br-general",
-    tags=["checkout"],
+    prefix="/br-general/stripe",
+    tags=["stripe"],
 )
 
 # Webhooks (Meta + Stripe)
