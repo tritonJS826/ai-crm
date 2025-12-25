@@ -1,22 +1,95 @@
-# Description: API router for the application, including health, user, and email endpoints.
+"""
+API router configuration.
 
-from . import check, health, websocket, users, tests, payments, stats, email
+Registers all API endpoints with appropriate prefixes and tags.
+"""
+
 from fastapi import APIRouter
 
+from . import (
+    auth,
+    health,
+    users,
+    conversations,
+    products,
+    webhooks,
+    checkout,
+    ai,
+    websocket,
+)
 from ..settings import settings
 
 api_router = APIRouter()
-api_router.include_router(health.router, prefix="/br-general/health", tags=["health"])
-api_router.include_router(check.router, prefix="/br-general/check", tags=["check"])
 
-api_router.include_router(users.router, prefix="/br-general/users", tags=["users"])
-api_router.include_router(tests.router, prefix="/br-general/tests", tags=["tests"])
+# Health check
 api_router.include_router(
-    payments.router, prefix="/br-general/payment", tags=["payments"]
+    health.router,
+    prefix="/br-general/health",
+    tags=["health"],
 )
-api_router.include_router(stats.router, prefix="/br-general/stats", tags=["stats"])
-# For production, disable email send and user create endpoints
-if settings.env_type != "prod":
-    api_router.include_router(email.router, prefix="/br-general/email", tags=["email"])
 
-api_router.include_router(websocket.router, prefix="/br-general/ws", tags=["websocket"])
+# Authentication
+api_router.include_router(
+    auth.router,
+    prefix="/br-general/auth",
+    tags=["auth"],
+)
+
+# Users
+api_router.include_router(
+    users.router,
+    prefix="/br-general/users",
+    tags=["users"],
+)
+
+# Conversations and Messages
+api_router.include_router(
+    conversations.router,
+    prefix="/br-general/conversations",
+    tags=["conversations"],
+)
+
+# Products Catalog
+api_router.include_router(
+    products.router,
+    prefix="/br-general/products",
+    tags=["products"],
+)
+
+# Checkout (Stripe redirect)
+api_router.include_router(
+    checkout.router,
+    prefix="/br-general",
+    tags=["checkout"],
+)
+
+# Webhooks (Meta + Stripe)
+api_router.include_router(
+    webhooks.router,
+    prefix="/br-general/webhooks",
+    tags=["webhooks"],
+)
+
+# AI Drafting
+api_router.include_router(
+    ai.router,
+    prefix="/br-general/ai",
+    tags=["ai"],
+)
+
+# Email (only in dev mode)
+if settings.env_type != "prod":
+    from . import email
+
+    api_router.include_router(
+        email.router,
+        prefix="/br-general/email",
+        tags=["email"],
+    )
+
+# WebSocket
+api_router.include_router(
+    websocket.router,
+    prefix="/br-general/ws",
+    tags=["websocket"],
+)
