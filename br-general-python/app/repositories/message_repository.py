@@ -8,7 +8,6 @@ from prisma import Prisma
 from prisma.models import Message
 
 from app.schemas.contact import Platform
-from app.schemas.conversation import MessageDirection
 
 
 class MessageRepository:
@@ -18,17 +17,17 @@ class MessageRepository:
         self,
         db: Prisma,
         conversation_id: str,
-        direction: MessageDirection,
         platform: Platform,
+        from_user_id: Optional[str] = None,
         text: Optional[str] = None,
         media_url: Optional[str] = None,
         remote_message_id: Optional[str] = None,
     ) -> Message:
-        """Create a new message."""
+        """Create a new message. from_user_id=None means from agent."""
         return await db.message.create(
             data={
                 "conversationId": conversation_id,
-                "direction": direction.value,
+                "fromUserId": from_user_id,
                 "platform": platform.value,
                 "text": text,
                 "mediaUrl": media_url,

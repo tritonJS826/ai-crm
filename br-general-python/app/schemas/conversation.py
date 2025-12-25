@@ -18,19 +18,12 @@ class ConversationStatus(str, Enum):
     CLOSED = "CLOSED"
 
 
-class MessageDirection(str, Enum):
-    """Message direction options."""
-
-    IN = "IN"
-    OUT = "OUT"
-
-
 class MessageOut(BaseModel):
     """Schema for message data in responses."""
 
     id: str
     conversation_id: str = Field(..., alias="conversationId")
-    direction: MessageDirection
+    from_user_id: Optional[str] = Field(default=None, alias="fromUserId")
     platform: Platform
     text: Optional[str] = None
     media_url: Optional[str] = Field(default=None, alias="mediaUrl")

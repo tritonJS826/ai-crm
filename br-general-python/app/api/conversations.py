@@ -22,7 +22,6 @@ from app.schemas.conversation import (
     SendMessageRequest,
     SendMessageResponse,
     MessageOut,
-    MessageDirection,
 )
 from app.schemas.contact import ContactOptOutUpdate, Platform
 
@@ -239,8 +238,8 @@ async def send_product_to_conversation(
     message = await message_repo.create(
         db,
         conversation_id=conversation_id,
-        direction=MessageDirection.OUT,
         platform=platform,
+        from_user_id=None,  # from agent
         text=f"[Product Card] {product.title} - {price_str}",
         remote_message_id=remote_id,
     )

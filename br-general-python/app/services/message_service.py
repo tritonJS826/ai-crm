@@ -7,7 +7,6 @@ from typing import Optional
 
 from app.db import db
 from app.schemas.contact import Platform
-from app.schemas.conversation import MessageDirection
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
@@ -64,8 +63,8 @@ class MessageService:
         message = await message_repo.create(
             db,
             conversation_id=conversation.id,
-            direction=MessageDirection.IN,
             platform=platform,
+            from_user_id=contact.id,  # from contact
             text=text,
             media_url=media_url,
             remote_message_id=remote_message_id,
@@ -80,7 +79,7 @@ class MessageService:
             {
                 "conversation_id": conversation.id,
                 "message_id": message.id,
-                "direction": "in",
+                "from_user_id": contact.id,
                 "platform": platform.value,
                 "text": text,
             },
@@ -134,8 +133,8 @@ class MessageService:
         message = await message_repo.create(
             db,
             conversation_id=conversation_id,
-            direction=MessageDirection.OUT,
             platform=platform,
+            from_user_id=None,  # from agent
             text=text,
             media_url=image_url,
             remote_message_id=remote_message_id,
@@ -150,7 +149,7 @@ class MessageService:
             {
                 "conversation_id": conversation_id,
                 "message_id": message.id,
-                "direction": "out",
+                "from_user_id": None,
                 "platform": platform.value,
                 "text": text,
             },
