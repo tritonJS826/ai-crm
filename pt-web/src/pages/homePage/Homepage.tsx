@@ -1,8 +1,25 @@
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
+
+type HomeDictionary = {
+  title: string;
+};
+
 export function HomePage() {
-  return (
-    <section aria-label="Home">
+  const dictionary = useDictionary(DictionaryKey.HOME) as HomeDictionary | null;
+
+  if (!dictionary) {
+    return (
       <div>
-        Home placeholder
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+    <section aria-label={dictionary.title}>
+      <div>
+        {dictionary.title}
       </div>
     </section>
   );

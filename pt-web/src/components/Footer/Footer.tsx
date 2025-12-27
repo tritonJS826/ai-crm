@@ -70,7 +70,7 @@ export function Footer() {
         </ul>
 
         <p className={styles.copy}>
-          © 2026 AI-CRM.
+          {dictionary.copyright}
         </p>
       </div>
     </footer>

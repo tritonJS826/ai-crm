@@ -1,8 +1,25 @@
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
+
+type AboutDictionary = {
+  title: string;
+};
+
 export function AboutPage() {
-  return (
-    <section aria-label="About">
+  const dictionary = useDictionary(DictionaryKey.ABOUT) as AboutDictionary | null;
+
+  if (!dictionary) {
+    return (
       <div>
-        About placeholder
+        Loading...
+      </div>
+    );
+  }
+
+  return (
+    <section aria-label={dictionary.title}>
+      <div>
+        {dictionary.title}
       </div>
     </section>
   );

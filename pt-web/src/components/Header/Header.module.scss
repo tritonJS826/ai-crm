@@ -18,6 +18,7 @@
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
+  position: relative;
 }
 
 .logo {
@@ -26,14 +27,16 @@
   text-decoration: none;
 }
 
-.logoText {
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: 0.06em;
-  color: vars.$color-primary;
+.logoImg {
+  position: relative;
+  bottom: 5px;
+  height: 40px;
+  width: auto;
+  display: block;
 }
 
 .navCenter {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -43,13 +46,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(16px, 2vw, 40px);
+  gap: clamp(22px, 3vw, 56px);
   list-style: none;
   margin: 0;
   padding: 0;
+  flex-wrap: nowrap;
 }
 
 .navItem {
+  position: relative;
   text-align: center;
 }
 
@@ -80,6 +85,7 @@
 
 .actions {
   justify-self: end;
+  justify-content: end;
   display: grid;
   grid-auto-flow: column;
   align-items: center;
@@ -87,56 +93,367 @@
 }
 
 .iconBtn {
+  order: 0;
   appearance: none;
   background: vars.$color-bg;
   border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-pill;
-  padding: 10px 12px;
-  cursor: pointer;
+  color: vars.$color-primary;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  border-radius: vars.$radius-pill;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
   transition:
     background-color vars.$transition-fast,
-    transform vars.$transition-fast;
-  text-decoration: none;
+    color vars.$transition-fast,
+    border-color vars.$transition-fast;
 }
 
 .iconBtn:hover {
   background-color: vars.$color-cta-bg;
-  transform: translateY(-1px);
+  color: vars.$color-primary-hover;
+  border-color: vars.$color-cta-bg;
 }
 
 .icon {
-  width: 18px;
+  width: 20px;
+  height: 20px;
+}
+
+.langWrap {
+  order: 1;
+  position: relative;
+}
+
+.langBtn {
+  appearance: none;
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  color: vars.$color-primary;
+  font-weight: 700;
+  font-size: vars.$font-sm;
+  border-radius: vars.$radius-pill;
+  height: 40px;
+  width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color vars.$transition-fast,
+    color vars.$transition-fast,
+    border-color vars.$transition-fast;
+}
+
+.langBtn:hover {
+  background-color: vars.$color-cta-bg;
+  color: vars.$color-primary-hover;
+  border-color: vars.$color-cta-bg;
+}
+
+.langMenu {
+  position: absolute;
+  top: calc(100% + 32px);
+  right: 0;
+  left: auto;
+  min-width: 150px;
+  padding: 6px;
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 14%);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity vars.$transition-base,
+    transform vars.$transition-base;
+  display: grid;
+  gap: 4px;
+  z-index: 120;
+}
+
+.langMenuOpen {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.langMenuSide {
+  top: 50%;
+  right: auto;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+}
+
+.langOption {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: vars.$radius-sm;
+  font-weight: 700;
+  color: vars.$color-primary;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background-color vars.$transition-fast,
+    color vars.$transition-fast;
+  display: block;
+}
+
+.langOption:hover {
+  background: vars.$color-cta-bg;
+  color: vars.$color-primary-hover;
+}
+
+.burgerWrap {
+  order: 3;
+  display: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  z-index: 51;
+  place-self: center end;
+}
+
+.burger {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.burgerInner {
+  width: 24px;
   height: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.burgerInner span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: vars.$color-primary;
+  transition:
+    transform vars.$transition-fast,
+    opacity vars.$transition-fast;
+}
+
+.burgerOpen .burgerInner span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.burgerOpen .burgerInner span:nth-child(2) {
+  opacity: 0;
+}
+
+.burgerOpen .burgerInner span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 45%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity vars.$transition-base;
+  z-index: 150;
+}
+
+.backdropOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  transform: translateX(-100%);
+  background: vars.$color-bg;
+  z-index: 200;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  transition: transform vars.$transition-base;
+}
+
+.drawerOpen {
+  transform: translateX(0);
+}
+
+.drawerHead {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: vars.$gap-md;
+  padding: vars.$pad-md;
+  border-bottom: 1px solid vars.$color-border;
+}
+
+.drawerLogo {
+  height: 36px;
+}
+
+.close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
   color: vars.$color-primary;
 }
 
+.drawerScroll {
+  overflow: auto;
+}
+
+.drawerList {
+  list-style: none;
+  margin: 0;
+  padding: vars.$pad-md;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.drawerLink {
+  display: block;
+  color: vars.$color-primary;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: vars.$font-lg;
+  padding: 10px 6px;
+}
+
+.drawerLink:hover {
+  color: vars.$color-primary-hover;
+}
+
+.drawerFoot {
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawerFoot .iconBtn {
+  width: 40px;
+  height: 40px;
+}
+
+.drawerFoot .langWrap {
+  position: relative;
+}
+
+.drawerFoot .langMenu {
+  inset: auto auto calc(100% + 8px) 0;
+  transform: translateY(6px);
+}
+
+.drawerFoot .langMenuOpen {
+  transform: translateY(0);
+}
+
+@media (width >= 1800px) {
+  .navAll {
+    gap: clamp(18px, 2vw, 36px);
+  }
+}
+
 @media (width <= 1440px) {
-  .logoText {
-    font-size: 20px;
+  .logoImg {
+    height: 38px;
   }
 
   .navAll {
-    gap: clamp(14px, 2vw, 32px);
+    gap: clamp(18px, 2.6vw, 48px);
   }
 }
 
 @media (width <= 1100px) {
   .navCenter {
-    justify-content: flex-start;
+    display: none;
+  }
+
+  .burgerWrap {
+    display: grid;
+  }
+
+  .actions {
+    gap: 10px;
+    justify-content: end;
+  }
+
+  .langBtn {
+    height: 40px;
+    padding: 0 12px;
+  }
+
+  .iconBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .langMenu {
+    top: calc(100% + 6px);
+    right: 0;
   }
 }
 
 @media (width <= 600px) {
-  .logoText {
-    font-size: 18px;
+  .logoImg {
+    height: 32px;
   }
 }
 
 @media (width <= 480px) {
-  .logoText {
-    font-size: 16px;
+  .logoImg {
+    height: 28px;
+  }
+
+  .burger span {
+    width: 20px;
+  }
+
+  .langBtn {
+    height: 34px;
+    padding: 0 10px;
+  }
+
+  .iconBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .icon {
+    width: 17px;
+    height: 17px;
   }
 }
