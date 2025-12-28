@@ -1,7 +1,7 @@
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
-export type Role = "PATIENT" | "DOCTOR";
+export type Role = "ADMIN" | "PATIENT";
 export type Token = { access_token: string; refresh_token: string; token_type: string };
 export type User = { id: string; email: string; name: string; role: Role };
 export type UserWithTokens = { user: User; tokens: Token };
