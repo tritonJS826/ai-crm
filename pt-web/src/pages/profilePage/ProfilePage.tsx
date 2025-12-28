@@ -137,25 +137,8 @@ function InlineEditable({
   );
 }
 
-type ProfileDictionary = {
-  page: { title: string; subtitle: string; logoutBtn: string };
-  user: {
-    title: string;
-    name: string;
-    preferredContactEmail: string;
-    city: string;
-    phone: string;
-    language: string;
-    preferredContactPhone: string;
-  };
-  actions: {
-    save: string;
-    cancel: string;
-  };
-};
-
 export function ProfilePage() {
-  const dictionary = useDictionary(DictionaryKey.PROFILE) as ProfileDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.PROFILE);
   const navigate = useNavigate();
 
   const accessTokens = useAtomValue(accessTokenAtomWithPersistence);

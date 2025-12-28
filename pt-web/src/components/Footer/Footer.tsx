@@ -14,8 +14,13 @@ const SOCIALS = [
 
 export function Footer() {
   const dictionary = useDictionary(DictionaryKey.FOOTER);
+
   if (!dictionary) {
-    return null;
+    return (
+      <div>
+        Loading...
+      </div>
+    );
   }
 
   return (

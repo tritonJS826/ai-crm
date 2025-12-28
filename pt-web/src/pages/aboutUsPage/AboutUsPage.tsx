@@ -1,12 +1,8 @@
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 
-type AboutDictionary = {
-  title: string;
-};
-
 export function AboutPage() {
-  const dictionary = useDictionary(DictionaryKey.ABOUT) as AboutDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.ABOUT);
 
   if (!dictionary) {
     return (

@@ -2,7 +2,7 @@ import React, {useEffect, /* useRef, */ useState} from "react";
 import {Link, NavLink} from "react-router-dom";
 import {useAtom, useAtomValue} from "jotai";
 import {UserRound} from "lucide-react";
-import logo from "src/assets/AICRM.png";
+import logo from "src/assets/AICRM.avif";
 import {LEFT_LINK_KEYS, MenuKey} from "src/components/Header/header.config";
 import {languageAtomWithPersistence} from "src/dictionary/dictionaryAtom";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
@@ -11,21 +11,8 @@ import {PATHS} from "src/routes/routes";
 import {accessTokenAtomWithPersistence} from "src/state/authAtom";
 import styles from "src/components/Header/Header.module.scss";
 
-type HeaderDictionary = {
-  nav: {
-    about: string;
-    profile: string;
-    ariaPrimary: string;
-    ariaHome: string;
-    ariaOpenMenu: string;
-    ariaMenu: string;
-    ariaCloseMenu: string;
-  };
-  lang: { en: string; ru: string };
-};
-
 export function Header() {
-  const dictionary = useDictionary(DictionaryKey.HEADER) as HeaderDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.HEADER);
   const [lang] = useAtom(languageAtomWithPersistence);
 
   const [drawerOpen, setDrawerOpen] = useState(false);

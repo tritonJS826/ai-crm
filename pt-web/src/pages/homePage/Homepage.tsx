@@ -1,12 +1,8 @@
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 
-type HomeDictionary = {
-  title: string;
-};
-
 export function HomePage() {
-  const dictionary = useDictionary(DictionaryKey.HOME) as HomeDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.HOME);
 
   if (!dictionary) {
     return (

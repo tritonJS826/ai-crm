@@ -1,7 +1,7 @@
 export const notFoundDict = {
-  title: "Страница не найдена",
-  description: "Страница, которую вы ищете, не существует.",
-  button: "Перейти на главную",
+  title: "",
+  description: "",
+  goHome: "",
 } as const;
 
 export type NotFoundDictRu = typeof notFoundDict;
