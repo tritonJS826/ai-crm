@@ -1,6 +1,6 @@
 # Description: API router for the application, including health, user, and email endpoints.
 
-from . import auth, check, health, websocket, users, tests, payments, stats, email
+from . import check, health, websocket, users, tests, payments, stats, email
 from fastapi import APIRouter
 
 from ..settings import settings
@@ -20,4 +20,3 @@ if settings.env_type != "prod":
     api_router.include_router(email.router, prefix="/br-general/email", tags=["email"])
 
 api_router.include_router(websocket.router, prefix="/br-general/ws", tags=["websocket"])
-api_router.include_router(auth.router, prefix="/br-general/auth", tags=["auth"])
