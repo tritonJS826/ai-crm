@@ -4,7 +4,7 @@ import {WsEventType} from "src/constants/wsEventTypes";
 import {socketAtom} from "src/socket/socketAtoms";
 import {WsEvent} from "src/socket/WsEvent";
 
-export function useOnSocketMessage<T>(
+export function useSubscribe<T>(
   eventType: WsEventType,
   eventHandler: (event: WsEvent<T>) => void,
 ) {

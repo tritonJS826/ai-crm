@@ -176,7 +176,15 @@ export default [
       "react/jsx-first-prop-new-line": ["error", "multiprop"],
       "react/no-unknown-property": "error",
       "react/self-closing-comp": "error",
-      "react/jsx-wrap-multilines": ["error", { return: "parens-new-line" }],
+      "react/jsx-wrap-multilines": ["error", {
+        declaration: 'parens-new-line',
+        assignment: 'parens-new-line',
+        return: 'parens-new-line',
+        arrow: 'parens-new-line',
+        condition: 'parens-new-line',
+        logical: 'parens-new-line',
+        prop: 'parens-new-line'
+      }],
       "react/jsx-one-expression-per-line": "error",
 
       // Padding
