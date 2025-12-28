@@ -62,12 +62,16 @@ export function ConditionsListPage() {
                   {item.title}
                 </Link>
               </h2>
-              {item.subtitle && <p className={styles.cardSubtitle}>
-                {item.subtitle}
-              </p>}
-              {item.excerpt && <p className={styles.cardText}>
-                {item.excerpt}
-              </p>}
+              {item.subtitle && (
+                <p className={styles.cardSubtitle}>
+                  {item.subtitle}
+                </p>
+              )}
+              {item.excerpt && (
+                <p className={styles.cardText}>
+                  {item.excerpt}
+                </p>
+              )}
             </div>
             <div className={styles.cardFoot}>
               <Button to={buildPath.conditionsDetail(item.id)}>

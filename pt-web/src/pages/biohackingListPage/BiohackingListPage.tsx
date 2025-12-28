@@ -56,9 +56,11 @@ export function BiohackingListPage() {
             key={articleItem.id}
             className={styles.card}
           >
-            {articleItem.isPaid && <span className={styles.lockBadge}>
-              PRO
-            </span>}
+            {articleItem.isPaid && (
+              <span className={styles.lockBadge}>
+                PRO
+              </span>
+            )}
 
             {articleItem.img && (
               <Link
@@ -84,12 +86,16 @@ export function BiohackingListPage() {
                 </Link>
               </h2>
 
-              {articleItem.subtitle && <p className={styles.cardSubtitle}>
-                {articleItem.subtitle}
-              </p>}
-              {articleItem.excerpt && <p className={styles.cardText}>
-                {articleItem.excerpt}
-              </p>}
+              {articleItem.subtitle && (
+                <p className={styles.cardSubtitle}>
+                  {articleItem.subtitle}
+                </p>
+              )}
+              {articleItem.excerpt && (
+                <p className={styles.cardText}>
+                  {articleItem.excerpt}
+                </p>
+              )}
             </div>
 
             <div className={styles.cardFoot}>

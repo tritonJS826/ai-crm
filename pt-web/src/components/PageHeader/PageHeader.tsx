@@ -14,9 +14,11 @@ export function PageHeader({title, subtitle}: PageHeaderProps) {
       >
         {title}
       </h1>
-      {subtitle && <p className={styles.subtitle}>
-        {subtitle}
-      </p>}
+      {subtitle && (
+        <p className={styles.subtitle}>
+          {subtitle}
+        </p>
+      )}
     </header>
   );
 }

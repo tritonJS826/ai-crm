@@ -56,9 +56,11 @@ export function ConditionArticleDetailPage() {
           {article.title}
         </h1>
       )}
-      {article.subtitle && <p className={styles.subtitle}>
-        {article.subtitle}
-      </p>}
+      {article.subtitle && (
+        <p className={styles.subtitle}>
+          {article.subtitle}
+        </p>
+      )}
 
       <div className={styles.content}>
         {content.map((node, i) => {

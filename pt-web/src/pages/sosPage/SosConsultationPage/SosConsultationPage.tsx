@@ -189,9 +189,11 @@ export function SosConsultationPage() {
                 />
               </label>
 
-              {sendError && <div className={styles.err}>
-                {sendError}
-              </div>}
+              {sendError && (
+                <div className={styles.err}>
+                  {sendError}
+                </div>
+              )}
 
               <div className={styles.actions}>
                 <button

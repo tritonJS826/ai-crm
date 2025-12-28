@@ -115,9 +115,11 @@ export function BiohackingDetailPage() {
         >
           {article.title}
         </h1>
-        {article.subtitle && <p className={styles.subtitle}>
-          {article.subtitle}
-        </p>}
+        {article.subtitle && (
+          <p className={styles.subtitle}>
+            {article.subtitle}
+          </p>
+        )}
         <div className={styles.metaRow}>
           <Link
             to={PATHS.BIOHACKING.LIST}
