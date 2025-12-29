@@ -1,16 +1,21 @@
 import {useEffect} from "react";
-import {useAtomValue} from "jotai";
+import {useAtomValue, useSetAtom} from "jotai";
 import {WsEventType} from "src/constants/wsEventTypes";
-import {socketAtom} from "src/socket/socketAtoms";
+import {connectSocketAtom} from "src/socket/socketActions";
+import {socketStateAtom} from "src/socket/socketAtoms";
 import {WsEvent} from "src/socket/WsEvent";
 
 export function useSubscribe<T>(
   eventType: WsEventType,
   eventHandler: (event: WsEvent<T>) => void,
 ) {
-  const socket = useAtomValue(socketAtom);
+  const {socket} = useAtomValue(socketStateAtom);
+
+  const connect = useSetAtom(connectSocketAtom);
 
   useEffect(() => {
+    connect();
+
     if (!socket) {
       return;
     }
