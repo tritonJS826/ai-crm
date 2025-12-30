@@ -25,7 +25,7 @@ async def receive_message(request: Request):
     raw_body = await request.body()
     signature = request.headers.get("X-Hub-Signature-256")
 
-    if not verify_signature(settings.whatsapp_app_secret, raw_body, signature):
+    if not verify_signature(settings.whatsapp_access_token, raw_body, signature):
         raise HTTPException(status_code=403, detail="Invalid signature")
 
     payload = await request.json()

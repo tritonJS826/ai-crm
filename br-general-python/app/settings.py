@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
 
     # Server
-    server_port: int = Field(default=8000, alias="SERVER_PORT")
+    server_port: int = Field(..., alias="SERVER_PORT")
     env_type: Literal["dev", "prod"] = Field(default="dev", alias="ENV_TYPE")
-    webapp_domain: str = Field(default="localhost", alias="WEBAPP_DOMAIN")
-    app_base_url: str = Field(default="http://localhost:8000", alias="APP_BASE_URL")
+    webapp_domain: str = Field(..., alias="WEBAPP_DOMAIN")
+    app_base_url: str = Field(..., alias="APP_BASE_URL")
 
     # Database
     database_url: str = Field(..., alias="DATABASE_URL")
@@ -31,61 +31,53 @@ class Settings(BaseSettings):
     postgres_db: str = Field(..., alias="POSTGRES_DB")
 
     # Email (SMTP)
-    smtp_host: str = Field(default="localhost", alias="SMTP_HOST")
-    smtp_port: int = Field(default=1025, alias="SMTP_PORT")
-    smtp_user: Optional[str] = Field(default=None, alias="SMTP_USER")
-    smtp_password: Optional[str] = Field(default=None, alias="SMTP_PASSWORD")
-    smtp_starttls: bool = Field(default=False, alias="SMTP_STARTTLS")
-    smtp_ssl: bool = Field(default=False, alias="SMTP_SSL")
-    smtp_sender_email: EmailStr = Field(
-        default="no-reply@example.com", alias="SMTP_SENDER_EMAIL"
-    )
-    smtp_sender_name: str = Field(default="UnifiedChat", alias="SMTP_SENDER_NAME")
+    smtp_host: str = Field(..., alias="SMTP_HOST")
+    smtp_port: int = Field(..., alias="SMTP_PORT")
+    smtp_user: Optional[str] = Field(..., alias="SMTP_USER")
+    smtp_password: Optional[str] = Field(..., alias="SMTP_PASSWORD")
+    smtp_starttls: bool = Field(..., alias="SMTP_STARTTLS")
+    smtp_ssl: bool = Field(..., alias="SMTP_SSL")
+    smtp_sender_email: EmailStr = Field(..., alias="SMTP_SENDER_EMAIL")
+    smtp_sender_name: str = Field(..., alias="SMTP_SENDER_NAME")
 
     # JWT Authentication
     jwt_secret_key: str = Field(..., alias="JWT_SECRET_KEY")
-    jwt_algorithm: str = Field(default="HS256", alias="JWT_ALGORITHM")
-    access_token_expire_minutes: int = Field(
-        default=120, alias="ACCESS_TOKEN_EXPIRE_MINUTES"
-    )
-    refresh_token_expire_minutes: int = Field(
-        default=10080, alias="REFRESH_TOKEN_EXPIRE_MINUTES"
-    )
+    jwt_algorithm: str = Field(..., alias="JWT_ALGORITHM")
+    access_token_expire_minutes: int = Field(..., alias="ACCESS_TOKEN_EXPIRE_MINUTES")
+    refresh_token_expire_minutes: int = Field(..., alias="REFRESH_TOKEN_EXPIRE_MINUTES")
 
     # Meta API (WhatsApp, Messenger, Instagram)
-    meta_verify_token: Optional[str] = Field(default=None, alias="META_VERIFY_TOKEN")
-    meta_app_id: Optional[str] = Field(default=None, alias="META_APP_ID")
-    meta_app_secret: Optional[str] = Field(default=None, alias="META_APP_SECRET")
+    meta_verify_token: Optional[str] = Field(..., alias="META_VERIFY_TOKEN")
+    meta_app_id: Optional[str] = Field(..., alias="META_APP_ID")
+    meta_app_secret: Optional[str] = Field(..., alias="META_APP_SECRET")
+
+    # WhatsApp Business API
     whatsapp_phone_number_id: Optional[str] = Field(
-        default=None, alias="WHATSAPP_PHONE_NUMBER_ID"
+        ..., alias="WHATSAPP_PHONE_NUMBER_ID"
     )
-    whatsapp_access_token: Optional[str] = Field(
-        default=None, alias="WHATSAPP_ACCESS_TOKEN"
-    )
+    whatsapp_access_token: Optional[str] = Field(..., alias="WHATSAPP_ACCESS_TOKEN")
+
+    # Facebook Messenger
     facebook_page_access_token: Optional[str] = Field(
-        default=None, alias="FACEBOOK_PAGE_ACCESS_TOKEN"
+        ..., alias="FACEBOOK_PAGE_ACCESS_TOKEN"
     )
+    # Instagram (optional, can use same as Facebook)
     instagram_page_access_token: Optional[str] = Field(
-        default=None, alias="IG_PAGE_ACCESS_TOKEN"
+        ..., alias="IG_PAGE_ACCESS_TOKEN"
     )
 
     # Stripe Payments
-    stripe_secret_key: Optional[str] = Field(default=None, alias="STRIPE_SECRET_KEY")
-    stripe_webhook_secret: Optional[str] = Field(
-        default=None, alias="STRIPE_WEBHOOK_SECRET"
-    )
+    stripe_secret_key: Optional[str] = Field(..., alias="STRIPE_SECRET_KEY")
+    stripe_webhook_secret: Optional[str] = Field(..., alias="STRIPE_WEBHOOK_SECRET")
 
-    # OpenAI (TODO - placeholder for AI drafting)
-    openai_api_key: Optional[str] = Field(default=None, alias="OPENAI_API_KEY")
+    # OpenAI API
+    openai_api_key: Optional[str] = Field(..., alias="OPENAI_API_KEY")
 
     model_config = SettingsConfigDict(
         env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         case_sensitive=True,
     )
-
-    whatsapp_verify_token: str = Field(..., alias="WHATSAPP_VERIFY_TOKEN")
-    whatsapp_app_secret: str = Field(..., alias="WHATSAPP_APP_SECRET")
 
     @property
     def base_url(self) -> str:

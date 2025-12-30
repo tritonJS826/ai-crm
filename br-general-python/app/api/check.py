@@ -20,7 +20,7 @@ async def inbound_message(payload: dict):
         "id": str(uuid.uuid4()),
         "direction": "in",
         "text": payload["text"],
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(datetime.UTC).isoformat(),
     }
 
     await ws_manager.broadcast(
