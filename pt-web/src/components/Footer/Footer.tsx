@@ -14,27 +14,14 @@ const SOCIALS = [
 
 export function Footer() {
   const dictionary = useDictionary(DictionaryKey.FOOTER);
+
   if (!dictionary) {
-    return null;
+    return (
+      <div>
+        Loading...
+      </div>
+    );
   }
-
-  const COL_1 = {
-    title: dictionary.sectionsTitle,
-    links: [
-      {label: dictionary.links.about, to: PATHS.ABOUT},
-      {label: dictionary.links.states, to: PATHS.CONDITIONS.LIST},
-      {label: dictionary.links.tests, to: PATHS.TESTS.LIST},
-    ],
-  } as const;
-
-  const COL_2 = {
-    title: dictionary.resourcesTitle,
-    links: [
-      {label: dictionary.links.statesCatalog, to: PATHS.CONDITIONS.LIST},
-      {label: dictionary.links.testsCatalog, to: PATHS.TESTS.LIST},
-      {label: dictionary.links.biohackingCatalog, to: PATHS.BIOHACKING.LIST},
-    ],
-  } as const;
 
   return (
     <footer
@@ -42,32 +29,24 @@ export function Footer() {
       aria-label={dictionary.ariaFooter}
     >
       <div className={styles.grid}>
-        {[COL_1, COL_2].map((col) => (
-          <nav
-            key={col.title}
-            className={styles.col}
-            aria-label={col.title}
-          >
-            <h3 className={styles.colTitle}>
-              {col.title}
-            </h3>
-            <ul className={styles.list}>
-              {col.links.map((l) => (
-                <li
-                  key={l.label}
-                  className={styles.item}
-                >
-                  <Link
-                    to={l.to}
-                    className={styles.link}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ))}
+        <nav
+          className={styles.col}
+          aria-label={dictionary.sectionsTitle}
+        >
+          <h3 className={styles.colTitle}>
+            {dictionary.sectionsTitle}
+          </h3>
+          <ul className={styles.list}>
+            <li className={styles.item}>
+              <Link
+                to={PATHS.ABOUT}
+                className={styles.link}
+              >
+                {dictionary.links.about}
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       <div className={styles.divider} />

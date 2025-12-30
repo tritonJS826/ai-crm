@@ -1,13 +1,22 @@
-import {AboutProjectSection} from "src/pages/homePage/aboutProjectSection/AboutProjectSection";
-import {Hero} from "src/pages/homePage/heroSection/HeroSection";
-import {ServicesSection} from "src/pages/homePage/servicesSection/ServicesSection";
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
 
 export function HomePage() {
+  const dictionary = useDictionary(DictionaryKey.HOME);
+
+  if (!dictionary) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
+
   return (
-    <section>
-      <Hero />
-      <AboutProjectSection />
-      <ServicesSection />
+    <section aria-label={dictionary.title}>
+      <div>
+        {dictionary.title}
+      </div>
     </section>
   );
 }

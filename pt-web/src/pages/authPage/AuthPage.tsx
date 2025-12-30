@@ -12,19 +12,9 @@ import {
 } from "src/state/authAtom";
 import styles from "src/pages/authPage/AuthPage.module.scss";
 
-type AuthDictionary = {
-  tabs: { login: string; register: string };
-  title: { login: string; register: string };
-  subtitle: { login: string; register: string };
-  fields: { fullName: string; email: string; password: string; passwordRepeat: string };
-  placeholders: { fullName: string; email: string; password: string; passwordRepeat: string };
-  errors: { nameRequired: string; passwordsMismatch: string; requestFailed: string };
-  buttons: { submitLogin: string; submitRegister: string; loading: string };
-};
-
 export function AuthPage() {
   const navigate = useNavigate();
-  const dictionary = useDictionary(DictionaryKey.AUTH) as AuthDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.AUTH);
 
   const [mode, setMode] = useState<"login" | "register">("register");
   const [fullName, setFullName] = useState("");
