@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request, HTTPException, Response
 from app.services.whatsapp_normalizer import normalize_whatsapp_payload
 from app.settings import settings
 from app.services.whatsapp_security import verify_signature
+from app.repositories.whatsapp_message_repository import save_inbound_whatsapp_message
 
 router = APIRouter()
 
@@ -30,8 +31,7 @@ async def receive_message(request: Request):
     payload = await request.json()
     messages = normalize_whatsapp_payload(payload)
 
-    # TEMP: log only
     for msg in messages:
-        print("[WA INBOUND]", msg)
+        await save_inbound_whatsapp_message(msg)
 
     return {"status": "ok"}
