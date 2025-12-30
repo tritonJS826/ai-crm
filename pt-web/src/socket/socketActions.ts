@@ -6,7 +6,6 @@ import {
   socketErrorAtom,
 } from "src/socket/socketAtoms";
 import {WsEvent} from "src/socket/WsEvent";
-import {env} from "src/utils/env/env";
 
 export const connectSocketAtom = atom(null, (get, set) => {
   const existingSocket = get(socketAtom);
@@ -14,7 +13,7 @@ export const connectSocketAtom = atom(null, (get, set) => {
     return;
   }
 
-  const socket = socketService.connect(env.WS_PATH);
+  const socket = socketService.connect();
 
   socket.addEventListener("open", () => {
     set(isConnectedAtom, true);

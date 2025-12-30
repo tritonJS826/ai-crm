@@ -1,4 +1,5 @@
 import {WsEvent} from "src/socket/WsEvent";
+import {env} from "src/utils/env/env";
 
 const RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -30,7 +31,7 @@ class SocketService {
     return this.socket;
   }
 
-  public connect(url: string) {
+  public connect() {
     if (
       this.socket &&
       (this.socket.readyState === WebSocket.OPEN ||
@@ -39,10 +40,10 @@ class SocketService {
       return this.socket;
     }
 
-    this.url = url;
+    this.url = env.WS_PATH;
     this.isManuallyClosed = false;
 
-    this.socket = new WebSocket(url);
+    this.socket = new WebSocket(this.url);
 
     this.socket.addEventListener("open", () => {
       this.reconnectAttempts = 0;
@@ -114,7 +115,7 @@ class SocketService {
       if (!this.url) {
         return;
       }
-      this.connect(this.url);
+      this.connect();
     }, RECONNECT_DELAY);
   }
 

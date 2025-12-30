@@ -175,9 +175,11 @@ export function AuthPage() {
             </label>
           )}
 
-          {error && <div className={styles.err}>
-            {error}
-          </div>}
+          {error && (
+            <div className={styles.err}>
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"

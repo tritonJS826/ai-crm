@@ -5,8 +5,8 @@ import {ScrollToTop} from "src/components/ScrollToTop/ScrollToTop";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {Navigation} from "src/pages/Navigation";
 import {DevApi} from "src/services/health";
-import {useOnSocketMessage} from "src/socket/useOnSocketMessage";
 import {useSocket} from "src/socket/useSocket";
+import {useSubscribe} from "src/socket/useSubscribe";
 import "src/styles/_globals.scss";
 
 export function App() {
@@ -19,7 +19,7 @@ export function App() {
   const {isConnected, error, emit} = useSocket();
 
   // Example for add ws listeners
-  useOnSocketMessage(WsEventType.HEALTH_PING, (msg) => {
+  useSubscribe(WsEventType.HEALTH_PING, (msg) => {
     // eslint-disable-next-line no-console
     console.log("Received:", msg);
   });
@@ -42,9 +42,11 @@ export function App() {
         <p>
           {`Status: ${isConnected ? "Socket Connected" : "Disconnected"}`}
         </p>
-        <p>
-          {`Socket Error: ${error}`}
-        </p>
+        {error && (
+          <p>
+            {`Socket Error: ${error}`}
+          </p>
+        )}
         <Navigation />
       </main>
       <Footer />
