@@ -12,12 +12,11 @@ requirements:
 
 *Use WSL (Windows Subsystem for Linux) on Windows OS.*
 
-*Do not use mount directories like `/mnt/c/Users/YourUserName/Documents` in WSL.*
+*Do not use mount directories like `/mnt/c/Users/{YourUserName}/Documents/{project_name}` for project in WSL.*
 
 *Instead of this use like `~/{project_name}`*
 
 ## 🚀 Quick Start
-
 
 1. Install dependencies:
 
