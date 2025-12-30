@@ -73,6 +73,11 @@ class Settings(BaseSettings):
     # OpenAI API
     openai_api_key: Optional[str] = Field(..., alias="OPENAI_API_KEY")
 
+    # WebSocket broadcast endpoint
+    enable_ws_broadcast_endpoint: bool = Field(
+        ..., alias="ENABLE_WS_BROADCAST_ENDPOINT"
+    )
+
     model_config = SettingsConfigDict(
         env_file=str(ENV_PATH),
         env_file_encoding="utf-8",

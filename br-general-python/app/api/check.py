@@ -1,8 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+
+from app.ws.dispatcher import emit
+from app.ws.event_types import WSEventType
 from app.ws.manager import ws_manager
 from app.ws.events import ws_event
 from datetime import datetime
 import uuid
+
+from ..settings import settings
 
 router = APIRouter()
 
@@ -33,4 +38,16 @@ async def inbound_message(payload: dict):
         )
     )
 
+    return {"status": "ok"}
+
+
+@router.post("/broadcast")
+async def broadcast_event(payload: dict):
+    if not settings.enable_ws_broadcast_endpoint:
+        raise HTTPException(status_code=404)
+
+    await emit(
+        WSEventType.CHECK_EVENT,
+        payload,
+    )
     return {"status": "ok"}

@@ -16,6 +16,7 @@ from . import (
     checkout,
     ai,
     websocket,
+    check,
 )
 from ..settings import settings
 
@@ -92,4 +93,10 @@ api_router.include_router(
     websocket.router,
     prefix="/br-general/ws",
     tags=["websocket"],
+)
+
+api_router.include_router(
+    check.router,
+    prefix="/br-general/check",
+    tags=["check"],
 )
