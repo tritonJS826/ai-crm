@@ -3,9 +3,9 @@ import {env} from "src/utils/env/env";
 
 const RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_ATTEMPTS = 5;
-class SocketService {
+class SocketClient {
 
-  private static instance: SocketService;
+  private static instance: SocketClient;
 
   private socket: WebSocket | null = null;
 
@@ -19,12 +19,12 @@ class SocketService {
 
   private constructor() {}
 
-  public static getInstance(): SocketService {
-    if (!SocketService.instance) {
-      SocketService.instance = new SocketService();
+  public static getInstance(): SocketClient {
+    if (!SocketClient.instance) {
+      SocketClient.instance = new SocketClient();
     }
 
-    return SocketService.instance;
+    return SocketClient.instance;
   }
 
   public getSocket() {
@@ -121,4 +121,4 @@ class SocketService {
 
 }
 
-export const socketService = SocketService.getInstance();
+export const socketService = SocketClient.getInstance();
