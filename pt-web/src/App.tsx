@@ -1,14 +1,14 @@
 import {useEffect} from "react";
+import {useAtomValue, useSetAtom} from "jotai";
 import {Footer} from "src/components/Footer/Footer";
 import {Header} from "src/components/Header/Header";
 import {ScrollToTop} from "src/components/ScrollToTop/ScrollToTop";
-import {ConversationStatus} from "src/constants/conversationStatuses";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {Navigation} from "src/pages/Navigation";
-import {getConversationList} from "src/services/conversation";
 import {DevApi} from "src/services/health";
 import {useSocket} from "src/socket/useSocket";
 import {useSubscribe} from "src/socket/useSubscribe";
+import {conversationListStateAtom, loadConversationListAtom} from "src/state/conversations.Atom";
 import "src/styles/_globals.scss";
 
 export function App() {
@@ -36,14 +36,12 @@ export function App() {
     });
   }, []);
 
+  const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
+  const loadConversationList = useSetAtom(loadConversationListAtom);
   // TODO: remove this
   useEffect(() => {
     async function test() {
-      // eslint-disable-next-line no-magic-numbers
-      const data = await getConversationList(ConversationStatus.OPEN, 2, 4);
-      // eslint-disable-next-line no-console
-      console.log(data);
-
+      await loadConversationList();
     }
     test();
   }, []);
@@ -61,6 +59,15 @@ export function App() {
             {`Socket Error: ${error}`}
           </p>
         )}
+        <p>
+          {`conversationList: ${conversationList}`}
+        </p>
+        <p>
+          {`conversationListLoading: ${conversationListLoading}`}
+        </p>
+        <p>
+          {`conversationListError: ${conversationListError}`}
+        </p>
         <Navigation />
       </main>
       <Footer />
