@@ -8,7 +8,7 @@ export type ContactBase = {
     name?: string;
 }
 
-// Schema for creating a new contact.e
+// Schema for creating a new contact.
 export type ContactCreate = ContactBase
 
 // Schema for contact data in responses.
