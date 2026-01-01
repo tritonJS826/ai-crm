@@ -13,6 +13,7 @@ class WSConnection:
     id: str
     ws: WebSocket
     connected_at: datetime
+    user_id: str
 
 
 class WSManager:
@@ -26,12 +27,13 @@ class WSManager:
     async def connect(self, ws: WebSocket) -> str:
         await ws.accept()
 
+    def connect(self, websocket: WebSocket, user_id: str) -> str:
         connection_id = str(uuid.uuid4())
-
         self.connections[connection_id] = WSConnection(
             id=connection_id,
-            ws=ws,
-            connected_at=datetime.utcnow(),
+            ws=websocket,
+            connected_at=datetime.now(timezone.utc),
+            user_id=user_id,
         )
 
         logger.info("[WS] connected %s", connection_id)
