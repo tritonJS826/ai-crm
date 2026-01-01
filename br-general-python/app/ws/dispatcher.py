@@ -4,7 +4,15 @@ from app.ws.events import ws_event
 
 async def emit(event_type: str, data: dict) -> None:
     """
-    Single entry-point for server -> client WS events.
-    Keeps WS concerns out of business endpoints/services.
+    WS dispatch entry-point.
+    Routes events based on payload.
     """
-    await ws_manager.broadcast(ws_event(event_type, data))
+    message = ws_event(event_type, data)
+
+    if "conversation_id" in data:
+        await ws_manager.broadcast_channel(
+            data["conversation_id"],
+            message,
+        )
+    else:
+        await ws_manager.broadcast_all(message)

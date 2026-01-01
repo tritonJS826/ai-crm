@@ -1,13 +1,12 @@
 import asyncio
 from app.logging import logger
 from app.ws.dispatcher import emit
-from app.ws.event_types import WSEventType
 from app.events.domain import subscribe
 
 
 async def _publish_ws_event(event_type: str, payload: dict) -> None:
     try:
-        await emit(WSEventType(event_type), payload)
+        await emit(event_type, payload)
     except Exception:
         logger.exception("Failed to deliver WS event: %s", event_type)
 
