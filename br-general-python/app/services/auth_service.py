@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
+
 from app.settings import settings
 from typing import Optional, Union
 
@@ -56,10 +57,14 @@ class AuthService:
         )
 
     def decode_token(self, token: str) -> Optional[dict]:
-        """Decode JWT token safely. Returns payload dict or None."""
+        if token.startswith("Bearer "):
+            token = token.removeprefix("Bearer ").strip()
+
         try:
             return jwt.decode(
-                token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
+                token,
+                settings.jwt_secret_key,
+                algorithms=[settings.jwt_algorithm],
             )
         except JWTError:
             return None
