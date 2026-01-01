@@ -1,23 +1,19 @@
 import {useEffect} from "react";
-import {useAtomValue, useSetAtom} from "jotai";
 import {WsEventType} from "src/constants/wsEventTypes";
-import {connectSocketAtom} from "src/socket/socketActions";
-import {socketStateAtom} from "src/socket/socketAtoms";
-import {WsEvent} from "src/socket/WsEvent";
+import {socketClient, WsEvent} from "src/services/websocketClient";
 
 export function useSubscribe<T>(
   eventType: WsEventType,
   eventHandler: (event: WsEvent<T>) => void,
 ) {
-  const {socket} = useAtomValue(socketStateAtom);
-
-  const connect = useSetAtom(connectSocketAtom);
+  const socket = socketClient.connect();
 
   useEffect(() => {
-    connect();
-
-    if (!socket) {
-      return;
+    if (
+      !socket || (socket.readyState !== WebSocket.OPEN &&
+        socket.readyState !== WebSocket.CONNECTING)
+    ) {
+      throw new Error("Socket not ready");
     }
 
     const handler = (event: MessageEvent) => {

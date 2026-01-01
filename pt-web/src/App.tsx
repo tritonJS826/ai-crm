@@ -1,14 +1,13 @@
 import {useEffect} from "react";
-import {useAtomValue, useSetAtom} from "jotai";
 import {Footer} from "src/components/Footer/Footer";
 import {Header} from "src/components/Header/Header";
 import {ScrollToTop} from "src/components/ScrollToTop/ScrollToTop";
 import {WsEventType} from "src/constants/wsEventTypes";
+import {useSocket} from "src/hooks/useSocket";
+import {useSubscribe} from "src/hooks/useSubscribe";
 import {Navigation} from "src/pages/Navigation";
 import {DevApi} from "src/services/health";
-import {useSocket} from "src/socket/useSocket";
-import {useSubscribe} from "src/socket/useSubscribe";
-import {conversationListStateAtom, loadConversationListAtom} from "src/state/conversations.Atom";
+import {socketClient} from "src/services/websocketClient";
 import "src/styles/_globals.scss";
 
 export function App() {
@@ -17,8 +16,8 @@ export function App() {
     DevApi.checkHealth();
   }, []);
 
-  // Example for useSocket
-  const {isConnected, error, emit} = useSocket();
+  // Example for ws connect
+  useSocket();
 
   // Example for add ws listeners
   useSubscribe(WsEventType.HEALTH_PING, (msg) => {
@@ -28,7 +27,7 @@ export function App() {
 
   // Example for ws emit message
   useEffect(() => {
-    emit<string>({
+    socketClient.emit<string>({
       v: 1,
       type: WsEventType.HEALTH_PING,
       ts: new Date(),
@@ -36,38 +35,11 @@ export function App() {
     });
   }, []);
 
-  const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
-  const loadConversationList = useSetAtom(loadConversationListAtom);
-  // TODO: remove this
-  useEffect(() => {
-    async function test() {
-      await loadConversationList();
-    }
-    test();
-  }, []);
-
   return (
     <div className="page">
       <Header />
       <main className="main">
         <ScrollToTop />
-        <p>
-          {`Status: ${isConnected ? "Socket Connected" : "Disconnected"}`}
-        </p>
-        {error && (
-          <p>
-            {`Socket Error: ${error}`}
-          </p>
-        )}
-        <p>
-          {`conversationList: ${conversationList}`}
-        </p>
-        <p>
-          {`conversationListLoading: ${conversationListLoading}`}
-        </p>
-        <p>
-          {`conversationListError: ${conversationListError}`}
-        </p>
         <Navigation />
       </main>
       <Footer />
