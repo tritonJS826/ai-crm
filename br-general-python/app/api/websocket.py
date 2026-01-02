@@ -56,7 +56,18 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         while True:
-            data = await websocket.receive_json()
+            try:
+                data = await websocket.receive_json()
+            except ValueError:
+                await websocket.send_json(
+                    {
+                        "type": "error",
+                        "code": "invalid_json",
+                    }
+                )
+                await websocket.close(code=1003)  # unsupported data
+                ws_manager.disconnect(connection_id)
+                break
 
             conn = ws_manager.connections.get(connection_id)
             if not conn:
@@ -110,14 +121,34 @@ async def websocket_endpoint(websocket: WebSocket):
                     continue
 
                 # admin bypass
-                allowed = False
+                # allowed = False
+                # if role == "admin":
+                #     allowed = True
+                # else:
+                #     allowed = await can_subscribe_to_conversation(
+                #         user_id=conn.user_id,
+                #         conversation_id=scope_id,
+                #     )
+
+                # Per-connection ACL cache to avoid repeated DB lookups
+                acl_cache = getattr(conn, "acl_cache", None)
+                if acl_cache is None:
+                    acl_cache = {}
+                    setattr(conn, "acl_cache", acl_cache)
+                cache_key = scope_id
+                # admin bypass
                 if role == "admin":
                     allowed = True
+                    acl_cache[cache_key] = True
                 else:
-                    allowed = await can_subscribe_to_conversation(
-                        user_id=str(user_id),
-                        conversation_id=scope_id,
-                    )
+                    if cache_key in acl_cache:
+                        allowed = acl_cache[cache_key]
+                    else:
+                        allowed = await can_subscribe_to_conversation(
+                            user_id=str(user_id),
+                            conversation_id=scope_id,
+                        )
+                        acl_cache[cache_key] = allowed
 
                 if not allowed:
                     await websocket.send_json(

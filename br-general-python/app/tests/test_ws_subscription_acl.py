@@ -38,6 +38,39 @@ def test_ws_subscribe_allowed(monkeypatch, client):
         assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
 
 
+def test_ws_subscribe_admin_bypass(monkeypatch, client):
+    monkeypatch.setattr(
+        ws_api.auth_service,
+        "decode_token",
+        lambda _: {"sub": "admin1", "exp": 9999999999, "role": "admin"},
+    )
+
+    # ACL should NOT be called for admin
+    called = {"count": 0}
+
+    async def forbidden(**_):
+        called["count"] += 1
+        return False
+
+    monkeypatch.setattr(
+        "app.api.websocket.can_subscribe_to_conversation",
+        forbidden,
+    )
+
+    with client.websocket_connect("/br-general/ws/ws?token=fake") as ws:
+        ws.send_json(
+            {
+                "type": "subscribe",
+                "scope": "conversation",
+                "id": "c1",
+            }
+        )
+
+        conn = next(iter(ws_manager.connections.values()))
+        assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
+        assert called["count"] == 0
+
+
 def test_ws_subscribe_forbidden(monkeypatch, client):
     monkeypatch.setattr(
         ws_api.auth_service,
