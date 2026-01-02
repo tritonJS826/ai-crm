@@ -17,3 +17,6 @@ class WSEventType(str, Enum):
 
     # Order events
     ORDER_CREATED = "order_created"
+
+    # Check event
+    CHECK_EVENT = "check_event"
