@@ -78,6 +78,8 @@ class Settings(BaseSettings):
         ..., alias="ENABLE_WS_BROADCAST_ENDPOINT"
     )
 
+    ws_idle_timeout_seconds: int = Field(..., alias="WS_IDLE_TIMEOUT_SECONDS")
+
     model_config = SettingsConfigDict(
         env_file=str(ENV_PATH),
         env_file_encoding="utf-8",

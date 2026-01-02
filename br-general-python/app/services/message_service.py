@@ -2,10 +2,10 @@
 Service for message business logic.
 """
 
-import logging
 from typing import Optional
 
 from app.db import db
+from app.logging import logger
 from app.schemas.contact import Platform
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
@@ -14,7 +14,6 @@ from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
 
-logger = logging.getLogger(__name__)
 
 # Opt-out keywords (case-insensitive)
 OPT_OUT_KEYWORDS = {"stop", "unsubscribe", "отписаться", "стоп"}
