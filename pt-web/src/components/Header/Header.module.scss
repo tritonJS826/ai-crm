@@ -92,28 +92,6 @@
   gap: 14px;
 }
 
-.cta {
-  order: 2;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px 12px;
-  font-size: vars.$font-md;
-  font-weight: 700;
-  color: vars.$color-primary;
-  background-color: vars.$color-bg;
-  border: 2px solid vars.$color-primary;
-  border-radius: vars.$radius-pill;
-  text-decoration: none;
-  transition: background-color vars.$transition-fast;
-  cursor: pointer;
-}
-
-.cta:hover {
-  background-color: vars.$color-cta-bg;
-}
-
 .iconBtn {
   order: 0;
   appearance: none;
@@ -291,89 +269,6 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
-.dock {
-  position: absolute;
-  top: vars.$header-height;
-  left: 0;
-  right: 0;
-  z-index: 55;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition:
-    opacity vars.$transition-base,
-    transform vars.$transition-base;
-}
-
-.dockOpen {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.dockInner {
-  border-top: 1px solid vars.$color-border;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  background: vars.$color-bg;
-  box-shadow: 0 20px 40px rgb(0 0 0 / 14%);
-  padding: vars.$gap-lg vars.$gap-xl;
-  max-height: clamp(320px, 60vh, 620px);
-  overflow: hidden;
-}
-
-.dockInner::before {
-  content: "";
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%) rotate(45deg);
-  width: 14px;
-  height: 14px;
-  background: vars.$color-bg;
-  border-left: 1px solid vars.$color-border;
-  border-top: 1px solid vars.$color-border;
-  box-shadow: -4px -4px 12px rgb(0 0 0 / 05%);
-}
-
-.dockHeading {
-  display: inline-block;
-  color: vars.$color-primary;
-  font-weight: 800;
-  font-size: vars.$font-xl;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
-}
-
-.dockHeading:hover {
-  color: vars.$color-cta-bg;
-}
-
-.dockList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: vars.$gap-sm;
-}
-
-.dockLink {
-  display: block;
-  color: vars.$color-primary;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: vars.$font-md;
-  padding: 8px 4px;
-  border-bottom: 1px dashed transparent;
-  transition: color vars.$transition-fast;
-}
-
-.dockLink:hover {
-  color: vars.$color-cta-bg;
-}
-
 .backdrop {
   position: fixed;
   inset: 0;
@@ -454,65 +349,6 @@
   color: vars.$color-primary-hover;
 }
 
-.drawerLinkBtn {
-  width: 100%;
-  text-align: left;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-
-.drawerLinkOpen {
-  color: vars.$color-cta-bg;
-}
-
-.chevron {
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid vars.$color-primary;
-  border-bottom: 2px solid vars.$color-primary;
-  transition: transform vars.$transition-fast;
-}
-
-.chevronRight {
-  transform: rotate(-45deg);
-}
-
-.chevronDown {
-  transform: rotate(45deg);
-}
-
-.submenu {
-  list-style: none;
-  margin: 0 0 4px;
-  padding: 0 0 0 8px;
-  overflow: hidden;
-  transition: max-height vars.$transition-base;
-  display: grid;
-  gap: 8px;
-  max-height: 0;
-}
-
-.submenuOpen {
-  max-height: 520px;
-}
-
-.submenuLink {
-  display: block;
-  font-size: vars.$font-md;
-  color: vars.$color-primary;
-  text-decoration: none;
-  padding: 6px 0;
-}
-
-.submenuLink:hover {
-  color: vars.$color-primary-hover;
-}
-
 .drawerFoot {
   position: relative;
   overflow: visible;
@@ -540,100 +376,6 @@
   transform: translateY(0);
 }
 
-.dockLayout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: vars.$gap-lg;
-  align-items: stretch;
-}
-
-.dockLists {
-  display: grid;
-  gap: vars.$gap-md;
-  align-content: start;
-  overflow: auto;
-  padding-right: vars.$pad-sm;
-}
-
-.dockListTwoCols {
-  column-count: 2;
-  column-gap: vars.$gap-lg;
-}
-
-.dockListTwoCols > li {
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
-  -moz-column-break-inside: avoid;
-  margin-bottom: 8px;
-}
-
-.dockPromo {
-  position: relative;
-  display: block;
-  border-radius: vars.$radius-lg;
-  overflow: hidden;
-  border: 1px solid vars.$color-border;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 10%);
-  text-decoration: none;
-  height: 100%;
-  min-height: 220px;
-}
-
-.dockPromoImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform vars.$transition-fast;
-}
-
-.dockPromo:hover .dockPromoImg {
-  transform: scale(1.03);
-}
-
-.dockPromoTitle {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  font-weight: 800;
-  font-size: vars.$font-lg;
-  color: #fff;
-  text-shadow: 0 2px 12px rgb(0 0 0 / 60%);
-}
-
-.sosFloat {
-  position: fixed;
-  right: 25px;
-  bottom: 60px;
-  z-index: 140;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 999px;
-  font-weight: 800;
-  font-size: 14px;
-  color: vars.$color-primary;
-  background: vars.$color-bg;
-  border: 2px solid vars.$color-primary;
-  box-shadow: 0 10px 20px rgb(0 0 0 / 20%);
-  text-decoration: none;
-  letter-spacing: 0.5px;
-}
-
-.sosFloat:hover {
-  background: vars.$color-cta-bg;
-  color: vars.$color-primary-hover;
-  box-shadow: 0 12px 24px rgb(0 0 0 / 24%);
-  transform: translateY(-2px);
-}
-
-.sosFloat:active {
-  transform: translateY(1px);
-}
-
 @media (width >= 1800px) {
   .navAll {
     gap: clamp(18px, 2vw, 36px);
@@ -655,16 +397,8 @@
     display: none;
   }
 
-  .cta {
-    display: none;
-  }
-
   .burgerWrap {
     display: grid;
-  }
-
-  .dock {
-    display: none;
   }
 
   .actions {
@@ -690,22 +424,6 @@
   .langMenu {
     top: calc(100% + 6px);
     right: 0;
-  }
-
-  .dockLayout {
-    grid-template-columns: 1fr;
-  }
-
-  .dockListTwoCols {
-    column-count: 1;
-  }
-
-  .dockPromo {
-    min-height: 180px;
-  }
-
-  .sosFloat {
-    display: inline-flex;
   }
 }
 

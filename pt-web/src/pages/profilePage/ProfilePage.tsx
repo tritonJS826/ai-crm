@@ -1,20 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {NavLink, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {useAtomValue, useSetAtom} from "jotai";
-import {Pencil, PhoneCall} from "lucide-react";
-import {Button} from "src/components/Button/Button";
+import {Pencil} from "lucide-react";
 import {PageHeader} from "src/components/PageHeader/PageHeader";
-import {SupportPlan} from "src/constants/userPlans";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
-import {buildPath, PATHS} from "src/routes/routes";
+import {PATHS} from "src/routes/routes";
 import {logoutUser} from "src/services/auth";
-import {getPaymentLink} from "src/services/payment";
 import {
-  getUserPersonal,
   getUserProfile,
   patchUserProfile,
-  type UserPersonal as ApiUserPersonal,
   type UserProfile as ApiUserProfile,
 } from "src/services/profile";
 import {
@@ -142,51 +137,8 @@ function InlineEditable({
   );
 }
 
-type ConditionKey = "panic" | "depression" | "burnout";
-type StatusKey = "low" | "moderate" | "high";
-
-type ProfileDictionary = {
-  page: { title: string; subtitle: string; logoutBtn: string };
-  user: {
-    title: string;
-    name: string;
-    preferredContactEmail: string;
-    city: string;
-    phone: string;
-    language: string;
-    preferredContactPhone: string;
-  };
-  plan: {
-    title: string;
-    baseTitle: string;
-    supportTitle: string;
-    scheduleBtn: string;
-    buyBtn: string;
-    statsIncluded: string;
-    statsDaysLeft: string;
-    descActivePrefix: string;
-    descActiveSuffix: string;
-    descInactive: string;
-    priorityBooking: string;
-    emergencyCall: string;
-    hint: string;
-  };
-  tests: {
-    title: string;
-    subtitle: string;
-    name: string;
-  };
-  actions: {
-    save: string;
-    cancel: string;
-  };
-  conditions: Record<ConditionKey, string>;
-  status: Record<StatusKey, string>;
-  recommendations: Record<ConditionKey, Record<StatusKey, string>>;
-};
-
 export function ProfilePage() {
-  const dictionary = useDictionary(DictionaryKey.PROFILE) as ProfileDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.PROFILE);
   const navigate = useNavigate();
 
   const accessTokens = useAtomValue(accessTokenAtomWithPersistence);
@@ -196,7 +148,6 @@ export function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [pageError, setPageError] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<ApiUserProfile | null>(null);
-  const [userPersonal, setUserPersonal] = useState<ApiUserPersonal | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -211,15 +162,11 @@ export function ProfilePage() {
       setIsLoading(true);
       setPageError(null);
       try {
-        const [profileResponse, personalResponse] = await Promise.all([
-          getUserProfile(),
-          getUserPersonal(),
-        ]);
+        const profileResponse = await getUserProfile();
         if (!isMounted) {
           return;
         }
         setUserProfile(profileResponse);
-        setUserPersonal(personalResponse);
       } catch (err) {
         if (!isMounted) {
           return;
@@ -245,27 +192,6 @@ export function ProfilePage() {
   if (!isAuthenticated) {
     return null;
   }
-
-  const isPaidSupportPlan = (userPersonal?.plan ?? SupportPlan.FREE) !== SupportPlan.FREE;
-  const planTitle =
-    isPaidSupportPlan ? (dictionary?.plan.supportTitle ?? "Paid") : (dictionary?.plan.baseTitle ?? "Base");
-  const hotlineNumber = "+49 123 4567890";
-  const [paymentLink, setPaymentLink] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function fetchPaymentLink() {
-      try {
-        const link = await getPaymentLink();
-        setPaymentLink(link);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Error fetching payment link:", error);
-        setPaymentLink(null);
-      }
-    }
-
-    fetchPaymentLink();
-  }, []);
 
   const handleLogout = async (): Promise<void> => {
     await logoutUser();
@@ -371,163 +297,6 @@ export function ProfilePage() {
                   cancelLabel={dictionary.actions.cancel}
                 />
               </ul>
-            </div>
-
-            <div className={styles.card}>
-              <div className={styles.cardTitleRow}>
-                <h2 className={styles.cardTitle}>
-                  {dictionary.plan.title}
-                </h2>
-                <div className={styles.planStatusInline}>
-                  {isPaidSupportPlan
-                    ? (
-                      <span className={`${styles.planBadge} ${styles.planSupport}`}>
-                        {planTitle}
-                      </span>
-                    )
-                    : (
-                      <span className={styles.planDefault}>
-                        {planTitle}
-                      </span>
-                    )}
-                </div>
-              </div>
-
-              <div className={styles.planHeader}>
-                <div className={styles.planPrimaryActions}>
-                  <Button to={PATHS.SOS.CONSULTATION}>
-                    {dictionary.plan.scheduleBtn}
-                  </Button>
-
-                  {!isPaidSupportPlan && (
-                    <a
-                      className={styles.upgradeBtn}
-                      href={paymentLink ?? "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={(e) => {
-                        if (!paymentLink) {
-                          e.preventDefault();
-                          alert("Платёжная ссылка ещё загружается. Попробуйте позже.");
-                        }
-                      }}
-                    >
-                      {dictionary.plan.buyBtn}
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              <div className={styles.planBody}>
-                <div className={styles.statActions}>
-                  <div
-                    className={styles.statBtn}
-                    aria-label={dictionary.plan.statsIncluded}
-                  >
-                    <span className={styles.statBtnValue}>
-                      {isPaidSupportPlan ? userPersonal?.consultations_included ?? "—" : "—"}
-                    </span>
-                    <span className={styles.statBtnLabel}>
-                      {dictionary.plan.statsIncluded}
-                    </span>
-                  </div>
-
-                  <div
-                    className={styles.statBtn}
-                    aria-label={dictionary.plan.statsDaysLeft}
-                  >
-                    <span className={styles.statBtnValue}>
-                      {isPaidSupportPlan ? userPersonal?.days_to_end ?? "—" : "—"}
-                    </span>
-                    <span className={styles.statBtnLabel}>
-                      {dictionary.plan.statsDaysLeft}
-                    </span>
-                  </div>
-                </div>
-
-                <p className={styles.planDesc}>
-                  {isPaidSupportPlan
-                    ? `${dictionary.plan.descActivePrefix} ${dictionary.plan.descActiveSuffix}`
-                    : dictionary.plan.descInactive}
-                </p>
-
-                <div className={styles.planSecondaryActions}>
-                  <button
-                    type="button"
-                    className={`${styles.ghostBtn} ${!isPaidSupportPlan ? styles.btnDisabled : ""}`}
-                    aria-disabled={!isPaidSupportPlan}
-                  >
-                    {dictionary.plan.priorityBooking}
-                  </button>
-                  {isPaidSupportPlan
-                    ? (
-                      <a
-                        href={hotlineNumber ? `tel:${hotlineNumber}` : undefined}
-                        className={styles.ghostBtn}
-                      >
-                        <PhoneCall className={styles.inlineIcon} />
-                        {dictionary.plan.emergencyCall}
-                      </a>
-                    )
-                    : (
-                      <button
-                        type="button"
-                        className={`${styles.ghostBtn} ${styles.btnDisabled}`}
-                        aria-disabled
-                      >
-                        <PhoneCall className={styles.inlineIcon} />
-                        {dictionary.plan.emergencyCall}
-                      </button>
-                    )}
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className={styles.card}>
-            <div className={styles.cardHead}>
-              <h2 className={styles.cardTitle}>
-                {dictionary.tests.title}
-              </h2>
-              <div className={styles.cardSub}>
-                {dictionary.tests.subtitle}
-              </div>
-            </div>
-
-            <div className={styles.tableWrap}>
-              <table
-                className={styles.table}
-                aria-label={dictionary.tests.title}
-              >
-                <thead>
-                  <tr>
-                    <th>
-                      {dictionary.tests.name}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(userPersonal?.test_topics ?? []).length === 0 && (
-                    <tr>
-                      <td>
-                        —
-                      </td>
-                    </tr>
-                  )}
-                  {(userPersonal?.test_topics ?? []).map((topic) => (
-                    <tr key={topic.id}>
-                      <td data-label={dictionary.tests.name}>
-                        <NavLink
-                          className={styles.linkBtn}
-                          to={buildPath.testsDetail(topic.id)}
-                        >
-                          {topic.title}
-                        </NavLink>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </section>
         </>

@@ -6,17 +6,26 @@ from app.db import db
 from app.api import api_router
 
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.logging import logger
 from app.settings import settings
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # startup
-    await db.connect()
+    try:
+        await db.connect()
+        # real probe, not internals
+        await db.execute_raw("SELECT 1")
+        logger.info("DB CONNECTED AND QUERYABLE")
+
+    except Exception as e:
+        logger.error("DB connection failed: %s", e)
+        raise
+
     yield
-    # shutdown
+
     await db.disconnect()
-    # pass
 
 
 app = FastAPI(lifespan=lifespan)
@@ -33,6 +42,5 @@ app.add_middleware(
         "X-Requested-With",
     ],
 )
-
 
 app.include_router(api_router)

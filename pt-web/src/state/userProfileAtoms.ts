@@ -1,14 +1,11 @@
 import {atom} from "jotai";
 import {
-  getUserPersonal,
   getUserProfile,
   patchUserProfile,
-  UserPersonal,
   UserProfile,
 } from "src/services/profile";
 
 export const userProfileAtom = atom<UserProfile | null>(null);
-export const userPersonalAtom = atom<UserPersonal | null>(null);
 export const userLoadingAtom = atom<boolean>(false);
 export const userErrorAtom = atom<string | null>(null);
 
@@ -19,13 +16,9 @@ export const loadUserDataAtom = atom(
     set(userErrorAtom, null);
 
     try {
-      const [profile, personal] = await Promise.all([
-        getUserProfile(),
-        getUserPersonal(),
-      ]);
+      const profile = await getUserProfile();
 
       set(userProfileAtom, profile);
-      set(userPersonalAtom, personal);
     } catch (error) {
       if (error instanceof Error) {
         set(userErrorAtom, error.message);
