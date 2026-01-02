@@ -1,5 +1,7 @@
+
 import {useEffect} from "react";
 import {Platform} from "src/constants/platform";
+import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {socketClient, WsIncomingEvent} from "src/services/websocketClient";
 
@@ -12,31 +14,39 @@ export type Message = {
     text?: string;
 }
 
-export function useSubscribe<T>(
-  eventType: WsEventType,
-  eventHandler: (event: WsIncomingEvent<T>) => void,
+export function useSubscribeOnNewMessage(
+  conversation_id: string,
+  eventHandler: (event: WsIncomingEvent<Message>) => void,
 ) {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      const parsed = JSON.parse(event.data) as WsIncomingEvent<T>;
+      const parsed = JSON.parse(event.data) as WsIncomingEvent<Message>;
 
       if (parsed.type === WsEventType.NEW_MESSAGE) {
         eventHandler(parsed);
       }
     };
 
+    const addSubscription = (socket: WebSocket) => {
+      socket.addEventListener("message", handler);
+      socket.send(JSON.stringify({
+        action: WsActionType.SUBSCRIBE,
+        conversation_id: conversation_id,
+      }));
+    };
+
     const socket = socketClient.connect();
 
     if (socket.readyState === WebSocket.OPEN) {
-      socket.addEventListener("message", handler);
+      addSubscription(socket);
     } else {
       socket.onopen = () => {
-        socket.addEventListener("message", handler);
+        addSubscription(socket);
       };
     }
 
     return () => {
       socket.removeEventListener("message", handler);
     };
-  }, [eventType, eventHandler]);
+  }, [conversation_id, eventHandler]);
 }

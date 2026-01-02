@@ -1,12 +1,17 @@
+import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {env} from "src/utils/env/env";
 
-export interface WsEvent<T> {
+export type WsIncomingEvent<T> = {
   v: number;
   type: WsEventType;
   ts: Date;
   data: T;
 }
+
+export type WsOutgoingEvent<T> = {
+  action: WsActionType;
+} & Record<string, T>
 
 const RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -66,6 +71,7 @@ class SocketClient {
     });
 
     return this.socket;
+
   }
 
   public disconnect() {
@@ -77,20 +83,25 @@ class SocketClient {
     }
   }
 
-  public emit<T>(payload: WsEvent<T>) {
-    this.connect();
+  public emit<T>(payload: WsOutgoingEvent<T>) {
+    const socket = this.connect();
     const message = JSON.stringify(payload);
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      return this.socket.send(message);
+
+    const sendMessage = () => {
+      socket.send(message);
+    };
+
+    if (socket.readyState === WebSocket.OPEN) {
+      sendMessage();
+    } else {
+      socket.addEventListener("open", () => {
+        sendMessage();
+      });
     }
-    if (this.socket?.readyState === WebSocket.CONNECTING) {
-      setTimeout(() => {
-        if (this.socket?.readyState !== WebSocket.OPEN) {
-          throw new Error("Websocket not ready");
-        }
-        this.socket.send(message);
-      }, RECONNECT_DELAY);
-    }
+    socket.removeEventListener("open", () => {
+      sendMessage();
+    });
+
   }
 
   private tryReconnect() {
