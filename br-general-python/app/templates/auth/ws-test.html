@@ -7,24 +7,34 @@
 <html>
 <body>
 <script>
-    // Paste a valid JWT here locally (DO NOT COMMIT REAL TOKENS)
-    const token = "< PASTE_ACCESS_TOKEN_HERE >";
+(function () {
+    const isLocalhost = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
+    if (!isLocalhost) {
+        document.body.innerHTML = `
+            <h1>ws-test.html disabled</h1>
+            <p>This debug WebSocket test page is for local development only.</p>
+        `;
+        return;
+    }
 
-    if (token.includes("<")) {
+    const token = prompt("Paste a JWT access token (local debug only):");
+    if (!token) {
         console.error("No token provided");
+        return;
     }
 
     const ws = new WebSocket(
-        "ws://localhost:8000/br-general/ws/ws?token=" + token
+        "ws://localhost:8000/br-general/ws/ws?token=" + encodeURIComponent(token)
     );
 
     ws.onopen = () => {
         console.log("connected");
-        ws.send(JSON.stringify({type: "ping"}));
+        ws.send(JSON.stringify({ type: "ping" }));
     };
 
     ws.onmessage = (e) => console.log("message:", e.data);
     ws.onclose = (e) => console.log("closed", e.code);
+})();
 </script>
 </body>
 </html>
