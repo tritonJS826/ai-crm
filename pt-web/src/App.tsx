@@ -3,7 +3,6 @@ import {Footer} from "src/components/Footer/Footer";
 import {Header} from "src/components/Header/Header";
 import {ScrollToTop} from "src/components/ScrollToTop/ScrollToTop";
 import {WsEventType} from "src/constants/wsEventTypes";
-import {useSocket} from "src/hooks/useSocket";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {Navigation} from "src/pages/Navigation";
 import {DevApi} from "src/services/health";
@@ -15,9 +14,6 @@ export function App() {
   useEffect(() => {
     DevApi.checkHealth();
   }, []);
-
-  // Example for ws connect
-  useSocket();
 
   // Example for add ws listeners
   useSubscribe(WsEventType.HEALTH_PING, (msg) => {
