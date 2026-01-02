@@ -1,12 +1,13 @@
-from fastapi import APIRouter, HTTPException
-from app.services.health_service import get_health_status
+from datetime import datetime, timezone
+from fastapi import APIRouter
 
 router = APIRouter()
 
 
 @router.get("/")
 async def root():
-    try:
-        return await get_health_status()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Health check failed: {e}")
+    # Liveness probe: process is running
+    return {
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
