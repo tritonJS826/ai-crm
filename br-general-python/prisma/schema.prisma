@@ -182,4 +182,5 @@ model ConversationParticipant {
   @@unique([conversationId, userId])
   @@index([conversationId])
   @@index([userId])
+  @@map("conversation_participants")
 }
