@@ -1,24 +1,36 @@
+"""
+Application settings module.
+
+Loads configuration from environment variables with validation.
+"""
+
 from typing import Literal, Optional
+
+from pydantic import EmailStr, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, field_validator, EmailStr
 
-import os
+from pathlib import Path
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))  # br-general-python/
-ENV_PATH = os.path.join(BASE_DIR, ".env")
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
+    """Application configuration loaded from environment variables."""
+
+    # Server
     server_port: int = Field(..., alias="SERVER_PORT")
     env_type: Literal["dev", "prod"] = Field(default="dev", alias="ENV_TYPE")
     webapp_domain: str = Field(..., alias="WEBAPP_DOMAIN")
+    app_base_url: str = Field(..., alias="APP_BASE_URL")
 
+    # Database
     database_url: str = Field(..., alias="DATABASE_URL")
     postgres_user: str = Field(..., alias="POSTGRES_USER")
     postgres_password: str = Field(..., alias="POSTGRES_PASSWORD")
     postgres_db: str = Field(..., alias="POSTGRES_DB")
 
-    # --- email config ---
+    # Email (SMTP)
     smtp_host: str = Field(..., alias="SMTP_HOST")
     smtp_port: int = Field(..., alias="SMTP_PORT")
     smtp_user: Optional[str] = Field(..., alias="SMTP_USER")
@@ -28,19 +40,46 @@ class Settings(BaseSettings):
     smtp_sender_email: EmailStr = Field(..., alias="SMTP_SENDER_EMAIL")
     smtp_sender_name: str = Field(..., alias="SMTP_SENDER_NAME")
 
-    # user auth / jwt
+    # JWT Authentication
     jwt_secret_key: str = Field(..., alias="JWT_SECRET_KEY")
     jwt_algorithm: str = Field(..., alias="JWT_ALGORITHM")
     access_token_expire_minutes: int = Field(..., alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     refresh_token_expire_minutes: int = Field(..., alias="REFRESH_TOKEN_EXPIRE_MINUTES")
 
-    # payments settings
-    yookassa_shop_id: str = Field(..., alias="YOOKASSA_SHOP_ID")
-    yookassa_secret: str = Field(..., alias="YOOKASSA_SECRET")
-    frontend_url: str = Field(..., alias="FRONTEND_URL")
+    # Meta API (WhatsApp, Messenger, Instagram)
+    meta_verify_token: Optional[str] = Field(..., alias="META_VERIFY_TOKEN")
+    meta_app_id: Optional[str] = Field(..., alias="META_APP_ID")
+    meta_app_secret: Optional[str] = Field(..., alias="META_APP_SECRET")
+
+    # WhatsApp Business API
+    whatsapp_phone_number_id: Optional[str] = Field(
+        ..., alias="WHATSAPP_PHONE_NUMBER_ID"
+    )
+    whatsapp_access_token: Optional[str] = Field(..., alias="WHATSAPP_ACCESS_TOKEN")
+
+    # Facebook Messenger
+    facebook_page_access_token: Optional[str] = Field(
+        ..., alias="FACEBOOK_PAGE_ACCESS_TOKEN"
+    )
+    # Instagram (optional, can use same as Facebook)
+    instagram_page_access_token: Optional[str] = Field(
+        ..., alias="IG_PAGE_ACCESS_TOKEN"
+    )
+
+    # Stripe Payments
+    stripe_secret_key: Optional[str] = Field(..., alias="STRIPE_SECRET_KEY")
+    stripe_webhook_secret: Optional[str] = Field(..., alias="STRIPE_WEBHOOK_SECRET")
+
+    # OpenAI API
+    openai_api_key: Optional[str] = Field(..., alias="OPENAI_API_KEY")
+
+    # WebSocket broadcast endpoint
+    enable_ws_broadcast_endpoint: bool = Field(
+        ..., alias="ENABLE_WS_BROADCAST_ENDPOINT"
+    )
 
     model_config = SettingsConfigDict(
-        env_file=ENV_PATH,
+        env_file=str(ENV_PATH),
         env_file_encoding="utf-8",
         case_sensitive=True,
     )
@@ -52,12 +91,29 @@ class Settings(BaseSettings):
 
     @property
     def flag_reload(self) -> bool:
-        """Return true if in development mode, else false."""
+        """Return true if in development mode."""
         return self.env_type == "dev"
+
+    @property
+    def is_meta_configured(self) -> bool:
+        """Check if Meta API is properly configured."""
+        return all(
+            [
+                self.meta_verify_token,
+                self.meta_app_secret,
+                self.whatsapp_access_token or self.facebook_page_access_token,
+            ]
+        )
+
+    @property
+    def is_stripe_configured(self) -> bool:
+        """Check if Stripe is properly configured."""
+        return all([self.stripe_secret_key, self.stripe_webhook_secret])
 
     @field_validator("database_url")
     @classmethod
-    def _db_url_must_be_pg(cls, v: str) -> str:
+    def validate_database_url(cls, v: str) -> str:
+        """Ensure DATABASE_URL is a valid PostgreSQL connection string."""
         if not v.startswith(("postgresql://", "postgres://")):
             raise ValueError(
                 "DATABASE_URL must start with postgresql:// or postgres://"
@@ -66,8 +122,8 @@ class Settings(BaseSettings):
 
     @field_validator("smtp_ssl")
     @classmethod
-    def _validate_tls_ssl(cls, v: bool, info):
-        # avoid SSL and STARTTLS both true
+    def validate_tls_ssl_exclusive(cls, v: bool, info) -> bool:
+        """Ensure SSL and STARTTLS are not both enabled."""
         starttls = info.data.get("smtp_starttls", False)
         if v and starttls:
             raise ValueError("Only one of SMTP_SSL or SMTP_STARTTLS can be true.")

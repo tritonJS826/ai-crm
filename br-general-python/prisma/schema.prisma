@@ -1,7 +1,8 @@
-// prisma/schema.prisma
+// Unified Chat + In-Chat Checkout MVP
 
 generator client {
-  provider = "prisma-client-py"
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
 }
 
 datasource db {
@@ -9,142 +10,158 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum QuestionType {
-  RADIO
-  CHECKBOX
-  TEXT
-}
+// ============================================
+// ENUMS
+// ============================================
 
 enum Role {
-  PATIENT
-  DOCTOR
+  ADMIN
+  AGENT
 }
 
-enum Plan {
-  FREE
-  BASIC
+enum Platform {
+  WHATSAPP
+  MESSENGER
+  INSTAGRAM
 }
 
+enum ConversationStatus {
+  OPEN
+  CLOSED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+// ============================================
+// CORE MODELS
+// ============================================
+
+/// User model for authentication and authorization.
+/// Roles: ADMIN (full access), AGENT (inbox access only).
 model User {
   id              String   @id @default(cuid())
   email           String   @unique
-  hashed_password String
+  hashed_password String   @map("hashed_password")
   name            String
-  role            Role     @default(PATIENT)
-  createdAt       DateTime @default(now())
+  role            Role     @default(AGENT)
+  createdAt       DateTime @default(now()) @map("created_at")
 
-  sessions      TestSession[]
-  subscriptions Subscription[]
-
-  // Personal data fields
-  // e.g. "Dresden, Germany"
-  city     String?
-  // e.g. "+49 151 23456789"
-  phone    String?
-  // e.g. "Deutsch, English"
-  language String?
+  @@map("users")
 }
 
-model Topic {
-  id      String   @id @default(cuid())
-  title   String
-  tests   Test[]
-  createdAt DateTime @default(now())
+/// Contact represents a customer from messaging platforms.
+/// Each contact is unique per platform + platformUserId combination.
+model Contact {
+  id             String   @id @default(cuid())
+  platform       Platform
+  platformUserId String   @map("platform_user_id")
+  phone          String? // E.164 format for WhatsApp
+  name           String?
+  optOut         Boolean  @default(false) @map("opt_out")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  conversations Conversation[]
+  orders        Order[]
+
+  @@unique([platform, platformUserId])
+  @@index([platform])
+  @@map("contacts")
 }
 
-model Test {
-  id          String        @id @default(cuid())
-  title       String
-  topicId   String
-  topic     Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  description String
-  questions   Question[]
-  sessions    TestSession[]
-  createdAt   DateTime      @default(now())
+/// Conversation groups messages with a contact.
+/// Status: OPEN (active), CLOSED (archived).
+model Conversation {
+  id            String             @id @default(cuid())
+  contactId     String             @map("contact_id")
+  contact       Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  status        ConversationStatus @default(OPEN)
+  lastMessageAt DateTime           @default(now()) @map("last_message_at")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  messages Message[]
+
+  @@index([lastMessageAt(sort: Desc)])
+  @@index([contactId])
+  @@index([status])
+  @@map("conversations")
 }
 
-model Question {
-  id        String         @id @default(cuid())
-  test      Test           @relation(fields: [testId], references: [id], onDelete: Cascade)
-  testId    String
-  text      String
-  type      QuestionType
-  options   AnswerOption[]
-  nextYesId String?
-  nextNoId  String?
-  createdAt DateTime       @default(now())
-  answers   GivenAnswer[]
+/// Message stores individual chat messages.
+/// fromUserId: NULL = from agent, NOT NULL = from contact.
+model Message {
+  id              String       @id @default(cuid())
+  conversationId  String       @map("conversation_id")
+  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  fromUserId      String?      @map("from_user_id")
+  platform        Platform
+  text            String?
+  mediaUrl        String?      @map("media_url")
+  remoteMessageId String?      @map("remote_message_id")
+  createdAt       DateTime     @default(now()) @map("created_at")
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
 }
 
-model AnswerOption {
-  id         String        @id @default(cuid())
-  question   Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId String
-  text       String
-  isCorrect  Boolean
-  createdAt  DateTime      @default(now())
-  answers    GivenAnswer[]
+/// Product catalog for in-chat checkout.
+/// stripePriceId links to Stripe Price object.
+model Product {
+  id            String   @id @default(cuid())
+  title         String
+  priceCents    Int      @map("price_cents")
+  currency      String   @default("USD")
+  imageUrl      String?  @map("image_url")
+  description   String?
+  stripePriceId String   @map("stripe_price_id")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@index([isActive])
+  @@map("products")
 }
 
-model TestSession {
-  id         String        @id @default(cuid())
-  test       Test          @relation(fields: [testId], references: [id], onDelete: Cascade)
-  testId     String
-  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId     String
-  createdAt  DateTime      @default(now())
-  finishedAt DateTime?
-  isFinished Boolean  @default(false) //session auto-closes on bulk submit
-  answers    GivenAnswer[]
-  stats      SessionStat[]
+/// Order tracks purchases made through chat.
+/// conversationId allows sending confirmation back to chat.
+model Order {
+  id              String      @id @default(cuid())
+  contactId       String      @map("contact_id")
+  contact         Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  productId       String      @map("product_id")
+  product         Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  conversationId  String?     @map("conversation_id")
+  amountCents     Int         @map("amount_cents")
+  currency        String
+  stripeSessionId String      @unique @map("stripe_session_id")
+  status          OrderStatus @default(PENDING)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  @@index([contactId])
+  @@index([status])
+  @@map("orders")
 }
 
-model SessionStat {
-  id        String       @id @default(cuid())
-  session   TestSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId String
-  key       String
-  value     Int
-  createdAt DateTime     @default(now())
-
-  @@unique([sessionId, key]) // One metric = one row per session
-}
-
-model GivenAnswer {
-  id             String        @id @default(cuid())
-  session        TestSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId      String
-  question       Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  questionId     String
-  answerOption   AnswerOption? @relation(fields: [answerOptionId], references: [id], onDelete: SetNull)
-  answerOptionId String?
-  freeText       String?
-  createdAt      DateTime      @default(now())
-}
-
+/// EmailLog for tracking sent emails.
+/// Preserved from original codebase.
 model EmailLog {
   id        String   @id @default(cuid())
   to        String
   subject   String
-  // optional: store raw body or rendered HTML
   template  String?
-  // e.g. "SENT", "FAILED"
   body      String?
-  // error message if failed
   status    String
   error     String?
-  createdAt DateTime @default(now())
-}
+  createdAt DateTime @default(now()) @map("created_at")
 
-model Subscription {
-  id                    String   @id @default(cuid())
-  userId                String
-  plan                  Plan     @default(FREE)
-  startedAt             DateTime @default(now())
-  endsAt                DateTime
-  consultationsIncluded Int      @default(0)
-  consultationsUsed     Int      @default(0)
-  createdAt             DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  @@map("email_logs")
 }

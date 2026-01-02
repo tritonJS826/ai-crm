@@ -1,46 +1,39 @@
-from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
+"""
+User-related Pydantic schemas for request/response validation.
+"""
+
 from enum import Enum
 from typing import Optional
 
+from pydantic import BaseModel, EmailStr, Field
+
 
 class Role(str, Enum):
-    PATIENT = "PATIENT"
-    DOCTOR = "DOCTOR"
+    """User roles for authorization."""
 
-
-class Plan(str, Enum):
-    FREE = "FREE"
-    BASIC = "BASIC"
-
-
-class SubscriptionOut(BaseModel):
-    id: str
-    plan: Plan
-    startedAt: datetime
-    endsAt: Optional[datetime] = None
+    ADMIN = "ADMIN"
+    AGENT = "AGENT"
 
 
 class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-    name: str
-    role: Role
+    """Schema for user registration request."""
 
-
-class UserResponse(BaseModel):
-    id: str
     email: EmailStr
-    name: str
-    role: Role
+    password: str = Field(..., min_length=8)
+    name: str = Field(..., min_length=1, max_length=100)
+    role: Role = Role.AGENT
 
 
 class UserLogin(BaseModel):
+    """Schema for user login request."""
+
     email: EmailStr
     password: str
 
 
 class UserOut(BaseModel):
+    """Schema for user data in responses."""
+
     id: str
     email: EmailStr
     name: str
@@ -48,50 +41,34 @@ class UserOut(BaseModel):
 
 
 class Token(BaseModel):
+    """Schema for JWT token pair."""
+
     access_token: str = Field(
         ..., description="JWT access token for API authentication"
     )
     refresh_token: Optional[str] = Field(
-        None, description="JWT refresh token for renewing access"
+        default=None, description="JWT refresh token for renewing access"
     )
-    token_type: str = Field("bearer", description="Type of authentication scheme")
+    token_type: str = Field(
+        default="bearer", description="Type of authentication scheme"
+    )
 
 
 class RefreshTokenRequest(BaseModel):
+    """Schema for token refresh request."""
+
     access_token: str
     refresh_token: str
 
 
 class UserWithTokens(BaseModel):
+    """Schema for user data with authentication tokens."""
+
     user: UserOut
-    tokens: Token | None = None
+    tokens: Optional[Token] = None
 
 
 class LogoutResponse(BaseModel):
+    """Schema for logout response."""
+
     message: str
-
-
-class TestTopic(BaseModel):
-    id: str
-    title: str
-
-
-class UserPersonalInfo(BaseModel):
-    email: EmailStr
-    name: str
-    role: Role
-    plan: str
-    city: Optional[str] = None
-    phone: Optional[str] = None
-    language: Optional[str] = None
-    consultations_used: int
-    consultations_included: int
-    days_to_end: int
-    # add id + title for each test topic
-    test_topics: list[TestTopic] = []
-
-
-class UserProfileUpdate(BaseModel):
-    city: Optional[str] = None
-    phone: Optional[str] = None
-    language: Optional[str] = None

@@ -4,13 +4,8 @@ import {useDictionary} from "src/dictionary/useDictionary";
 import {PATHS} from "src/routes/routes";
 import styles from "src/pages/notFoundPage/NotFoundPage.module.scss";
 
-type NotFoundDictionary = {
-    title: string;
-    goHome: string;
-  };
-
 export function NotFoundPage() {
-  const dictionary = useDictionary(DictionaryKey.NOT_FOUND) as NotFoundDictionary | null;
+  const dictionary = useDictionary(DictionaryKey.NOT_FOUND);
 
   if (!dictionary) {
     return (
