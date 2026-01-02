@@ -86,9 +86,6 @@ class Settings(BaseSettings):
         case_sensitive=True,
     )
 
-    whatsapp_verify_token: str = Field(..., alias="WHATSAPP_VERIFY_TOKEN")
-    whatsapp_app_secret: str = Field(..., alias="WHATSAPP_APP_SECRET")
-
     @property
     def base_url(self) -> str:
         """Return base URL for local or test usage."""
