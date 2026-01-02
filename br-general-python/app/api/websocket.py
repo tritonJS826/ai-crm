@@ -120,24 +120,15 @@ async def websocket_endpoint(websocket: WebSocket):
                     )
                     continue
 
-                # admin bypass
-                # allowed = False
-                # if role == "admin":
-                #     allowed = True
-                # else:
-                #     allowed = await can_subscribe_to_conversation(
-                #         user_id=conn.user_id,
-                #         conversation_id=scope_id,
-                #     )
-
                 # Per-connection ACL cache to avoid repeated DB lookups
                 acl_cache = getattr(conn, "acl_cache", None)
                 if acl_cache is None:
                     acl_cache = {}
                     setattr(conn, "acl_cache", acl_cache)
                 cache_key = scope_id
-                # admin bypass
-                if role == "admin":
+
+                # admin bypass (case-insensitive, tolerant of missing/None role)
+                if isinstance(role, str) and role.lower() == "admin":
                     allowed = True
                     acl_cache[cache_key] = True
                 else:
@@ -165,4 +156,6 @@ async def websocket_endpoint(websocket: WebSocket):
                 ws_manager.subscribe(connection_id, full_scope)
 
     except WebSocketDisconnect:
+        pass
+    finally:
         ws_manager.disconnect(connection_id)
