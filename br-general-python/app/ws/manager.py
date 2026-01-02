@@ -67,7 +67,7 @@ class WSManager:
             and not self._connections_by_scope[scope]
         ):
             del self._connections_by_scope[scope]
-            logger.info("[WS] %s unsubscribed to %s", connection_id, scope)
+        logger.info("[WS] %s unsubscribed to %s", connection_id, scope)
 
     async def broadcast_all(self, message: dict) -> None:
         logger.info("[WS] broadcasting to all: %s", message)
