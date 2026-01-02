@@ -1,19 +1,30 @@
+<!--
+  LOCAL DEBUG ONLY
+  Never commit real JWT tokens
+-->
+
 <!DOCTYPE html>
 <html>
 <body>
-
 <script>
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWp2aXNkdTcwMDAwamF5NjJ4aDg0eXBjIiwiZXhwIjoxNzY3Mjg3Mjg4LCJpYXQiOjE3NjcyODAwODgsImp0aSI6IjhiMjRkNGEyLTE3MzMtNDc4ZC1iNTk3LWNhY2E3ODhiZTk0MyIsInR5cGUiOiJhY2Nlc3MifQ.HS1VQ7hLA7PrUekNihagQjRJ4kCgRb8mhJMdGbTwiBk";
-    const ws = new WebSocket("ws://localhost:8000/br-general/ws/ws?token=" + token);
+    // Paste a valid JWT here locally (DO NOT COMMIT REAL TOKENS)
+    const token = "< PASTE_ACCESS_TOKEN_HERE >";
+
+    if (token.includes("<")) {
+        console.error("No token provided");
+    }
+
+    const ws = new WebSocket(
+        "ws://localhost:8000/br-general/ws/ws?token=" + token
+    );
 
     ws.onopen = () => {
         console.log("connected");
-        ws.send(JSON.stringify({ping: true}));
+        ws.send(JSON.stringify({type: "ping"}));
     };
 
     ws.onmessage = (e) => console.log("message:", e.data);
     ws.onclose = (e) => console.log("closed", e.code);
 </script>
-
 </body>
 </html>
