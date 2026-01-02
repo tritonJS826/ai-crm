@@ -46,7 +46,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     role = payload.get("role")
 
-    await websocket.accept()  # ✅ ACCEPT ONLY HERE
+    await websocket.accept()
 
     connection_id = ws_manager.connect(
         websocket=websocket,
