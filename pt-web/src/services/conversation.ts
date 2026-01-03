@@ -35,7 +35,7 @@ export type ConversationWithMessages = ConversationOut & {
 }
 
 // Schema for paginated conversation list.
-export type ConversationList = {
+export type ConversationListResponse = {
     items: ConversationWithContact[];
     total: number;
     limit: number;
@@ -58,7 +58,7 @@ export type SendMessageResponse = {
 export async function getConversationList(
   status?: ConversationStatus,
   offset?: number,
-  limit?: number): Promise<ConversationList> {
+  limit?: number): Promise<ConversationListResponse> {
 
   const searchParams: Record<string, string> = {};
   if (status) {
@@ -71,7 +71,7 @@ export async function getConversationList(
     searchParams.limit = String(limit);
   }
 
-  return apiClient.get<ConversationList>("/conversations?" + new URLSearchParams(searchParams));
+  return apiClient.get<ConversationListResponse>("/conversations?" + new URLSearchParams(searchParams));
 }
 
 export async function getConversation(conversationId: string): Promise<ConversationWithContact> {

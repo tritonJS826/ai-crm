@@ -1,3 +1,4 @@
+
 import {useEffect} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
 import {WsActionType} from "src/constants/wsActionTypes";
@@ -5,17 +6,22 @@ import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {apiClient} from "src/services/apiClient";
 import {ConversationWithContact} from "src/services/conversation";
+import {NewMessage} from "src/services/conversationWs";
 import {socketClient} from "src/services/websocketClient";
-import {conversationListStateAtom, loadConversationListAtom} from "src/state/conversations.Atom";
+import {
+  conversationListStateAtom,
+  loadConversationListAtom,
+  updateConversationListByNewMessageEventAtom,
+} from "src/state/conversationsAtom";
 import styles from "src/components/ConversationList/ConversationList.module.scss";
 
 export function ConversationList() {
   const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
   const loadConversationList = useSetAtom(loadConversationListAtom);
-  // Example for add ws listeners
-  useSubscribe(WsEventType.NEW_MESSAGE, (msg) => {
-    // eslint-disable-next-line no-console
-    console.log("Received NEW_MESSAGE:", msg);
+  const updateConversationListByNewMessageEvent = useSetAtom(updateConversationListByNewMessageEventAtom);
+  // Add ws listeners for NEW_MESSAGE event
+  useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, async (event) => {
+    await updateConversationListByNewMessageEvent(event);
   });
 
   // Example for emit event

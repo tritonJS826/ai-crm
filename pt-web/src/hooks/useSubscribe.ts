@@ -1,16 +1,6 @@
 import {useEffect} from "react";
-import {Platform} from "src/constants/platform";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {socketClient, WsIncomingEvent} from "src/services/websocketClient";
-
-// Schema for message data in responses.
-export type Message = {
-    conversation_id: string;
-    message_id: string;
-    from_user_id?: string;
-    platform: Platform;
-    text?: string;
-}
 
 export function useSubscribe<T>(
   eventType: WsEventType,
