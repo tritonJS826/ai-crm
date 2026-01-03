@@ -21,7 +21,7 @@ def test_ws_subscribe_allowed(monkeypatch, client):
         return True
 
     monkeypatch.setattr(
-        "app.api.websocket.can_subscribe_to_conversation",
+        "app.api.websocket.can_user_subscribe_to_conversation",
         allow,
     )
 
@@ -53,7 +53,7 @@ def test_ws_subscribe_admin_bypass(monkeypatch, client):
         return False
 
     monkeypatch.setattr(
-        "app.api.websocket.can_subscribe_to_conversation",
+        "app.api.websocket.can_user_subscribe_to_conversation",
         forbidden,
     )
 
@@ -83,7 +83,7 @@ def test_ws_subscribe_forbidden(monkeypatch, client):
         return False
 
     monkeypatch.setattr(
-        "app.api.websocket.can_subscribe_to_conversation",
+        "app.api.websocket.can_user_subscribe_to_conversation",
         deny,
     )
 

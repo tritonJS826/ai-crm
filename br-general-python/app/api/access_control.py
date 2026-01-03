@@ -3,7 +3,7 @@ from app.repositories.conversation_participant_repository import (
 )
 
 
-async def can_subscribe_to_conversation(
+async def can_user_subscribe_to_conversation(
     *,
     user_id: str,
     conversation_id: str,

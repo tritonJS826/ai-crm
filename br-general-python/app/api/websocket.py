@@ -3,7 +3,7 @@ from time import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.api.acl import can_subscribe_to_conversation
+from app.api.access_control import can_user_subscribe_to_conversation
 from app.api.auth import auth_service
 from app.ws.manager import ws_manager
 
@@ -135,7 +135,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     if cache_key in acl_cache:
                         allowed = acl_cache[cache_key]
                     else:
-                        allowed = await can_subscribe_to_conversation(
+                        allowed = await can_user_subscribe_to_conversation(
                             user_id=str(user_id),
                             conversation_id=scope_id,
                         )
