@@ -33,7 +33,7 @@ async def list_conversations(
     status: Optional[ConversationStatus] = None,
     limit: int = 50,
     offset: int = 0,
-    # current_user=Depends(get_current_user),
+    current_user=Depends(get_current_user),
 ):
     """List all conversations with pagination."""
     conversations, total = await conversation_repo.list_conversations(
