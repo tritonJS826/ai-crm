@@ -17,7 +17,7 @@ import {WsIncomingEvent} from "src/services/websocketClient";
 //     created_at: Date;
 // }
 
-export const messageListAtom = atom<MessageOut[] | []>([]);
+export const messageListAtom = atom<MessageOut[]>([]);
 export const messageListLoadingAtom = atom<boolean>(false);
 export const messageListErrorAtom = atom<string | null>(null);
 
@@ -52,12 +52,7 @@ export const loadMessageListAtom = atom(
 export const updateMessageListByNewMessageEventAtom = atom(
   null,
   (get, set, event: WsIncomingEvent<NewMessage>): void => {
-    let messageList = get(messageListAtom);
-
-    // Load list if missing
-    if (!messageList) {
-      messageList = [];
-    }
+    const messageList = get(messageListAtom);
 
     // Message exists in list → return
     if (messageList.find(message => message.id === event.data.message_id)) {

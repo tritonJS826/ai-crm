@@ -41,7 +41,7 @@ class SocketClient {
     return this.socket;
   }
 
-  public connect(url?: string) {
+  public connect() {
     if (
       this.socket &&
       (this.socket.readyState === WebSocket.OPEN ||
@@ -50,7 +50,7 @@ class SocketClient {
       return this.socket;
     }
 
-    this.url = url || env.WS_PATH;
+    this.url = env.WS_PATH;
     this.isManuallyClosed = false;
 
     this.socket = new WebSocket(this.url);
@@ -62,7 +62,7 @@ class SocketClient {
     this.socket.addEventListener("close", () => {
       if (!this.isManuallyClosed) {
         this.tryReconnect();
-        this.connect(this.url || env.WS_PATH);
+        this.connect();
       }
     });
 
@@ -87,21 +87,16 @@ class SocketClient {
     const socket = this.connect();
     const message = JSON.stringify(payload);
 
-    const sendMessage = () => {
+    try {
       socket.send(message);
-    };
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log("WS error during emit message: ", error);
 
-    if (socket.readyState === WebSocket.OPEN) {
-      sendMessage();
-    } else {
-      socket.addEventListener("open", () => {
-        sendMessage();
-      });
+      setTimeout(() => {
+        socket.send(message);
+      }, RECONNECT_DELAY);
     }
-    socket.removeEventListener("open", () => {
-      sendMessage();
-    });
-
   }
 
   private tryReconnect() {

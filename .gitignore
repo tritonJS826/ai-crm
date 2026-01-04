@@ -72,6 +72,3 @@ storybook-static/
 
 # Env & secrets
 gateway/certs/
-
-# my temp notes file (Petro Zolotukhin)
-notes

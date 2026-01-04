@@ -1,13 +1,11 @@
-
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
-import {WsActionType} from "src/constants/wsActionTypes";
+import {CompanionProfile} from "src/components/CompanionProfile/CompanionProfile";
+import {MessageList} from "src/components/MessageList/MessageList";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {apiClient} from "src/services/apiClient";
 import {ConversationWithContact} from "src/services/conversation";
 import {NewMessage} from "src/services/conversationWs";
-import {socketClient} from "src/services/websocketClient";
 import {
   conversationListStateAtom,
   loadConversationListAtom,
@@ -16,18 +14,15 @@ import {
 import styles from "src/components/ConversationList/ConversationList.module.scss";
 
 export function ConversationList() {
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
   const loadConversationList = useSetAtom(loadConversationListAtom);
   const updateConversationListByNewMessageEvent = useSetAtom(updateConversationListByNewMessageEventAtom);
+
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, async (event) => {
     await updateConversationListByNewMessageEvent(event);
   });
-
-  // Example for emit event
-  useEffect(() => {
-    socketClient.emit<string>({action: WsActionType.SUBSCRIBE, conversation_id: "1"});
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,19 +31,9 @@ export function ConversationList() {
     fetchData();
   }, []);
 
-  // TODO: remove this temporal sending new message
+  // Todo: remove this temporal call
   useEffect(() => {
-    setTimeout(() => {
-      apiClient.post("/conversations/send1",
-        {
-          conversation_id: "1",
-          text: "string",
-          image_url: "null",
-        },
-      );
-
-    // eslint-disable-next-line no-magic-numbers
-    }, 2000);
+    setCurrentConversationId("1");
   }, []);
 
   const conversationListElement = conversationList
@@ -72,6 +57,11 @@ export function ConversationList() {
       {conversationListError && <p>
         {conversationListError}
       </p>}
+      {currentConversationId && <>
+        <MessageList conversation_id={currentConversationId} />
+        <CompanionProfile />
+      </>
+      }
     </div>
   );
 }
