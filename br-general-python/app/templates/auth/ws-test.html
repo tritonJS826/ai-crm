@@ -1,0 +1,40 @@
+<!--
+  LOCAL DEBUG ONLY
+  Never commit real JWT tokens
+-->
+
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+(function () {
+    const isLocalhost = ["localhost", "127.0.0.1", "[::1]"].includes(window.location.hostname);
+    if (!isLocalhost) {
+        document.body.innerHTML = `
+            <h1>ws-test.html disabled</h1>
+            <p>This debug WebSocket test page is for local development only.</p>
+        `;
+        return;
+    }
+
+    const token = prompt("Paste a JWT access token (local debug only):");
+    if (!token) {
+        console.error("No token provided");
+        return;
+    }
+
+    const ws = new WebSocket(
+        "ws://localhost:8000/br-general/ws/ws?token=" + encodeURIComponent(token)
+    );
+
+    ws.onopen = () => {
+        console.log("connected");
+        ws.send(JSON.stringify({ type: "ping" }));
+    };
+
+    ws.onmessage = (e) => console.log("message:", e.data);
+    ws.onclose = (e) => console.log("closed", e.code);
+})();
+</script>
+</body>
+</html>

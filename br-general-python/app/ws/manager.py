@@ -1,5 +1,6 @@
+from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Set
 import uuid
 
@@ -13,25 +14,27 @@ class WSConnection:
     id: str
     ws: WebSocket
     connected_at: datetime
+    user_id: str
+    last_seen: datetime
+    token_exp: int  # unix timestamp (seconds)
 
 
 class WSManager:
     def __init__(self) -> None:
         # all active connections
         self.connections: Dict[str, WSConnection] = {}
+        self._scopes_by_connection: Dict[str, Set[str]] = defaultdict(set)
+        self._connections_by_scope: Dict[str, Set[str]] = defaultdict(set)
 
-        # channel -> set of connection_ids
-        self.channels: Dict[str, Set[str]] = {}
-
-    async def connect(self, ws: WebSocket) -> str:
-        await ws.accept()
-
+    def connect(self, websocket: WebSocket, user_id: str, token_exp: int) -> str:
         connection_id = str(uuid.uuid4())
-
         self.connections[connection_id] = WSConnection(
             id=connection_id,
-            ws=ws,
-            connected_at=datetime.utcnow(),
+            ws=websocket,
+            connected_at=datetime.now(timezone.utc),
+            user_id=user_id,
+            last_seen=datetime.now(timezone.utc),
+            token_exp=token_exp,
         )
 
         logger.info("[WS] connected %s", connection_id)
@@ -41,34 +44,50 @@ class WSManager:
         if connection_id not in self.connections:
             return
 
-        # remove from channels
-        for subscribers in self.channels.values():
-            subscribers.discard(connection_id)
+        scopes = self._scopes_by_connection.pop(connection_id, set())
+        for scope in scopes:
+            self._connections_by_scope[scope].discard(connection_id)
+            if not self._connections_by_scope[scope]:
+                del self._connections_by_scope[scope]
 
         del self.connections[connection_id]
         logger.info("[WS] disconnected %s", connection_id)
 
-    def subscribe(self, connection_id: str, channel: str) -> None:
-        self.channels.setdefault(channel, set()).add(connection_id)
-        logger.info("[WS] %s subscribed to %s", connection_id, channel)
+    def subscribe(self, connection_id: str, scope: str) -> None:
+        self._scopes_by_connection[connection_id].add(scope)
+        self._connections_by_scope[scope].add(connection_id)
+        logger.info("[WS] %s subscribed to %s", connection_id, scope)
+
+    def unsubscribe(self, connection_id: str, scope: str) -> None:
+        self._scopes_by_connection[connection_id].discard(scope)
+        self._connections_by_scope[scope].discard(connection_id)
+
+        if (
+            scope in self._connections_by_scope
+            and not self._connections_by_scope[scope]
+        ):
+            del self._connections_by_scope[scope]
+        logger.info("[WS] %s unsubscribed to %s", connection_id, scope)
 
     async def broadcast_all(self, message: dict) -> None:
+        logger.info("[WS] broadcasting to all: %s", message)
         for conn_id, conn in list(self.connections.items()):
             try:
                 await conn.ws.send_json(message)
+                logger.info("[WS] sent to %s", conn_id)
             except WebSocketDisconnect:
                 self.disconnect(conn_id)
             except Exception:
                 logger.exception("[WS] failed to send to %s", conn_id)
                 self.disconnect(conn_id)
 
-    async def broadcast_channel(self, channel: str, message: dict) -> None:
-        subscribers = self.channels.get(channel, set())
+    async def broadcast_scope(self, scope: str, message: dict) -> None:
+        connection_ids = self._connections_by_scope.get(scope, set())
 
-        for conn_id in list(subscribers):
+        for conn_id in list(connection_ids):
             conn = self.connections.get(conn_id)
             if not conn:
-                subscribers.discard(conn_id)
+                connection_ids.discard(conn_id)
                 continue
 
             try:
