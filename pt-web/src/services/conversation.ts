@@ -78,7 +78,7 @@ export async function getConversation(conversationId: string): Promise<Conversat
   return apiClient.get<ConversationWithContact>(`/conversations/${conversationId}`);
 }
 
-export async function getMessages(conversationId: string, limit?: number, cursor?: string): Promise<ConversationWithContact> {
+export async function getMessages(conversationId: string, limit?: number, cursor?: string): Promise<MessageOut[]> {
   const searchParams: Record<string, string> = {};
   if (limit) {
     searchParams.limit = String(limit);
@@ -87,21 +87,27 @@ export async function getMessages(conversationId: string, limit?: number, cursor
     searchParams.cursor = cursor;
   }
 
-  return apiClient.get<ConversationWithContact>(`/conversations/${conversationId}/messages`);
+  return apiClient.get<MessageOut[]>(`/conversations/${conversationId}/messages`);
 }
 
 export async function sendMessage(payload: SendMessageRequest): Promise<SendMessageResponse> {
   return apiClient.post<SendMessageResponse>("/conversations/send", payload);
 }
 
-export async function closeConversation(conversationId: string): Promise<SendMessageResponse> {
-  return apiClient.post<SendMessageResponse>(`/conversations/${conversationId}/close`);
+export async function closeConversation(conversationId: string): Promise<void> {
+  return apiClient.post<void>(`/conversations/${conversationId}/close`);
 }
 
-export async function updateContactCptCut(conversationId: string, payload: ContactOptOutUpdate): Promise<SendMessageResponse> {
-  return apiClient.patch<SendMessageResponse>(`/conversations/${conversationId}/optout`, payload);
+export async function updateContactOptOut(contactId: string, payload: ContactOptOutUpdate): Promise<void> {
+  return apiClient.patch<void>(`/conversations/contacts/${contactId}/optout`, payload);
 }
 
-export async function sendProduct(conversationId: string, productId: string): Promise<SendMessageResponse> {
-  return apiClient.post<SendMessageResponse>(`/conversations/${conversationId}/send-product`, {productId});
+export async function sendProductToConversation(conversationId: string, productId: string): Promise<{
+  message_id: string;
+  remote_message_id: string;
+  product_id: string;}> {
+  return apiClient.post<{
+    message_id: string;
+    remote_message_id: string;
+    product_id: string;}>(`/conversations/${conversationId}/send-product`, {productId});
 }

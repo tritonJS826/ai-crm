@@ -12,7 +12,7 @@ import {
   conversationListStateAtom,
   loadConversationListAtom,
   updateConversationListByNewMessageEventAtom,
-} from "src/state/conversationsAtom";
+} from "src/state/conversationListAtom";
 import styles from "src/components/ConversationList/ConversationList.module.scss";
 
 export function ConversationList() {

@@ -7,6 +7,29 @@ import {
 import {NewMessage} from "src/services/conversationWs";
 import {WsIncomingEvent} from "src/services/websocketClient";
 
+// ConversationListResponse = {
+//     items: {
+//         id: string;
+//         contact_id: string;
+//         status: "OPEN" | "CLOSED";
+//         last_message_at: Date;
+//         created_at: Date;
+//         contact: {
+//             platform: "WHATSAPP" | "MESSENGER" | "INSTAGRAM";
+//             platform_user_id: string;
+//             phone?: string;
+//             name?: string;
+//             id: string;
+//             opt_out: boolean;
+//             created_at: Date;
+//             updated_at: Date;
+//         };
+//     }[];
+//     total: number;
+//     limit: number;
+//     offset: number;
+// }
+
 export const conversationListAtom = atom<ConversationListResponse | null>(null);
 export const conversationListLoadingAtom = atom<boolean>(false);
 export const conversationListErrorAtom = atom<string | null>(null);
@@ -55,7 +78,7 @@ export const updateConversationListByNewMessageEventAtom = atom(
     }
 
     const existingIndex = conversationList.items.findIndex(
-      c => c.id === event.data.conversation_id,
+      conversation => conversation.id === event.data.conversation_id,
     );
 
     // Conversation not in list → fetch and append
