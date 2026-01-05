@@ -1,7 +1,7 @@
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
-export type Role = "ADMIN" | "PATIENT";
+export type Role = "ADMIN" | "AGENT";
 export type Token = { access_token: string; refresh_token: string; token_type: string };
 export type User = { id: string; email: string; name: string; role: Role };
 export type UserWithTokens = { user: User; tokens: Token };
@@ -42,6 +42,18 @@ export async function loginByEmail(email: string, password: string): Promise<voi
     headers: {"Content-Type": "application/x-www-form-urlencoded"},
     body,
   });
+  if (!res.ok) {
+    let message = "Login request failed";
+    try {
+      const errorBody = (await res.json()) as {detail?: unknown};
+      if (typeof errorBody?.detail === "string") {
+        message = errorBody.detail;
+      }
+    } catch {
+      // Ignore JSON parse errors and fall back to the default message.
+    }
+    throw new Error(message);
+  }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
 }
@@ -50,20 +62,29 @@ export async function registerByEmail(email: string, password: string, fullName:
   const res = await fetch(`${env.API_BASE_PATH}/auth/register`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({email, password, name: fullName, role: "PATIENT"}),
+    body: JSON.stringify({email, password, name: fullName, role: "AGENT"}),
   });
+  if (!res.ok) {
+    let message = "Registration request failed";
+    try {
+      const errorBody = (await res.json()) as {detail?: unknown};
+      if (typeof errorBody?.detail === "string") {
+        message = errorBody.detail;
+      }
+    } catch {
+      // Ignore JSON parse errors and fall back to the default message.
+    }
+    throw new Error(message);
+  }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
 }
 
 export async function fetchCurrentUser(): Promise<User> {
-  const res = await apiFetch("/auth/me");
-  const data = (await res.json()) as UserWithTokens;
-  if (data.tokens?.access_token) {
-    saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
-  }
+  const res = await apiFetch("/users/me");
+  const data = (await res.json()) as User;
 
-  return data.user;
+  return data;
 }
 
 export async function logoutUser(): Promise<void> {
