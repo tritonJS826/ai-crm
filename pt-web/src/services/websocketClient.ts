@@ -1,5 +1,17 @@
-import {WsEvent} from "src/socket/WsEvent";
+import {WsActionType} from "src/constants/wsActionTypes";
+import {WsEventType} from "src/constants/wsEventTypes";
 import {env} from "src/utils/env/env";
+
+export type WsIncomingEvent<T> = {
+  v: number;
+  type: WsEventType;
+  ts: Date;
+  data: T;
+}
+
+export type WsOutgoingEvent<T> = {
+  action: WsActionType;
+} & Record<string, T>
 
 const RECONNECT_DELAY = 1000;
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -12,8 +24,6 @@ class SocketClient {
   private url: string | null = null;
 
   private reconnectAttempts = 0;
-
-  private messageQueue: string[] = [];
 
   private isManuallyClosed = false;
 
@@ -47,21 +57,21 @@ class SocketClient {
 
     this.socket.addEventListener("open", () => {
       this.reconnectAttempts = 0;
-      this.flushQueue();
     });
 
     this.socket.addEventListener("close", () => {
       if (!this.isManuallyClosed) {
         this.tryReconnect();
+        this.connect();
       }
     });
 
     this.socket.addEventListener("error", (err) => {
-      // eslint-disable-next-line no-console
-      console.error("WS error", err);
+      throw new Error("Websocket error: " + err);
     });
 
     return this.socket;
+
   }
 
   public disconnect() {
@@ -71,32 +81,21 @@ class SocketClient {
       this.socket.close();
       this.socket = null;
     }
-
-    this.messageQueue = [];
   }
 
-  public socketEmit<T>(payload: WsEvent<T>) {
+  public emit<T>(payload: WsOutgoingEvent<T>) {
+    const socket = this.connect();
     const message = JSON.stringify(payload);
 
-    if (this.socket?.readyState === WebSocket.OPEN) {
-      this.socket.send(message);
+    try {
+      socket.send(message);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log("WS error during emit message: ", error);
 
-      return;
-    }
-
-    this.messageQueue.push(message);
-  }
-
-  private flushQueue() {
-    if (this.socket?.readyState !== WebSocket.OPEN) {
-      return;
-    }
-
-    while (this.messageQueue.length) {
-      const msg = this.messageQueue.shift();
-      if (msg) {
-        this.socket.send(msg);
-      }
+      setTimeout(() => {
+        socket.send(message);
+      }, RECONNECT_DELAY);
     }
   }
 
@@ -121,4 +120,4 @@ class SocketClient {
 
 }
 
-export const socketService = SocketClient.getInstance();
+export const socketClient = SocketClient.getInstance();
