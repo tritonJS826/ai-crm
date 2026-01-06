@@ -4,46 +4,36 @@ services:
       context: .
       dockerfile: ./postgres/postgres-general.Dockerfile
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
     volumes:
       - br-postgres-general:/var/lib/postgresql/data
     env_file:
-      - ./br-general-python/.env
+      - ./pt-general/.env
     networks:
       - app-network
 
-  br-general-python:
+  br-grafana:
     build:
       context: .
-      dockerfile: br-general-python/Dockerfile
+      dockerfile: ./grafana/Dockerfile
     ports:
-      - "127.0.0.1:8000:8000"
-    depends_on:
-      - br-postgres-general
-    networks:
-      - app-network
-
-  br-web:
-    build:
-      context: .
-      dockerfile: ./pt-web/Dockerfile
-    ports:
-      - "127.0.0.1:5174:80"
+      - "9876:3000"
+    env_file:
+      - ./grafana/.env
     networks:
       - app-network
 
   br-gateway:
     image: caddy:2.8-alpine
     container_name: caddy-local
-    depends_on:
-      - br-general-python
-      - br-web
     ports:
-      - "80:80"
+      - "5173:80"
     volumes:
       - ./gateway/Caddyfile.local:/etc/caddy/Caddyfile:ro
     networks:
       - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   br-postgres-general:
