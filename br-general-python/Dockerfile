@@ -57,4 +57,4 @@ COPY --from=builder /root/.cache/prisma-python /root/.cache/prisma-python
 
 VOLUME /app/logs
 EXPOSE 8000
-CMD ["python", "app/run.py"]
+CMD ["python", "-m", "app.run"]

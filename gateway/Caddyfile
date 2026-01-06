@@ -1,0 +1,69 @@
+# Global options
+{
+    email admin@cs7.link
+
+    # For testing use staging (uncomment):
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+demo.ai.crm.cs7.link {
+    # Compression
+    encode gzip zstd
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+        format json
+    }
+
+    # Health check
+    handle /health {
+        respond "OK" 200
+    }
+
+    # Backend API with CORS (includes swagger)
+    handle /br-general/* {
+        header {
+            Access-Control-Allow-Origin "{header.Origin}"
+            Access-Control-Allow-Credentials "true"
+            Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Refresh-Token"
+            Vary "Origin"
+        }
+
+        @options method OPTIONS
+        handle @options {
+            respond "" 204
+        }
+
+        reverse_proxy br-general-python:8000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Grafana dashboard
+    handle_path /grafana/* {
+        reverse_proxy br-grafana:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Frontend - catch all
+    handle {
+        reverse_proxy br-web:5174 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up Upgrade {header.Upgrade}
+            header_up Connection {header.Connection}
+        }
+    }
+}
