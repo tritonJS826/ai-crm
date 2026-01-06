@@ -14,7 +14,20 @@
         respond "OK" 200
     }
 
-    # Backend API (FastAPI on host machine, port 8000)
+    # Swagger UI & OpenAPI
+    handle /docs {
+        reverse_proxy host.docker.internal:8000
+    }
+
+    handle /redoc {
+        reverse_proxy host.docker.internal:8000
+    }
+
+    handle /openapi.json {
+        reverse_proxy host.docker.internal:8000
+    }
+
+    # Backend API
     handle /br-general/* {
         reverse_proxy host.docker.internal:8000
     }
@@ -24,10 +37,9 @@
         reverse_proxy br-grafana:3000
     }
 
-    # Frontend (Vite on host machine, port 5174)
+    # Frontend
     handle {
         reverse_proxy host.docker.internal:5174 {
-            header_up Host {host}
             header_up Upgrade {header.Upgrade}
             header_up Connection {header.Connection}
         }

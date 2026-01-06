@@ -25,6 +25,7 @@ build/
 !.env.example
 !.env.local.example
 !.env.local.docker.example
+!.env.production.example
 
 # Vite cache
 .vite/

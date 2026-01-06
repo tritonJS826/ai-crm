@@ -1,0 +1,37 @@
+# Python virtual environments
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+
+# Node
+**/node_modules
+
+# IDE
+**/.idea
+**/.vscode
+
+# Git
+.git
+.gitignore
+
+# Logs
+**/*.log
+
+# Local env files - exclude only specific directories
+br-general-python/.env
+br-general-python/.env.local
+grafana/.env
+grafana/.env.local
+
+# Keep pt-web/.env for build!
+# pt-web/.env is needed during Docker build
+
+# Build artifacts
+**/dist
+**/build
+**/*.egg-info

@@ -21,6 +21,8 @@ services:
       - "127.0.0.1:8000:8000"
     depends_on:
       - br-postgres-general
+    env_file:
+      - ./br-general-python/.env
     networks:
       - app-network
     restart: unless-stopped
@@ -35,6 +37,18 @@ services:
       - app-network
     restart: unless-stopped
 
+  br-grafana:
+    build:
+      context: .
+      dockerfile: ./grafana/Dockerfile
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - ./grafana/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+
   br-gateway:
     image: caddy:2.8-alpine
     container_name: caddy
@@ -45,18 +59,13 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      # Caddyfile configuration
       - ./gateway/Caddyfile:/etc/caddy/Caddyfile:ro
-      # Persistent storage for certificates
       - caddy_data:/data
-      # Caddy configuration cache
       - caddy_config:/config
-      # Logs directory
       - caddy_logs:/var/log/caddy
     networks:
       - app-network
     restart: unless-stopped
-    # Health check
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
       interval: 30s
@@ -67,8 +76,6 @@ services:
 volumes:
   br-postgres-general:
   caddy_data:
-    # This volume stores TLS certificates
-    # IMPORTANT: Back this up to avoid rate limit issues
   caddy_config:
   caddy_logs:
 

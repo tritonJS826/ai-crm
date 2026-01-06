@@ -6,7 +6,7 @@ from app.ws.dispatcher import emit
 
 
 from fastapi import HTTPException
-from app.logging import logger
+from app.logger import logger
 
 
 async def get_health_status() -> dict:

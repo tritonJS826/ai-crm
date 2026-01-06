@@ -1,5 +1,5 @@
 from typing import Any, Callable, List, Tuple
-from app.logging import logger
+from app.logger import logger
 
 # type: (event_type, payload)
 Event = Tuple[str, dict[str, Any]]

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 
 from app.db import db
-from app.logging import logger
+from app.logger import logger
 
 router = APIRouter()
 

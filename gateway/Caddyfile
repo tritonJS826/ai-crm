@@ -1,16 +1,13 @@
 # Global options
 {
-    # Email for Let's Encrypt notifications
-    email test@cs7.link
-    
-    # Use Let's Encrypt production (default)
-    # For testing, uncomment the line below:
+    email admin@cs7.link
+
+    # For testing use staging (uncomment):
     # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
-# Main site configuration
 demo.ai.crm.cs7.link {
-    # Enable compression
+    # Compression
     encode gzip zstd
 
     # Logging
@@ -22,14 +19,26 @@ demo.ai.crm.cs7.link {
         format json
     }
 
-    # Health check endpoint
+    # Health check
     handle /health {
         respond "OK" 200
     }
 
+    # Swagger UI & OpenAPI
+    handle /docs {
+        reverse_proxy br-general-python:8000
+    }
+
+    handle /redoc {
+        reverse_proxy br-general-python:8000
+    }
+
+    handle /openapi.json {
+        reverse_proxy br-general-python:8000
+    }
+
     # Backend API with CORS
     handle /br-general/* {
-        # CORS headers
         header {
             Access-Control-Allow-Origin "{header.Origin}"
             Access-Control-Allow-Credentials "true"
@@ -38,13 +47,11 @@ demo.ai.crm.cs7.link {
             Vary "Origin"
         }
 
-        # Handle preflight OPTIONS requests
         @options method OPTIONS
         handle @options {
             respond "" 204
         }
 
-        # Proxy to FastAPI backend
         reverse_proxy br-general-python:8000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
@@ -55,7 +62,7 @@ demo.ai.crm.cs7.link {
 
     # Grafana dashboard
     handle_path /grafana/* {
-        reverse_proxy grafana:3000 {
+        reverse_proxy br-grafana:3000 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up X-Forwarded-For {remote_host}
@@ -63,17 +70,9 @@ demo.ai.crm.cs7.link {
         }
     }
 
-    # Swagger
-    handle /openapi.json {
-        reverse_proxy br-general-python:8000 {
-            header_up Host {host}
-            header_up X-Real-IP {remote_host}
-        }
-    }
-
-    # Frontend
+    # Frontend - catch all
     handle {
-        reverse_proxy br-web:5174 {
+        reverse_proxy br-web:80 {
             header_up Host {host}
             header_up X-Real-IP {remote_host}
             header_up Upgrade {header.Upgrade}
