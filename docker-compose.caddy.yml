@@ -1,0 +1,77 @@
+services:
+  br-postgres-general:
+    build:
+      context: .
+      dockerfile: ./postgres/postgres-general.Dockerfile
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - br-postgres-general:/var/lib/postgresql/data
+    env_file:
+      - ./br-general-python/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-general-python:
+    build:
+      context: .
+      dockerfile: br-general-python/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - br-postgres-general
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-web:
+    build:
+      context: .
+      dockerfile: ./pt-web/Dockerfile
+    ports:
+      - "127.0.0.1:5174:80"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-gateway:
+    image: caddy:2.8-alpine
+    container_name: caddy
+    depends_on:
+      - br-general-python
+      - br-web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Caddyfile configuration
+      - ./gateway/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Persistent storage for certificates
+      - caddy_data:/data
+      # Caddy configuration cache
+      - caddy_config:/config
+      # Logs directory
+      - caddy_logs:/var/log/caddy
+    networks:
+      - app-network
+    restart: unless-stopped
+    # Health check
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  br-postgres-general:
+  caddy_data:
+    # This volume stores TLS certificates
+    # IMPORTANT: Back this up to avoid rate limit issues
+  caddy_config:
+  caddy_logs:
+
+networks:
+  app-network:
+    driver: bridge

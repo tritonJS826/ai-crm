@@ -1,0 +1,83 @@
+# Global options
+{
+    # Email for Let's Encrypt notifications
+    email test@cs7.link
+    
+    # Use Let's Encrypt production (default)
+    # For testing, uncomment the line below:
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+# Main site configuration
+demo.ai.crm.cs7.link {
+    # Enable compression
+    encode gzip zstd
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+        format json
+    }
+
+    # Health check endpoint
+    handle /health {
+        respond "OK" 200
+    }
+
+    # Backend API with CORS
+    handle /br-general/* {
+        # CORS headers
+        header {
+            Access-Control-Allow-Origin "{header.Origin}"
+            Access-Control-Allow-Credentials "true"
+            Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+            Access-Control-Allow-Headers "Origin, Content-Type, Accept, Authorization, X-Refresh-Token"
+            Vary "Origin"
+        }
+
+        # Handle preflight OPTIONS requests
+        @options method OPTIONS
+        handle @options {
+            respond "" 204
+        }
+
+        # Proxy to FastAPI backend
+        reverse_proxy br-general-python:8000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Grafana dashboard
+    handle_path /grafana/* {
+        reverse_proxy grafana:3000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Swagger
+    handle /openapi.json {
+        reverse_proxy br-general-python:8000 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+        }
+    }
+
+    # Frontend
+    handle {
+        reverse_proxy br-web:5174 {
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up Upgrade {header.Upgrade}
+            header_up Connection {header.Connection}
+        }
+    }
+}
