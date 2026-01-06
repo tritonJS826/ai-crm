@@ -1,0 +1,32 @@
+import {useEffect} from "react";
+import {WsEventType} from "src/constants/wsEventTypes";
+import {socketClient, WsIncomingEvent} from "src/services/websocketClient";
+
+export function useSubscribe<T>(
+  eventType: WsEventType,
+  eventHandler: (event: WsIncomingEvent<T>) => void,
+) {
+  useEffect(() => {
+    const handler = (event: MessageEvent) => {
+      const parsed = JSON.parse(event.data) as WsIncomingEvent<T>;
+
+      if (parsed.type === WsEventType.NEW_MESSAGE) {
+        eventHandler(parsed);
+      }
+    };
+
+    const socket = socketClient.connect();
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.addEventListener("message", handler);
+    } else {
+      socket.onopen = () => {
+        socket.addEventListener("message", handler);
+      };
+    }
+
+    return () => {
+      socket.removeEventListener("message", handler);
+    };
+  }, [eventType, eventHandler]);
+}
