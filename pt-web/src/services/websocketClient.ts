@@ -1,5 +1,6 @@
 import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
+import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
 export type WsIncomingEvent<T> = {
@@ -42,6 +43,16 @@ class SocketClient {
   }
 
   public connect() {
+
+    const accessObj = localStorageWorker.getItemByKey<LSToken>("accessToken");
+    if (!accessObj?.token) {
+      // eslint-disable-next-line no-console
+      console.log("WS error during connect: access token not found.");
+      this.disconnect();
+
+      return;
+    }
+
     if (
       this.socket &&
       (this.socket.readyState === WebSocket.OPEN ||
@@ -50,7 +61,7 @@ class SocketClient {
       return this.socket;
     }
 
-    this.url = env.WS_PATH;
+    this.url = `${env.WS_PATH}?token=${accessObj.token}`;
     this.isManuallyClosed = false;
 
     this.socket = new WebSocket(this.url);
@@ -88,12 +99,24 @@ class SocketClient {
     const message = JSON.stringify(payload);
 
     try {
+      if (!socket) {
+      // eslint-disable-next-line no-console
+        console.log("WS error during emit message: socket not init");
+
+        return;
+      }
       socket.send(message);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.log("WS error during emit message: ", error);
 
       setTimeout(() => {
+        if (!socket) {
+          // eslint-disable-next-line no-console
+          console.log("WS error during emit message: socket not init");
+
+          return;
+        }
         socket.send(message);
       }, RECONNECT_DELAY);
     }
