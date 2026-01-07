@@ -1,0 +1,84 @@
+services:
+  br-postgres-general:
+    build:
+      context: .
+      dockerfile: ./postgres/postgres-general.Dockerfile
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - br-postgres-general:/var/lib/postgresql/data
+    env_file:
+      - ./br-general-python/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-general-python:
+    build:
+      context: .
+      dockerfile: br-general-python/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - br-postgres-general
+    env_file:
+      - ./br-general-python/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-web:
+    build:
+      context: .
+      dockerfile: ./pt-web/Dockerfile
+    ports:
+      - "127.0.0.1:5174:80"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-grafana:
+    build:
+      context: .
+      dockerfile: ./grafana/Dockerfile
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - ./grafana/.env
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  br-gateway:
+    image: caddy:2.8-alpine
+    container_name: caddy
+    depends_on:
+      - br-general-python
+      - br-web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./gateway/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - caddy_logs:/var/log/caddy
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  br-postgres-general:
+  caddy_data:
+  caddy_config:
+  caddy_logs:
+
+networks:
+  app-network:
+    driver: bridge

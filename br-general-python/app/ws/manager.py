@@ -6,7 +6,7 @@ import uuid
 
 from fastapi import WebSocket, WebSocketDisconnect
 
-from app.logging import logger
+from app.logger import logger
 
 
 @dataclass

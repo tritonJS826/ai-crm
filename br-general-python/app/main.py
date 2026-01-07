@@ -7,7 +7,7 @@ from app.api import api_router
 
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.logging import logger
+from app.logger import logger
 from app.settings import settings
 
 

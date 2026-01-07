@@ -1,5 +1,5 @@
 import asyncio
-from app.logging import logger
+from app.logger import logger
 from app.ws.dispatcher import emit
 from app.events.domain import subscribe
 

@@ -6,9 +6,9 @@ RUN corepack enable && corepack prepare pnpm@9.8.0 --activate
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY pt-web/package.json pt-web/package.json
 
-RUN pnpm install --filter pt-web --frozen-lockfile
-
 COPY pt-web ./pt-web
+
+RUN pnpm install --filter pt-web --frozen-lockfile
 
 RUN pnpm --filter pt-web build
 

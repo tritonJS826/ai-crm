@@ -1,0 +1,43 @@
+services:
+  br-postgres-general:
+    build:
+      context: .
+      dockerfile: ./postgres/postgres-general.Dockerfile
+    ports:
+      - "5432:5432"
+    volumes:
+      - br-postgres-general:/var/lib/postgresql/data
+    env_file:
+      - ./pt-general/.env
+    networks:
+      - app-network
+
+  br-grafana:
+    build:
+      context: .
+      dockerfile: ./grafana/Dockerfile
+    ports:
+      - "9876:3000"
+    env_file:
+      - ./grafana/.env
+    networks:
+      - app-network
+
+  br-gateway:
+    image: caddy:2.8-alpine
+    container_name: caddy-local
+    ports:
+      - "5173:80"
+    volumes:
+      - ./gateway/Caddyfile.local:/etc/caddy/Caddyfile:ro
+    networks:
+      - app-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  br-postgres-general:
+
+networks:
+  app-network:
+    driver: bridge
