@@ -14,7 +14,7 @@ export type WsOutgoingEvent<T> = {
   action: WsActionType;
 } & Record<string, T>
 
-const RECONNECT_DELAY = 1000;
+const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 5;
 class SocketClient {
 

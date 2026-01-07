@@ -1,4 +1,5 @@
-import {StrictMode} from "react";
+
+// Import {StrictMode} from "react";
 import {createRoot} from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
 import {Provider as JotaiProvider} from "jotai";
@@ -12,11 +13,11 @@ if (!container) {
 }
 
 createRoot(container).render(
-  <StrictMode>
-    <BrowserRouter>
-      <JotaiProvider>
-        <App />
-      </JotaiProvider>
-    </BrowserRouter>
-  </StrictMode>,
+  // <StrictMode>
+  <BrowserRouter>
+    <JotaiProvider>
+      <App />
+    </JotaiProvider>
+  </BrowserRouter>,
+  // </StrictMode>,
 );

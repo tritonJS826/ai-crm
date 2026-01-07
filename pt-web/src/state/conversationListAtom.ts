@@ -109,7 +109,7 @@ export const updateConversationListByNewMessageEventAtom = atom(
     // Update existing conversation immutably
     const updatedItems = conversationList.items.map((conversation, idx) =>
       idx === existingIndex
-        ? {...conversation, last_message_at: event.ts}
+        ? {...conversation, lastMessageAt: event.ts}
         : conversation,
     );
     set(conversationListAtom, {

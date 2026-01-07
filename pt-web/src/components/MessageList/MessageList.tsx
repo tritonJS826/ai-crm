@@ -1,7 +1,6 @@
 
 import {useEffect} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
-import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {MessageOut} from "src/services/conversation";
@@ -37,8 +36,16 @@ export function MessageList({conversation_id}: MessageListProps) {
 
   // Emit for sending NEW_MESSAGE events by server
   useEffect(() => {
-    socketClient.emit<string>({action: WsActionType.SUBSCRIBE, conversation_id});
+    // SocketClient.emit<string>({action: WsActionType.SUBSCRIBE, conversation_id});
   }, [conversation_id]);
+
+  // TODO: remove this temporal Emit for sending NEW_MESSAGE events by server
+  useEffect(() => {
+    setTimeout(() => {
+      socketClient.getSocket()?.send(JSON.stringify({type: "subscribe", scope: "conversation", id: "1"}));
+    // eslint-disable-next-line no-magic-numbers
+    }, 4000);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +58,7 @@ export function MessageList({conversation_id}: MessageListProps) {
   const messageListElement = messageList.map((message: MessageOut) => (
     <li key={message.id}>
       {conversationWithContact?.contact.name}
+      -
       {message.text}
     </li>));
 
@@ -58,8 +66,10 @@ export function MessageList({conversation_id}: MessageListProps) {
     <div className={styles.messageList}>
       <h1>
         MessageList
-        {conversationWithContact?.contact.name}
       </h1>
+      <h2>
+        {conversationWithContact?.contact.name}
+      </h2>
       <ul>
         {messageListElement}
       </ul>

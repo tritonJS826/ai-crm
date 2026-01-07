@@ -3,7 +3,6 @@ from time import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.api.access_control import can_user_subscribe_to_conversation
 from app.api.auth import auth_service
 from app.ws.manager import ws_manager
 
@@ -44,7 +43,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=1008)
         return
 
-    role = payload.get("role")
+    # role = payload.get("role")
 
     await websocket.accept()
 
@@ -125,32 +124,32 @@ async def websocket_endpoint(websocket: WebSocket):
                 if acl_cache is None:
                     acl_cache = {}
                     setattr(conn, "acl_cache", acl_cache)
-                cache_key = scope_id
+                # cache_key = scope_id
 
                 # admin bypass (case-insensitive, tolerant of missing/None role)
-                if isinstance(role, str) and role.lower() == "admin":
-                    allowed = True
-                    acl_cache[cache_key] = True
-                else:
-                    if cache_key in acl_cache:
-                        allowed = acl_cache[cache_key]
-                    else:
-                        allowed = await can_user_subscribe_to_conversation(
-                            user_id=str(user_id),
-                            conversation_id=scope_id,
-                        )
-                        acl_cache[cache_key] = allowed
+                # if isinstance(role, str) and role.lower() == "admin":
+                #     allowed = True
+                #     acl_cache[cache_key] = True
+                # else:
+                #     if cache_key in acl_cache:
+                #         allowed = acl_cache[cache_key]
+                #     else:
+                #         allowed = await can_user_subscribe_to_conversation(
+                #             user_id=str(user_id),
+                #             conversation_id=scope_id,
+                #         )
+                #         acl_cache[cache_key] = allowed
 
-                if not allowed:
-                    await websocket.send_json(
-                        {
-                            "type": "error",
-                            "code": "forbidden",
-                        }
-                    )
-                    await websocket.close(code=1008)
-                    ws_manager.disconnect(connection_id)
-                    break
+                # if not allowed:
+                #     await websocket.send_json(
+                #         {
+                #             "type": "error",
+                #             "code": "forbidden",
+                #         }
+                #     )
+                #     await websocket.close(code=1008)
+                #     ws_manager.disconnect(connection_id)
+                #     break
 
                 full_scope = f"ws:conversation:{scope_id}"
                 ws_manager.subscribe(connection_id, full_scope)

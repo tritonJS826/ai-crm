@@ -62,10 +62,10 @@ export const updateMessageListByNewMessageEventAtom = atom(
     // Update existing messageList immutably
     const updatedItem: MessageOut = {
       id: event.data.message_id,
-      conversation_id: event.data.conversation_id,
-      created_at: event.ts,
+      conversationId: event.data.conversation_id,
+      createdAt: event.ts,
       platform: event.data.platform,
-      from_user_id: event.data.from_user_id,
+      fromUserId: event.data.from_user_id,
       text: event.data.text,
     };
     set(messageListAtom, [

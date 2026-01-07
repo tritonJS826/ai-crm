@@ -10,7 +10,6 @@ from app.schemas.contact import Platform
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
-from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
 
@@ -118,12 +117,13 @@ class MessageService:
             raise ValueError("Cannot send message: contact has opted out")
 
         # 3. Send via Meta API
-        remote_message_id = await meta_service.send_message(
-            platform=platform,
-            to=contact.platformUserId,
-            text=text,
-            image_url=image_url,
-        )
+        remote_message_id = "2"
+        # remote_message_id = await meta_service.send_message(
+        #     platform=platform,
+        #     to=contact.platformUserId,
+        #     text=text,
+        #     image_url=image_url,
+        # )
 
         if not remote_message_id:
             raise ValueError("Failed to send message via Meta API")

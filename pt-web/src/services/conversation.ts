@@ -6,22 +6,22 @@ import {ContactOptOutUpdate, ContactOut} from "src/services/contact";
 // Schema for message data in responses.
 export type MessageOut = {
     id: string;
-    conversation_id: string;
-    from_user_id?: string;
+    conversationId: string;
+    fromUserId?: string;
     platform: Platform;
     text?: string;
-    media_url?: string;
-    remote_message_id?: string;
-    created_at: Date;
+    mediaUrl?: string;
+    remoteMessageId?: string;
+    createdAt: Date;
 }
 
 // Schema for conversation data in responses.
 export type ConversationOut = {
     id: string;
-    contact_id: string;
+    contactId: string;
     status: ConversationStatus;
-    last_message_at: Date;
-    created_at: Date;
+    lastMessageAt: Date;
+    createdAt: Date;
 }
 
 // Schema for conversation with nested contact data.
@@ -44,15 +44,15 @@ export type ConversationListResponse = {
 
 // Schema for sending a message.
 export type SendMessageRequest={
-    conversation_id: string;
+    conversationId: string;
     text?: string;
-    image_url?: string;
+    imageUrl?: string;
 }
 
 // Schema for send message response.
 export type SendMessageResponse = {
     message: MessageOut;
-    remote_message_id?: string;
+    remoteMessageId?: string;
 }
 
 export async function getConversationList(

@@ -40,28 +40,43 @@ export function ConversationList() {
     ? conversationList.items.map((item: ConversationWithContact) => (
       <li key={item.id}>
         {item.contact.name}
+        <p>
+          last message at
+          {" "}
+          {String(item.lastMessageAt)}
+        </p>
+
       </li>))
-    : "";
+    : [];
 
   return (
     <div className={styles.conversationList}>
-      <h1>
-        ConversationList
-      </h1>
-      <ul>
-        {conversationListElement}
-      </ul>
-      {conversationListLoading && <p>
-        loading...
-      </p>}
-      {conversationListError && <p>
-        {conversationListError}
-      </p>}
-      {currentConversationId && <>
-        <MessageList conversation_id={currentConversationId} />
-        <CompanionProfile />
-      </>
-      }
+      <div className={styles.wrapper}>
+        <h1>
+          ConversationList
+        </h1>
+        <ul>
+          {conversationListElement.length > 0 ? conversationListElement : "{conversation list is empty}"}
+        </ul>
+        {conversationListLoading && <p>
+          loading...
+        </p>}
+        {conversationListError && <p>
+          {conversationListError}
+        </p>}
+      </div>
+      <div className={styles.wrapper}>
+        {currentConversationId && <>
+          <MessageList conversation_id={currentConversationId} />
+        </>
+        }
+      </div>
+      <div className={styles.wrapper}>
+        {currentConversationId && <>
+          <CompanionProfile />
+        </>
+        }
+      </div>
     </div>
   );
 }
