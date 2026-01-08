@@ -8,10 +8,6 @@ export const profileDictRu = {
     title: "",
     name: "",
     preferredContactEmail: "",
-    city: "",
-    phone: "",
-    language: "",
-    preferredContactPhone: "",
   },
   actions: {
     save: "",

@@ -12,6 +12,8 @@ import {
 } from "src/state/authAtom";
 import styles from "src/pages/authPage/AuthPage.module.scss";
 
+const MIN_PASSWORD_LENGTH = 8;
+
 export function AuthPage() {
   const navigate = useNavigate();
   const dictionary = useDictionary(DictionaryKey.AUTH);
@@ -48,6 +50,11 @@ export function AuthPage() {
     if (isRegister) {
       if (!fullName.trim()) {
         setError(dictionary.errors.nameRequired);
+
+        return;
+      }
+      if (password.length < MIN_PASSWORD_LENGTH) {
+        setError(dictionary.errors.passwordTooShort);
 
         return;
       }
@@ -154,7 +161,7 @@ export function AuthPage() {
               onChange={(e) => setPassword(e.currentTarget.value)}
               autoComplete={isRegister ? "new-password" : "current-password"}
               placeholder={dictionary.placeholders.password}
-              minLength={6}
+              minLength={MIN_PASSWORD_LENGTH}
               required
             />
           </label>
@@ -169,7 +176,7 @@ export function AuthPage() {
                 onChange={(e) => setPassword2(e.currentTarget.value)}
                 autoComplete="new-password"
                 placeholder={dictionary.placeholders.passwordRepeat}
-                minLength={6}
+                minLength={MIN_PASSWORD_LENGTH}
                 required
               />
             </label>

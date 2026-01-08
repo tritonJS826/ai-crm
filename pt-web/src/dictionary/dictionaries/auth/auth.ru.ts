@@ -19,6 +19,7 @@ export const authDict = {
   },
   errors: {
     nameRequired: "",
+    passwordTooShort: "",
     passwordsMismatch: "",
     requestFailed: "",
   },
