@@ -45,7 +45,7 @@ class OrderRepository:
                 "amountCents": amount_cents,
                 "currency": currency,
                 "stripeSessionId": stripe_session_id,
-                "status": "PENDING",
+                "status": OrderStatus.PENDING.value,
             }
         )
 
