@@ -5,7 +5,7 @@ User-related Pydantic schemas for request/response validation.
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 
 
 class Role(str, Enum):
@@ -13,6 +13,11 @@ class Role(str, Enum):
 
     ADMIN = "ADMIN"
     AGENT = "AGENT"
+
+
+# -------------------------
+# INPUT SCHEMAS
+# -------------------------
 
 
 class UserCreate(BaseModel):
@@ -23,12 +28,24 @@ class UserCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     role: Role = Role.AGENT
 
+    @field_validator("password")
+    @classmethod
+    def password_not_whitespace(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("Password cannot be empty")
+        return v
+
 
 class UserLogin(BaseModel):
     """Schema for user login request."""
 
     email: EmailStr
     password: str
+
+
+# -------------------------
+# OUTPUT SCHEMAS
+# -------------------------
 
 
 class UserOut(BaseModel):
@@ -39,19 +56,15 @@ class UserOut(BaseModel):
     name: str
     role: Role
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class Token(BaseModel):
     """Schema for JWT token pair."""
 
-    access_token: str = Field(
-        ..., description="JWT access token for API authentication"
-    )
-    refresh_token: Optional[str] = Field(
-        default=None, description="JWT refresh token for renewing access"
-    )
-    token_type: str = Field(
-        default="bearer", description="Type of authentication scheme"
-    )
+    access_token: str
+    refresh_token: Optional[str] = None
+    token_type: str = "bearer"
 
 
 class RefreshTokenRequest(BaseModel):

@@ -14,7 +14,6 @@ from app.services.message_service import message_service
 from app.repositories.order_repository import order_repo
 from app.repositories.product_repository import product_repo
 from app.repositories.conversation_repository import conversation_repo
-from app.schemas.contact import Platform
 from app.schemas.order import OrderStatus
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
@@ -77,7 +76,7 @@ async def handle_meta_webhook(request: Request) -> dict:
     if normalized is not None:
         try:
             await message_service.handle_inbound_message(
-                platform=Platform(normalized.platform),
+                platform=normalized.platform,
                 platform_user_id=normalized.platform_user_id,
                 text=normalized.text,
                 media_url=normalized.media_url,
@@ -85,8 +84,13 @@ async def handle_meta_webhook(request: Request) -> dict:
                 contact_name=normalized.contact_name,
                 contact_phone=normalized.contact_phone,
             )
-        except Exception as e:
-            logger.error(f"Error processing inbound message: {e}")
+            logger.info(
+                "Inbound %s message from %s",
+                normalized.platform,
+                normalized.platform_user_id,
+            )
+        except Exception:
+            logger.exception("Error processing inbound message")
 
     return {"status": "ok"}
 
@@ -121,8 +125,8 @@ async def handle_stripe_webhook(request: Request) -> dict:
         if session_data:
             try:
                 await _handle_checkout_completed(session_data)
-            except Exception as e:
-                logger.error(f"Error handling checkout completed: {e}")
+            except Exception:
+                logger.exception("Error handling checkout.session.completed")
 
     return {"status": "ok"}
 
