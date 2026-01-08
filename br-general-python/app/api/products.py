@@ -15,16 +15,24 @@ from app.schemas.product import (
     ProductOut,
     ProductListResponse,
 )
+from app.schemas.user import Role
 
 router = APIRouter()
 
 
-def require_admin(current_user: dict) -> dict:
-    """Dependency to require admin role."""
-    # Get user from DB to check role
-    # For simplicity, we trust the token here
-    # In production, you'd verify the role from DB
+def require_admin(current_user=Depends(get_current_user)):
+    """Require ADMIN role."""
+    if current_user.role != Role.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
     return current_user
+
+
+# -------------------------------------------------------------------
+# Public / authenticated endpoints
+# -------------------------------------------------------------------
 
 
 @router.get("", response_model=ProductListResponse)
@@ -33,14 +41,17 @@ async def list_products(
     search: Optional[str] = None,
     current_user=Depends(get_current_user),
 ):
-    """List all products."""
+    """List products."""
     products, total = await product_repo.list_products(
         db,
         active_only=active_only,
         search=search,
     )
 
-    return ProductListResponse(items=products, total=total)
+    return ProductListResponse(
+        items=[ProductOut.from_orm(p) for p in products],
+        total=total,
+    )
 
 
 @router.get("/{product_id}", response_model=ProductOut)
@@ -48,24 +59,25 @@ async def get_product(
     product_id: str,
     current_user=Depends(get_current_user),
 ):
-    """Get a specific product by ID."""
+    """Get a specific product."""
     product = await product_repo.get_by_id(db, product_id)
-
     if not product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found",
-        )
+        raise HTTPException(status_code=404, detail="Product not found")
 
-    return product
+    return ProductOut.from_orm(product)
+
+
+# -------------------------------------------------------------------
+# Admin-only endpoints
+# -------------------------------------------------------------------
 
 
 @router.post("", response_model=ProductOut, status_code=status.HTTP_201_CREATED)
 async def create_product(
     payload: ProductCreate,
-    current_user=Depends(get_current_user),
+    _admin=Depends(require_admin),
 ):
-    """Create a new product. Requires admin role."""
+    """Create a new product (ADMIN only)."""
     product = await product_repo.create(
         db,
         title=payload.title,
@@ -76,22 +88,19 @@ async def create_product(
         description=payload.description,
     )
 
-    return product
+    return ProductOut.from_orm(product)
 
 
 @router.put("/{product_id}", response_model=ProductOut)
 async def update_product(
     product_id: str,
     payload: ProductUpdate,
-    current_user=Depends(get_current_user),
+    _admin=Depends(require_admin),
 ):
-    """Update a product. Requires admin role."""
+    """Update a product (ADMIN only)."""
     existing = await product_repo.get_by_id(db, product_id)
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found",
-        )
+        raise HTTPException(status_code=404, detail="Product not found")
 
     updated = await product_repo.update(
         db,
@@ -99,20 +108,17 @@ async def update_product(
         data=payload.model_dump(exclude_unset=True),
     )
 
-    return updated
+    return ProductOut.from_orm(updated)
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: str,
-    current_user=Depends(get_current_user),
+    _admin=Depends(require_admin),
 ):
-    """Soft delete a product (set isActive=False). Requires admin role."""
+    """Soft delete a product (ADMIN only)."""
     existing = await product_repo.get_by_id(db, product_id)
     if not existing:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found",
-        )
+        raise HTTPException(status_code=404, detail="Product not found")
 
     await product_repo.delete(db, product_id)

@@ -26,6 +26,13 @@ class ProductBase(BaseModel):
         """Ensure currency is uppercase."""
         return v.upper()
 
+    @field_validator("stripe_price_id")
+    @classmethod
+    def stripe_price_id_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("stripePriceId cannot be empty")
+        return v
+
 
 class ProductCreate(ProductBase):
     """Schema for creating a new product."""

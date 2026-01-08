@@ -1,81 +1,128 @@
-import uuid
 from datetime import datetime, timedelta, timezone
-from jose import JWTError, jwt, ExpiredSignatureError
-from passlib.context import CryptContext
 
-from app.settings import settings
-from typing import Optional, Union
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from uuid import uuid4
+
+from ..settings import settings
+
+
+class InvalidTokenError(Exception):
+    """Token is invalid or malformed."""
+
+
+class ExpiredTokenError(Exception):
+    """Token has expired."""
+
+
+class WrongTokenTypeError(Exception):
+    """Token type is not allowed for this operation."""
+
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 class AuthService:
-    """Handles authentication logic: password hashing, JWT creation and decoding."""
+    """Authentication and token service."""
 
-    def get_password_hash(self, password: str) -> str:
-        """Hash plain password using Argon2."""
+    # -------------------------
+    # Password hashing
+    # -------------------------
+
+    def hash_password(self, password: str) -> str:
         return pwd_context.hash(password)
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        """Verify a plain password against its hashed value."""
         return pwd_context.verify(plain_password, hashed_password)
 
-    def create_access_token(self, data: dict) -> str:
-        """Create a short-lived access JWT."""
-        to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.access_token_expire_minutes
-        )
-        to_encode.update(
-            {
-                "exp": expire,
-                "iat": datetime.now(timezone.utc),
-                "jti": str(uuid.uuid4()),
-                "type": "access",
-            }
-        )
+    # -------------------------
+    # Token creation
+    # -------------------------
+
+    def _create_token(
+        self,
+        subject: str,
+        token_type: str,
+        expires_delta: timedelta,
+    ) -> str:
+        now = datetime.now(timezone.utc)
+
+        payload = {
+            "sub": subject,
+            "type": token_type,  # "access" or "refresh"
+            "iat": now,
+            "exp": now + expires_delta,
+            "jti": str(uuid4()),
+        }
+
         return jwt.encode(
-            to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+            payload,
+            settings.jwt_secret_key,
+            algorithm=settings.jwt_algorithm,
         )
 
-    def create_refresh_token(self, data: dict) -> str:
-        """Create a long-lived refresh JWT."""
-        to_encode = data.copy()
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.refresh_token_expire_minutes
-        )
-        to_encode.update(
-            {
-                "exp": expire,
-                "iat": datetime.now(timezone.utc),
-                "jti": str(uuid.uuid4()),
-                "type": "refresh",
-            }
-        )
-        return jwt.encode(
-            to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
+    def create_access_token(self, user_id: str) -> str:
+        return self._create_token(
+            subject=user_id,
+            token_type="access",
+            expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
         )
 
-    def decode_token(self, token: str) -> Optional[dict]:
+    def create_refresh_token(self, user_id: str) -> str:
+        return self._create_token(
+            subject=user_id,
+            token_type="refresh",
+            expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes),
+        )
+
+    # -------------------------
+    # Token decoding
+    # -------------------------
+
+    def decode_token(self, token: str) -> dict:
+        """
+        Decode a JWT and return payload.
+
+        Raises:
+            InvalidTokenError
+            ExpiredTokenError
+        """
         if token.startswith("Bearer "):
             token = token.removeprefix("Bearer ").strip()
 
         try:
-            return jwt.decode(
+            payload = jwt.decode(
                 token,
                 settings.jwt_secret_key,
                 algorithms=[settings.jwt_algorithm],
             )
-        except JWTError:
-            return None
+            return payload
 
-    def decode_token_with_exp(self, token: str) -> Union[dict, str, None]:
-        """Decode token but return 'expired' if expired, None if invalid."""
-        try:
-            return jwt.decode(
-                token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm]
-            )
-        except ExpiredSignatureError:
-            return "expired"
+        except jwt.ExpiredSignatureError:
+            raise ExpiredTokenError("Token has expired")
+
         except JWTError:
-            return None
+            raise InvalidTokenError("Invalid token")
+
+    # -------------------------
+    # Token type enforcement
+    # -------------------------
+
+    def require_access_token(self, token: str) -> dict:
+        payload = self.decode_token(token)
+
+        if payload.get("type") != "access":
+            raise WrongTokenTypeError("Access token required")
+
+        return payload
+
+    def require_refresh_token(self, token: str) -> dict:
+        payload = self.decode_token(token)
+
+        if payload.get("type") != "refresh":
+            raise WrongTokenTypeError("Refresh token required")
+
+        return payload
+
+
+auth_service = AuthService()

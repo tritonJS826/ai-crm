@@ -24,6 +24,7 @@ class OrderOut(BaseModel):
     id: str
     contact_id: str = Field(..., alias="contactId")
     product_id: str = Field(..., alias="productId")
+    # conversation_id: Optional conversation where the order originated.
     conversation_id: Optional[str] = Field(default=None, alias="conversationId")
     amount_cents: int = Field(..., alias="amountCents")
     currency: str

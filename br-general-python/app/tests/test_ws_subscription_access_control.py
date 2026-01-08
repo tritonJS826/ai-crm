@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -7,7 +9,8 @@ from app.api import websocket as ws_api
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    with TestClient(app) as client:
+        yield client
 
 
 def test_ws_subscribe_allowed(monkeypatch, client):
@@ -21,18 +24,28 @@ def test_ws_subscribe_allowed(monkeypatch, client):
         return True
 
     monkeypatch.setattr(
-        "app.api.websocket.can_user_subscribe_to_conversation",
+        "app.api.websocket.can_user_access_conversation",
         allow,
     )
+
+    import time
 
     with client.websocket_connect("/br-general/ws/ws?token=fake") as ws:
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
+
+        # Wait (briefly) until the server processes the subscribe
+        for _ in range(20):  # ~200ms max
+            if ws_manager._scopes_by_connection:
+                break
+            time.sleep(0.01)
 
         conn = next(iter(ws_manager.connections.values()))
         assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
@@ -53,7 +66,7 @@ def test_ws_subscribe_admin_bypass(monkeypatch, client):
         return False
 
     monkeypatch.setattr(
-        "app.api.websocket.can_user_subscribe_to_conversation",
+        "app.api.websocket.can_user_access_conversation",
         forbidden,
     )
 
@@ -61,10 +74,17 @@ def test_ws_subscribe_admin_bypass(monkeypatch, client):
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
+
+        for _ in range(20):
+            if ws_manager._scopes_by_connection:
+                break
+            time.sleep(0.01)
 
         conn = next(iter(ws_manager.connections.values()))
         assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
@@ -83,7 +103,7 @@ def test_ws_subscribe_forbidden(monkeypatch, client):
         return False
 
     monkeypatch.setattr(
-        "app.api.websocket.can_user_subscribe_to_conversation",
+        "app.api.websocket.can_user_access_conversation",
         deny,
     )
 
@@ -91,14 +111,16 @@ def test_ws_subscribe_forbidden(monkeypatch, client):
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
 
         msg = ws.receive_json()
         assert msg["type"] == "error"
-        assert msg["code"] == "forbidden"
+        assert msg["data"]["code"] == "forbidden"
 
         with pytest.raises(Exception):
             ws.receive_json()

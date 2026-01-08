@@ -4,8 +4,9 @@ API endpoints for conversations and messages.
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from app.api.access_control import can_user_access_conversation
 from app.api.users import get_current_user
 from app.db import db
 from app.repositories.conversation_repository import conversation_repo
@@ -28,6 +29,11 @@ from app.schemas.contact import ContactOptOutUpdate, Platform
 router = APIRouter()
 
 
+# -------------------------------------------------------------------
+# Conversations
+# -------------------------------------------------------------------
+
+
 @router.get("", response_model=ConversationListResponse)
 async def list_conversations(
     status: Optional[ConversationStatus] = None,
@@ -35,7 +41,9 @@ async def list_conversations(
     offset: int = 0,
     current_user=Depends(get_current_user),
 ):
-    """List all conversations with pagination."""
+    """
+    List conversations visible to the current user.
+    """
     conversations, total = await conversation_repo.list_conversations(
         db,
         status=status,
@@ -68,14 +76,15 @@ async def get_conversation(
     conversation_id: str,
     current_user=Depends(get_current_user),
 ):
-    """Get a specific conversation by ID."""
+    """
+    Get a single conversation.
+    """
     conversation = await conversation_repo.get_by_id(db, conversation_id)
-
     if not conversation:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Conversation not found",
-        )
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     return ConversationWithContact(
         id=conversation.id,
@@ -87,6 +96,29 @@ async def get_conversation(
     )
 
 
+@router.post("/{conversation_id}/close", status_code=status.HTTP_204_NO_CONTENT)
+async def close_conversation(
+    conversation_id: str,
+    current_user=Depends(get_current_user),
+):
+    """
+    Close a conversation.
+    """
+    conversation = await conversation_repo.get_by_id(db, conversation_id)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    await conversation_repo.close(db, conversation_id)
+
+
+# -------------------------------------------------------------------
+# Messages
+# -------------------------------------------------------------------
+
+
 @router.get("/{conversation_id}/messages", response_model=list[MessageOut])
 async def get_messages(
     conversation_id: str,
@@ -94,14 +126,15 @@ async def get_messages(
     cursor: Optional[str] = None,
     current_user=Depends(get_current_user),
 ):
-    """Get messages for a conversation with cursor pagination."""
-    # Verify conversation exists
+    """
+    Get messages for a conversation.
+    """
     conversation = await conversation_repo.get_by_id(db, conversation_id)
     if not conversation:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Conversation not found",
-        )
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     messages = await message_repo.get_by_conversation(
         db,
@@ -110,55 +143,50 @@ async def get_messages(
         cursor=cursor,
     )
 
-    return messages
+    return [MessageOut.from_orm(msg) for msg in messages]
 
 
 @router.post("/send", response_model=SendMessageResponse)
 async def send_message(
     payload: SendMessageRequest,
-    _current_user: dict = Depends(get_current_user),
-) -> SendMessageResponse:
-    """Send a message to a conversation."""
-    if not payload.text and not payload.image_url:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Message must contain text or image_url",
-        )
-    try:
-        result = await message_service.send_outbound_message(
-            conversation_id=payload.conversation_id,
-            text=payload.text,
-            image_url=payload.image_url,
-        )
-
-        message = await db.message.find_unique(where={"id": result["message_id"]})
-
-        return SendMessageResponse(
-            message=message,
-            remoteMessageId=result.get("remote_message_id"),
-        )
-
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e),
-        )
-
-
-@router.post("/{conversation_id}/close", status_code=status.HTTP_204_NO_CONTENT)
-async def close_conversation(
-    conversation_id: str,
     current_user=Depends(get_current_user),
 ):
-    """Close a conversation."""
-    conversation = await conversation_repo.get_by_id(db, conversation_id)
-    if not conversation:
+    """
+    Send an outbound message as the authenticated agent.
+    """
+    if not payload.text and not payload.image_url:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Conversation not found",
+            status_code=400,
+            detail="Message must contain text or image",
         )
 
-    await conversation_repo.close(db, conversation_id)
+    conversation = await conversation_repo.get_by_id(db, payload.conversation_id)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(
+        db, current_user.id, payload.conversation_id
+    ):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    result = await message_service.send_outbound_message(
+        conversation_id=payload.conversation_id,
+        text=payload.text,
+        image_url=payload.image_url,
+        agent_user_id=current_user.id,
+    )
+
+    message = await message_repo.get_by_id(db, result["message_id"])
+
+    return SendMessageResponse(
+        message=MessageOut.from_orm(message),
+        remoteMessageId=result.get("remote_message_id"),
+    )
+
+
+# -------------------------------------------------------------------
+# Contacts
+# -------------------------------------------------------------------
 
 
 @router.patch("/contacts/{contact_id}/optout", status_code=status.HTTP_204_NO_CONTENT)
@@ -167,59 +195,59 @@ async def update_contact_opt_out(
     payload: ContactOptOutUpdate,
     current_user=Depends(get_current_user),
 ):
-    """Update contact opt-out status."""
+    """
+    Update contact opt-out status.
+    """
     contact = await contact_repo.get_by_id(db, contact_id)
     if not contact:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Contact not found",
-        )
+        raise HTTPException(status_code=404, detail="Contact not found")
 
     await contact_repo.update_opt_out(db, contact_id, payload.opt_out)
+
+
+# -------------------------------------------------------------------
+# Products / Checkout
+# -------------------------------------------------------------------
 
 
 @router.post("/{conversation_id}/send-product")
 async def send_product_to_conversation(
     conversation_id: str,
-    product_id: str = Query(..., description="Product ID to send"),
-    current_user: dict = Depends(get_current_user),
-) -> dict:
-    """Send a product card to a conversation."""
+    product_id: str = Query(..., description="Product ID"),
+    current_user=Depends(get_current_user),
+):
+    """
+    Send a product card into a conversation.
+    """
     conversation = await conversation_repo.get_by_id(db, conversation_id)
-    if conversation is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Conversation not found",
-        )
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+        raise HTTPException(status_code=403, detail="Access denied")
 
     product = await product_repo.get_by_id(db, product_id)
-    if product is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found",
-        )
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
 
     if not product.isActive:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Product is not active",
-        )
+        raise HTTPException(status_code=400, detail="Product is not active")
 
     contact = conversation.contact
     if contact.optOut:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot send to opted-out contact",
-        )
+        raise HTTPException(status_code=400, detail="Contact has opted out")
 
     checkout_url = (
         f"{settings.app_base_url}/br-general/stripe/checkout"
-        f"?product_id={product.id}&conv_id={conversation_id}&contact_id={contact.id}"
+        f"?product_id={product.id}"
+        f"&conversation_id={conversation_id}"
+        f"&contact_id={contact.id}"
     )
 
     price_str = f"{product.priceCents / 100:.2f} {product.currency}"
 
     platform = Platform(contact.platform)
+
     remote_id = await meta_service.send_product_card(
         platform=platform,
         to=contact.platformUserId,
@@ -229,9 +257,9 @@ async def send_product_to_conversation(
         buy_url=checkout_url,
     )
 
-    if remote_id is None:
+    if not remote_id:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            status_code=500,
             detail="Failed to send product card",
         )
 
@@ -239,8 +267,8 @@ async def send_product_to_conversation(
         db,
         conversation_id=conversation_id,
         platform=platform,
-        from_user_id=None,  # from agent
-        text=f"[Product Card] {product.title} - {price_str}",
+        from_user_id=current_user.id,
+        text=f"[Product] {product.title} — {price_str}",
         remote_message_id=remote_id,
     )
 

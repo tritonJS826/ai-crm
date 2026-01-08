@@ -7,6 +7,7 @@ from typing import Optional
 from app.db import db
 from app.logging import logger
 from app.schemas.contact import Platform
+from app.schemas.message import MessageDirection
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
@@ -34,12 +35,6 @@ class MessageService:
     ) -> dict:
         """
         Process an inbound message from a customer.
-
-        1. Upsert contact
-        2. Get or create conversation
-        3. Check for opt-out keywords
-        4. Store message
-        5. Emit WebSocket event
         """
         # 1. Upsert contact
         contact = await contact_repo.upsert(
@@ -58,12 +53,13 @@ class MessageService:
             await contact_repo.update_opt_out(db, contact.id, opt_out=True)
             logger.info(f"Contact {contact.id} opted out")
 
-        # 4. Store message
+        # 4. Store inbound message (customer → agent)
         message = await message_repo.create(
             db,
             conversation_id=conversation.id,
+            direction=MessageDirection.IN,
             platform=platform,
-            from_user_id=contact.id,  # from contact
+            from_user_id=None,
             text=text,
             media_url=media_url,
             remote_message_id=remote_message_id,
@@ -78,7 +74,8 @@ class MessageService:
             {
                 "conversation_id": conversation.id,
                 "message_id": message.id,
-                "from_user_id": contact.id,
+                "direction": MessageDirection.IN.value,
+                "from_user_id": None,
                 "platform": platform.value,
                 "text": text,
             },
@@ -93,17 +90,16 @@ class MessageService:
     async def send_outbound_message(
         self,
         conversation_id: str,
+        agent_user_id: Optional[str],
         text: Optional[str] = None,
         image_url: Optional[str] = None,
     ) -> dict:
         """
         Send an outbound message to a customer.
 
-        1. Get conversation and contact
-        2. Check opt-out status
-        3. Send via Meta API
-        4. Store message
-        5. Emit WebSocket event
+        agent_user_id:
+        - NOT NULL → agent message
+        - NULL → system / bot message
         """
         # 1. Get conversation with contact
         conversation = await conversation_repo.get_by_id(db, conversation_id)
@@ -128,12 +124,13 @@ class MessageService:
         if not remote_message_id:
             raise ValueError("Failed to send message via Meta API")
 
-        # 4. Store message
+        # 4. Store outbound message (agent/system → customer)
         message = await message_repo.create(
             db,
             conversation_id=conversation_id,
+            direction=MessageDirection.OUT,
             platform=platform,
-            from_user_id=None,  # from agent
+            from_user_id=agent_user_id,
             text=text,
             media_url=image_url,
             remote_message_id=remote_message_id,
@@ -148,7 +145,8 @@ class MessageService:
             {
                 "conversation_id": conversation_id,
                 "message_id": message.id,
-                "from_user_id": None,
+                "direction": MessageDirection.OUT.value,
+                "from_user_id": agent_user_id,
                 "platform": platform.value,
                 "text": text,
             },
@@ -166,12 +164,21 @@ class MessageService:
         product_title: str,
         amount: str,
     ) -> Optional[str]:
-        """Send order confirmation message to customer."""
-        text = f"✅ Payment received!\n\nOrder #{order_id}\n{product_title}\nAmount: {amount}\n\nThank you for your purchase!"
+        """
+        Send order confirmation as a system message.
+        """
+        text = (
+            f"Payment received!\n\n"
+            f"Order #{order_id}\n"
+            f"{product_title}\n"
+            f"Amount: {amount}\n\n"
+            f"Thank you for your purchase!"
+        )
 
         try:
             result = await self.send_outbound_message(
                 conversation_id=conversation_id,
+                agent_user_id=None,  # system message
                 text=text,
             )
             return result.get("message_id")
