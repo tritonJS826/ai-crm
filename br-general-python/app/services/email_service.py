@@ -6,11 +6,10 @@ from enum import Enum
 from prisma import Prisma
 import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-import logging
+from app.logging import logger
 
 from app.settings import settings
 
-logger = logging.getLogger(__name__)
 
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 _env = Environment(

@@ -2,7 +2,7 @@
 API endpoints for Meta and Stripe webhooks.
 """
 
-import logging
+from app.logging import logger
 
 from fastapi import APIRouter, Request, HTTPException, Query, Response
 
@@ -17,8 +17,6 @@ from app.repositories.conversation_repository import conversation_repo
 from app.schemas.order import OrderStatus
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
