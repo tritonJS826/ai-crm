@@ -11,7 +11,7 @@ import httpx
 
 from app.settings import settings
 from app.schemas.platform import Platform
-from app.schemas.webhook import NormalizedMessage
+from app.schemas.message import NormalizedMessage, MessageDirection
 
 logger = logging.getLogger(__name__)
 
@@ -79,13 +79,20 @@ class MetaService:
             logger.exception("Error normalizing webhook")
             return None
 
-    def _normalize_whatsapp(
-        self, payload: Dict[str, Any]
-    ) -> Optional[NormalizedMessage]:
+    @staticmethod
+    def _normalize_whatsapp(payload: Dict[str, Any]) -> Optional[NormalizedMessage]:
         entry = (payload.get("entry") or [{}])[0]
         change = (entry.get("changes") or [{}])[0]
         value = change.get("value", {})
-        msg = (value.get("messages") or [{}])[0]
+
+        messages = value.get("messages")
+        contacts = value.get("contacts")
+
+        if not messages or not contacts:
+            return None
+
+        msg = messages[0]
+        contact = contacts[0]
 
         msg_from = msg.get("from")
         msg_id = msg.get("id")
@@ -93,15 +100,17 @@ class MetaService:
         if not msg_from or not msg_id:
             return None
 
-        contact = (value.get("contacts") or [{}])[0]
-
         return NormalizedMessage(
             platform=Platform.WHATSAPP,
-            platform_user_id=msg_from,
+            from_number=msg_from,
+            wa_id=contact.get("wa_id", msg_from),
+            name=contact.get("profile", {}).get("name"),
+            message_id=msg_id,
+            timestamp=int(msg.get("timestamp", 0)),
+            type=msg.get("type", "text"),
             text=msg.get("text", {}).get("body"),
-            remote_message_id=msg_id,
-            contact_name=contact.get("profile", {}).get("name"),
-            contact_phone=msg_from,
+            phone_number_id=value.get("metadata", {}).get("phone_number_id"),
+            direction=MessageDirection.IN,
         )
 
     def _normalize_messenger_instagram(
@@ -114,14 +123,23 @@ class MetaService:
         sender = event.get("sender", {})
         message = event.get("message", {})
 
-        if not sender.get("id") or not message.get("mid"):
+        sender_id = sender.get("id")
+        message_id = message.get("mid")
+
+        if not sender_id or not message_id:
             return None
 
         return NormalizedMessage(
             platform=platform,
-            platform_user_id=sender["id"],
+            from_number=sender_id,
+            wa_id=sender_id,  # reuse for non-WA platforms
+            name=None,
+            message_id=message_id,
+            timestamp=0,
+            type="text",
             text=message.get("text"),
-            remote_message_id=message["mid"],
+            phone_number_id="",
+            direction=MessageDirection.IN,
         )
 
     # -------------------------

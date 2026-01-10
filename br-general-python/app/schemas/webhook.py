@@ -96,7 +96,7 @@ class MetaWebhookPayload(BaseModel):
 # ============================================
 
 
-class NormalizedMessage(BaseModel):
+class MetaWebhookMessageDTO(BaseModel):
     """Normalized message format for internal processing."""
 
     platform: Platform
