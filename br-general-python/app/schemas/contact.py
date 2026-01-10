@@ -3,18 +3,11 @@ Contact-related Pydantic schemas for request/response validation.
 """
 
 from datetime import datetime
-from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
-
-class Platform(str, Enum):
-    """Supported messaging platforms."""
-
-    WHATSAPP = "WHATSAPP"
-    MESSENGER = "MESSENGER"
-    INSTAGRAM = "INSTAGRAM"
+from app.schemas.platform import Platform
 
 
 class ContactBase(BaseModel):

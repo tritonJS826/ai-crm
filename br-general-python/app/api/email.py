@@ -1,22 +1,28 @@
-# app/api/email.py
-from fastapi import APIRouter, BackgroundTasks
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+import logging
+
 from app.schemas.email import EmailSendRequest, EmailSendResponse
 from app.services.email_service import EmailService
-
-import logging
+from app.api.users import get_current_user
+from app.schemas.user import Role
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
-email_service = EmailService()
 
 
 @router.post("/send", response_model=EmailSendResponse, status_code=202)
-async def send_email(payload: EmailSendRequest, bg: BackgroundTasks):
-    # Fire-and-forget via background task
+async def send_email(
+    payload: EmailSendRequest,
+    bg: BackgroundTasks,
+    current_user=Depends(get_current_user),
+):
+    if current_user.role != Role.ADMIN:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
     async def _task():
         try:
-            await email_service.send(
+            await EmailService.send(
                 to=payload.to,
                 subject=payload.subject,
                 text=payload.text,
@@ -25,9 +31,7 @@ async def send_email(payload: EmailSendRequest, bg: BackgroundTasks):
                 params=payload.params,
             )
         except Exception as e:
-            # Also log to console
             logger.error(f"Email send failed: {e}")
-            # Do not re-raise to avoid crashing background workers
 
     bg.add_task(_task)
     return EmailSendResponse(accepted=True)
