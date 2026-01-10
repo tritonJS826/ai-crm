@@ -4,7 +4,7 @@ Service for Meta (WhatsApp, Messenger, Instagram) API operations.
 
 import hmac
 import hashlib
-import logging
+from app.logging import logger
 from typing import Optional, Dict, Any
 
 import httpx
@@ -12,8 +12,6 @@ import httpx
 from app.settings import settings
 from app.schemas.platform import Platform
 from app.schemas.message import NormalizedMessage, MessageDirection
-
-logger = logging.getLogger(__name__)
 
 META_API_VERSION = "v24.0"
 META_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}"
