@@ -16,16 +16,16 @@ router = APIRouter()
 
 @router.get("/checkout")
 async def create_checkout(
-    product_id: str = Query(..., alias="product_id"),
-    conv_id: Optional[str] = Query(None, alias="conv_id"),
-    contact_id: Optional[str] = Query(None, alias="contact_id"),
+    product_id: str = Query(...),
+    conv_id: Optional[str] = Query(None),
+    contact_id: Optional[str] = Query(None),
 ):
     """
     Create a Stripe Checkout Session and redirect to payment page.
 
-    This endpoint is called when a customer clicks "Buy" on a product card.
+    This endpoint is intentionally PUBLIC.
+    Security is enforced via Stripe webhooks, not here.
     """
-    # Get product
     product = await product_repo.get_by_id(db, product_id)
 
     if not product:
@@ -34,7 +34,12 @@ async def create_checkout(
     if not product.isActive:
         raise HTTPException(status_code=400, detail="Product is not available")
 
-    # Create Checkout Session
+    if not product.stripePriceId:
+        raise HTTPException(
+            status_code=400,
+            detail="Product is not configured for checkout",
+        )
+
     checkout_url = await stripe_service.create_checkout_session(
         stripe_price_id=product.stripePriceId,
         product_id=product_id,
@@ -48,5 +53,4 @@ async def create_checkout(
             detail="Failed to create checkout session",
         )
 
-    # Redirect to Stripe Checkout
     return RedirectResponse(url=checkout_url, status_code=302)

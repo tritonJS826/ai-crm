@@ -1,17 +1,15 @@
-# app/services/email_service.py
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Optional, Dict, Any
-from prisma import Prisma
+from enum import Enum
 
+from prisma import Prisma
 import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from app.logging import logger
 
 from app.settings import settings
 
-import logging
-
-logger = logging.getLogger(__name__)
 
 _TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 _env = Environment(
@@ -20,11 +18,16 @@ _env = Environment(
 )
 
 
+class EmailStatus(str, Enum):
+    SENT = "SENT"
+    FAILED = "FAILED"
+
+
 class EmailService:
     """SMTP-backed email sender."""
 
-    def __init__(self, db: Prisma | None = None) -> None:
-        self.db = db or Prisma()
+    def __init__(self, db: Prisma) -> None:
+        self.db = db
         self.host = settings.smtp_host
         self.port = settings.smtp_port
         self.user = settings.smtp_user
@@ -40,19 +43,18 @@ class EmailService:
 
     def _build_message(
         self,
+        *,
         to: str,
         subject: str,
-        text: Optional[str] = None,
-        html: Optional[str] = None,
+        text: Optional[str],
+        html: Optional[str],
     ) -> EmailMessage:
         msg = EmailMessage()
-        sender = f"{self.sender_name} <{self.sender_email}>"
-        msg["From"] = sender
+        msg["From"] = f"{self.sender_name} <{self.sender_email}>"
         msg["To"] = to
         msg["Subject"] = subject
 
         if html:
-            # Always add text fallback
             msg.set_content(text or "Your email client does not support HTML.")
             msg.add_alternative(html, subtype="html")
         else:
@@ -60,19 +62,16 @@ class EmailService:
 
         return msg
 
-    async def log_email(
+    async def _log_email(
         self,
         *,
         to: str,
         subject: str,
         body: str,
-        template: str = "",
-        status: str = "SENT",
-        error: Optional[str] = None,
+        template: str,
+        status: EmailStatus,
+        error: Optional[str],
     ) -> None:
-        """Public wrapper to store email logs in DB."""
-
-        await self.db.connect()
         try:
             await self.db.emaillog.create(
                 data={
@@ -80,12 +79,12 @@ class EmailService:
                     "subject": subject,
                     "template": template,
                     "body": body,
-                    "status": status,
+                    "status": status.value,
                     "error": error,
                 }
             )
-        finally:
-            await self.db.disconnect()
+        except Exception:
+            logger.exception("Failed to log email to database")
 
     async def send(
         self,
@@ -97,12 +96,20 @@ class EmailService:
         template: Optional[str] = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> None:
-        if template:
-            html = self._render_template(template, params or {})
-
-        message = self._build_message(to=to, subject=subject, text=text, html=html)
+        body = ""
 
         try:
+            if template:
+                html = self._render_template(template, params or {})
+
+            body = html or text or ""
+            message = self._build_message(
+                to=to,
+                subject=subject,
+                text=text,
+                html=html,
+            )
+
             if self.use_ssl:
                 await aiosmtplib.send(
                     message,
@@ -115,7 +122,9 @@ class EmailService:
                 )
             else:
                 async with aiosmtplib.SMTP(
-                    hostname=self.host, port=self.port, timeout=30
+                    hostname=self.host,
+                    port=self.port,
+                    timeout=30,
                 ) as smtp:
                     if self.use_starttls:
                         await smtp.starttls()
@@ -123,25 +132,23 @@ class EmailService:
                         await smtp.login(self.user, self.password)
                     await smtp.send_message(message)
 
-            # Log success
-            await self.log_email(
+            await self._log_email(
                 to=to,
                 subject=subject,
-                body=html or text or "",
+                body=body,
                 template=template or "",
-                status="SENT",
+                status=EmailStatus.SENT,
                 error=None,
             )
 
-        except Exception as e:
-            # log failure
-            await self.log_email(
+        except Exception as exc:
+            await self._log_email(
                 to=to,
                 subject=subject,
-                body=html or text or "",
+                body=body,
                 template=template or "",
-                status="FAILED",
-                error=str(e),
+                status=EmailStatus.FAILED,
+                error=str(exc),
             )
-            logger.error(f"Error sending email to {to}: {e}")
+            logger.exception("Error sending email to %s", to)
             raise

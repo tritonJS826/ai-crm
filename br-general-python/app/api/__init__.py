@@ -16,8 +16,8 @@ from . import (
     checkout,
     ai,
     websocket,
-    check,
     ready,
+    check,
 )
 from ..settings import settings
 

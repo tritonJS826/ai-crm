@@ -2,14 +2,28 @@
 Webhook-related Pydantic schemas for Meta and Stripe webhooks.
 """
 
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field
+
+from app.schemas.platform import Platform
 
 
 # ============================================
 # META WEBHOOK SCHEMAS
 # ============================================
+
+
+class MetaMessageType(str, Enum):
+    TEXT = "text"
+    IMAGE = "image"
+
+
+class StripePaymentStatus(str, Enum):
+    PAID = "paid"
+    UNPAID = "unpaid"
+    NO_PAYMENT_REQUIRED = "no_payment_required"
 
 
 class MetaWebhookVerify(BaseModel):
@@ -34,7 +48,7 @@ class MetaMessage(BaseModel):
     id: str
     from_: str = Field(..., alias="from")
     timestamp: str
-    type: str
+    type: MetaMessageType
     text: Optional[MetaMessageText] = None
 
     model_config = {"populate_by_name": True}
@@ -82,10 +96,10 @@ class MetaWebhookPayload(BaseModel):
 # ============================================
 
 
-class NormalizedMessage(BaseModel):
+class MetaWebhookMessageDTO(BaseModel):
     """Normalized message format for internal processing."""
 
-    platform: str
+    platform: Platform
     platform_user_id: str
     text: Optional[str] = None
     media_url: Optional[str] = None
@@ -115,4 +129,4 @@ class StripeCheckoutSession(BaseModel):
     metadata: Optional[Dict[str, str]] = None
     amount_total: Optional[int] = None
     currency: Optional[str] = None
-    payment_status: str
+    payment_status: StripePaymentStatus

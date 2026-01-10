@@ -1,9 +1,15 @@
 import logging
 import sys
 
+from app.settings import settings
+
 
 def setup_logger() -> logging.Logger:
     logger = logging.getLogger("br-general")
+
+    if logger.handlers:
+        return logger  # prevent double handlers on reload
+
     logger.setLevel(logging.INFO)
 
     handler = logging.StreamHandler(sys.stdout)
@@ -12,8 +18,10 @@ def setup_logger() -> logging.Logger:
     )
     handler.setFormatter(formatter)
 
-    if not logger.handlers:
-        logger.addHandler(handler)
+    logger.addHandler(handler)
+
+    # Allow propagation in tests so pytest caplog can see logs
+    logger.propagate = settings.env_type != "production"
 
     return logger
 
