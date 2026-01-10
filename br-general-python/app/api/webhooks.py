@@ -49,11 +49,6 @@ async def verify_meta_webhook(
 
 @router.post("/meta")
 async def handle_meta_webhook(request: Request) -> dict:
-    """
-    Handle incoming Meta webhook events.
-
-    Processes messages from WhatsApp, Messenger, and Instagram.
-    """
     if not meta_service.is_configured:
         logger.warning("Meta webhook received but service not configured")
         return {"status": "ok", "message": "Service not configured"}
@@ -73,24 +68,18 @@ async def handle_meta_webhook(request: Request) -> dict:
 
     normalized = meta_service.normalize_webhook(payload)
 
-    if normalized is not None:
-        try:
-            await message_service.handle_inbound_message(
-                platform=normalized.platform,
-                platform_user_id=normalized.platform_user_id,
-                text=normalized.text,
-                media_url=normalized.media_url,
-                remote_message_id=normalized.remote_message_id,
-                contact_name=normalized.contact_name,
-                contact_phone=normalized.contact_phone,
-            )
-            logger.info(
-                "Inbound %s message from %s",
-                normalized.platform,
-                normalized.platform_user_id,
-            )
-        except Exception:
-            logger.exception("Error processing inbound message")
+    if normalized is None:
+        return {"status": "ignored"}
+
+    try:
+        await message_service.handle_inbound(normalized)
+        logger.info(
+            "Inbound %s message from %s",
+            normalized.platform,
+            normalized.from_number,
+        )
+    except Exception:
+        logger.exception("Error processing inbound Meta message")
 
     return {"status": "ok"}
 
