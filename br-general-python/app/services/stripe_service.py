@@ -3,7 +3,7 @@ Service for Stripe payment operations.
 """
 
 import asyncio
-import logging
+from app.logging import logger
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 from typing import Optional
@@ -12,7 +12,6 @@ import stripe
 
 from app.settings import settings
 
-logger = logging.getLogger(__name__)
 
 # Stripe SDK is synchronous → run in a small shared thread pool
 _STRIPE_EXECUTOR = ThreadPoolExecutor(max_workers=3)

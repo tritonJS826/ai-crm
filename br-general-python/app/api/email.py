@@ -1,12 +1,10 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
-import logging
+from app.logging import logger
 
 from app.schemas.email import EmailSendRequest, EmailSendResponse
 from app.services.email_service import EmailService
 from app.api.users import get_current_user
 from app.schemas.user import Role
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 

@@ -4,7 +4,7 @@ Service for Meta (WhatsApp, Messenger, Instagram) API operations.
 
 import hmac
 import hashlib
-import logging
+from app.logging import logger
 from typing import Optional, Dict, Any
 
 import httpx
