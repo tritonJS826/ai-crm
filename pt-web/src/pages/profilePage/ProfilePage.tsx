@@ -6,12 +6,12 @@ import {PageHeader} from "src/components/PageHeader/PageHeader";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 import {PATHS} from "src/routes/routes";
-import {logoutUser} from "src/services/auth";
+import {logoutUser} from "src/services/authService";
 import {
   getUserProfile,
   patchUserProfile,
   type UserProfile as ApiUserProfile,
-} from "src/services/profile";
+} from "src/services/profileService";
 import {
   accessTokenAtomWithPersistence,
   clearTokensAtom,

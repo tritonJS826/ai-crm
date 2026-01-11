@@ -1,7 +1,7 @@
 import {ConversationStatus} from "src/constants/conversationStatuses";
 import {Platform} from "src/constants/platform";
 import {apiClient} from "src/services/apiClient";
-import {ContactOptOutUpdate, ContactOut} from "src/services/contact";
+import {ContactOptOutUpdate, ContactOut} from "src/services/contactService";
 
 // Schema for message data in responses.
 export type MessageOut = {

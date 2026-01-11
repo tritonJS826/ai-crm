@@ -3,8 +3,8 @@ import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {MessageOut, sendMessage} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
+import {MessageOut, sendMessage} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
 import {defaultWsEvent, socketClient} from "src/services/websocketClient";
 import {
   conversationWithContactStateAtom,

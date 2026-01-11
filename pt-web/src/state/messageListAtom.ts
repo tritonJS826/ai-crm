@@ -2,8 +2,8 @@ import {atom} from "jotai";
 import {
   getMessages,
   MessageOut,
-} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
+} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
 import {WsEvent} from "src/services/websocketClient";
 
 // MessageOut = {

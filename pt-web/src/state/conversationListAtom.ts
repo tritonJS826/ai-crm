@@ -3,8 +3,8 @@ import {
   ConversationListResponse,
   getConversation,
   getConversationList,
-} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
+} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
 import {WsEvent} from "src/services/websocketClient";
 
 // ConversationListResponse = {

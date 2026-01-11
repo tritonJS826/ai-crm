@@ -4,8 +4,8 @@ import {CompanionProfile} from "src/components/CompanionProfile/CompanionProfile
 import {MessageList} from "src/components/MessageList/MessageList";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {ConversationWithContact} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
+import {ConversationWithContact} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
 import {
   conversationListStateAtom,
   loadConversationListAtom,
