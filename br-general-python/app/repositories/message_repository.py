@@ -7,7 +7,8 @@ from typing import Optional, List
 from prisma import Prisma
 from prisma.models import Message
 
-from app.schemas.contact import Platform
+from app.schemas.platform import Platform
+from app.schemas.message import MessageDirection
 
 
 class MessageRepository:
@@ -16,17 +17,20 @@ class MessageRepository:
     async def create(
         self,
         db: Prisma,
+        *,
         conversation_id: str,
         platform: Platform,
+        direction: MessageDirection,
         from_user_id: Optional[str] = None,
         text: Optional[str] = None,
         media_url: Optional[str] = None,
         remote_message_id: Optional[str] = None,
     ) -> Message:
-        """Create a new message. from_user_id=None means from agent."""
+        """Create a new message."""
         return await db.message.create(
             data={
                 "conversationId": conversation_id,
+                "direction": direction.value,
                 "fromUserId": from_user_id,
                 "platform": platform.value,
                 "text": text,
@@ -64,7 +68,7 @@ class MessageRepository:
         conversation_id: str,
         limit: int = 10,
     ) -> List[Message]:
-        """Get recent messages for AI context (in chronological order)."""
+        """Get recent messages for AI context (chronological)."""
         messages = await db.message.find_many(
             where={"conversationId": conversation_id},
             order={"createdAt": "desc"},

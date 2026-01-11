@@ -1,16 +1,32 @@
+"""
+DEV-ONLY DEBUG ROUTES.
+
+This file bypasses normal application logic.
+DO NOT USE IN PROD.
+DELETE BEFORE RELEASE.
+"""
+
 from fastapi import APIRouter, HTTPException
 from datetime import datetime, timezone
 import uuid
 
 from app.events.domain import publish_event
+from ..schemas.message import MessageDirection
 
 from ..settings import settings
 
 router = APIRouter()
 
 
+def _env_dev_type():
+    if settings.env_type != "dev":
+        raise HTTPException(status_code=404)
+
+
 @router.post("/ping")
 async def ping(payload: dict):
+    _env_dev_type()
+
     await publish_event(
         event_type="check_event",
         payload=payload,
@@ -24,9 +40,11 @@ async def ping(payload: dict):
 
 @router.post("/inbound-message")
 async def inbound_message(payload: dict):
+    _env_dev_type()
+
     message = {
         "id": str(uuid.uuid4()),
-        "direction": "in",
+        "direction": MessageDirection.IN,
         "text": payload["text"],
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -44,6 +62,8 @@ async def inbound_message(payload: dict):
 
 @router.post("/broadcast")
 async def broadcast_event(payload: dict):
+    _env_dev_type()
+
     if not settings.enable_ws_broadcast_endpoint:
         raise HTTPException(status_code=404)
 

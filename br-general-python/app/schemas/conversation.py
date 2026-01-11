@@ -9,6 +9,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 from app.schemas.contact import ContactOut, Platform
+from app.schemas.message import MessageDirection
 
 
 class ConversationStatus(str, Enum):
@@ -19,10 +20,9 @@ class ConversationStatus(str, Enum):
 
 
 class MessageOut(BaseModel):
-    """Schema for message data in responses."""
-
     id: str
     conversation_id: str = Field(..., alias="conversationId")
+    direction: MessageDirection
     from_user_id: Optional[str] = Field(default=None, alias="fromUserId")
     platform: Platform
     text: Optional[str] = None
@@ -52,9 +52,7 @@ class ConversationWithContact(ConversationOut):
 
 
 class ConversationWithMessages(ConversationOut):
-    """Schema for conversation with nested messages."""
-
-    messages: List[MessageOut] = []
+    messages: List[MessageOut] = Field(default_factory=list)
 
 
 class ConversationListResponse(BaseModel):
@@ -72,6 +70,9 @@ class SendMessageRequest(BaseModel):
     conversation_id: str = Field(..., alias="conversationId")
     text: Optional[str] = None
     image_url: Optional[str] = Field(default=None, alias="imageUrl")
+    # agent_user_id: # Optional agent user ID.
+    # If null, message is treated as a system message.
+    agent_user_id: Optional[str] = Field(default=None, alias="agentUserId")
 
     model_config = {"populate_by_name": True}
 

@@ -2,7 +2,10 @@
 Repository for User database operations.
 """
 
+from typing import Optional, List
+
 from prisma import Prisma
+from prisma.models import User
 
 from app.schemas.user import Role
 
@@ -10,22 +13,22 @@ from app.schemas.user import Role
 class UserRepository:
     """Repository for User CRUD operations."""
 
-    async def get_by_id(self, db: Prisma, user_id: str):
+    async def get_by_id(self, db: Prisma, user_id: str) -> Optional[User]:
         """Get user by ID."""
         return await db.user.find_unique(where={"id": user_id})
 
-    async def get_by_email(self, db: Prisma, email: str):
+    async def get_by_email(self, db: Prisma, email: str) -> Optional[User]:
         """Get user by email address."""
         return await db.user.find_unique(where={"email": email})
 
-    async def create_user(
+    async def create(
         self,
         db: Prisma,
         email: str,
         hashed_password: str,
         name: str,
         role: Role = Role.AGENT,
-    ):
+    ) -> User:
         """Create a new user."""
         return await db.user.create(
             data={
@@ -36,7 +39,9 @@ class UserRepository:
             }
         )
 
-    async def list_users(self, db: Prisma, limit: int = 100, offset: int = 0):
+    async def list_users(
+        self, db: Prisma, limit: int = 100, offset: int = 0
+    ) -> List[User]:
         """List all users with pagination."""
         return await db.user.find_many(
             order={"createdAt": "desc"},
