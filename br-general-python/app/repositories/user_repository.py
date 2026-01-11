@@ -42,7 +42,10 @@ class UserRepository:
     async def list_users(
         self, db: Prisma, limit: int = 100, offset: int = 0
     ) -> List[User]:
-        """List all users with pagination."""
+        """
+        List users with pagination.
+        Defaults act as a safety guard to prevent unbounded queries.
+        """
         return await db.user.find_many(
             order={"createdAt": "desc"},
             take=limit,
