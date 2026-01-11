@@ -8,13 +8,13 @@ class ConversationParticipantRepository:
         user_id: str,
         conversation_id: str,
     ) -> bool:
-        record = await db.conversationparticipant.find_first(
+        count = await db.conversationparticipant.count(
             where={
                 "conversationId": conversation_id,
                 "userId": user_id,
             }
         )
-        return record is not None
+        return count > 0
 
 
 conversation_participant_repository = ConversationParticipantRepository()

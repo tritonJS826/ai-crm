@@ -19,13 +19,17 @@ export function App() {
     loginByEmail("user@example.com", "stringst");
   });
 
-  // TODO: remove this temporal send new message
-  useEffect(() => {
+  const handler = () => {
     setTimeout(() => {
       sendMessage({conversationId: "1", text: "test text"});
     // eslint-disable-next-line no-magic-numbers
     }, 6000);
-  }, []);
+  };
+
+  // TODO: remove this temporal send new message
+  // useEffect(() => {
+
+  // }, []);
 
   return (
     <div className="page">
@@ -33,6 +37,9 @@ export function App() {
       <main className="main">
         <ScrollToTop />
         <Navigation />
+        <button onClick={handler}>
+          send message
+        </button>
       </main>
       <Footer />
     </div>

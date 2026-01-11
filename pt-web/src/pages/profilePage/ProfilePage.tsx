@@ -18,7 +18,7 @@ import {
 } from "src/state/authAtom";
 import styles from "src/pages/profilePage/ProfilePage.module.scss";
 
-type EditableField = "city" | "phone" | "language";
+type EditableField = "name" | "email";
 
 function InlineEditable({
   label,
@@ -31,7 +31,7 @@ function InlineEditable({
 }: {
 
   label: string;
-  value: string | null | undefined;
+  value: string | undefined;
   field: EditableField;
 
   onSave: (field: EditableField, next: string) => Promise<void>;
@@ -253,45 +253,18 @@ export function ProfilePage() {
               </div>
 
               <ul className={styles.userList}>
-                <li className={styles.userItem}>
-                  <span className={styles.userLabel}>
-                    {dictionary.user.name}
-                  </span>
-                  <span className={styles.userValue}>
-                    {userProfile?.name ?? "—"}
-                  </span>
-                  <span className={styles.editPlaceholder} />
-                </li>
-                <li className={styles.userItem}>
-                  <span className={styles.userLabel}>
-                    {dictionary.user.preferredContactEmail}
-                  </span>
-                  <span className={styles.userValue}>
-                    {userProfile?.email ?? "—"}
-                  </span>
-                  <span className={styles.editPlaceholder} />
-                </li>
-
                 <InlineEditable
-                  label={dictionary.user.city}
-                  value={userProfile?.city}
-                  field="city"
+                  label={dictionary.user.name}
+                  value={userProfile?.name}
+                  field="name"
                   onSave={handleSaveField}
                   saveLabel={dictionary.actions.save}
                   cancelLabel={dictionary.actions.cancel}
                 />
                 <InlineEditable
-                  label={dictionary.user.phone}
-                  value={userProfile?.phone}
-                  field="phone"
-                  onSave={handleSaveField}
-                  saveLabel={dictionary.actions.save}
-                  cancelLabel={dictionary.actions.cancel}
-                />
-                <InlineEditable
-                  label={dictionary.user.language}
-                  value={userProfile?.language}
-                  field="language"
+                  label={dictionary.user.preferredContactEmail}
+                  value={userProfile?.email}
+                  field="email"
                   onSave={handleSaveField}
                   saveLabel={dictionary.actions.save}
                   cancelLabel={dictionary.actions.cancel}
