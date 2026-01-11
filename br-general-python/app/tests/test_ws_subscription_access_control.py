@@ -28,8 +28,6 @@ def test_ws_subscribe_allowed(monkeypatch, client):
         allow,
     )
 
-    import time
-
     with client.websocket_connect("/br-general/ws/ws?token=fake") as ws:
         ws.send_json(
             {
@@ -41,14 +39,18 @@ def test_ws_subscribe_allowed(monkeypatch, client):
             }
         )
 
-        # Wait (briefly) until the server processes the subscribe
-        for _ in range(20):  # ~200ms max
-            if ws_manager._scopes_by_connection:
-                break
-            time.sleep(0.01)
+        # # Wait (briefly) until the server processes subscribe
+        # for _ in range(20):  # ~200ms max
+        #     if ws_manager._scopes_by_connection:
+        #         break
+        #     time.sleep(0.01)
 
-        conn = next(iter(ws_manager.connections.values()))
-        assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
+        # conn = next(iter(ws_manager.connections.values()))
+        # assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
+        msg = ws.receive_json()
+        assert msg["type"] == "subscribed"
+        assert msg["data"]["scope"] == "conversation"
+        assert msg["data"]["id"] == "c1"
 
 
 def test_ws_subscribe_admin_bypass(monkeypatch, client):

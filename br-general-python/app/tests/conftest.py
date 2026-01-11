@@ -1,3 +1,8 @@
+# NOTE:
+# Prisma connection is managed by FastAPI lifespan and TestClient.
+# Enabling this fixture would cause double connection issues.
+# Keep this as opt-in documentation for repository-only tests.
+
 # import pytest
 # from app.db import db
 #

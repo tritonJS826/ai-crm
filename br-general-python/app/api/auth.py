@@ -42,7 +42,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
 
     user = await user_repo.get_by_id(db, user_id)
     if not user:
-        raise HTTPException(status_code=401, detail="User not found")
+        raise HTTPException(status_code=404, detail="User not found")
 
     return UserOut(
         id=user.id,

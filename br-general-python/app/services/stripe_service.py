@@ -12,7 +12,6 @@ import stripe
 
 from app.settings import settings
 
-
 # Stripe SDK is synchronous → run in a small shared thread pool
 _STRIPE_EXECUTOR = ThreadPoolExecutor(max_workers=3)
 
@@ -28,7 +27,11 @@ class StripeService:
             return
 
         if not settings.stripe_secret_key:
-            logger.warning("Stripe not configured: STRIPE_SECRET_KEY not set")
+            logger.warning(
+                "Stripe disabled: STRIPE_SECRET_KEY not set. "
+                "Stripe operations will be no-ops."
+            )
+            self._initialized = True
             return
 
         stripe.api_key = settings.stripe_secret_key
