@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -32,8 +34,10 @@ def test_ws_subscribe_allowed(monkeypatch, client):
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
 
@@ -70,10 +74,17 @@ def test_ws_subscribe_admin_bypass(monkeypatch, client):
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
+
+        for _ in range(20):
+            if ws_manager._scopes_by_connection:
+                break
+            time.sleep(0.01)
 
         conn = next(iter(ws_manager.connections.values()))
         assert "ws:conversation:c1" in ws_manager._scopes_by_connection[conn.id]
@@ -100,14 +111,16 @@ def test_ws_subscribe_forbidden(monkeypatch, client):
         ws.send_json(
             {
                 "type": "subscribe",
-                "scope": "conversation",
-                "id": "c1",
+                "data": {
+                    "scope": "conversation",
+                    "id": "c1",
+                },
             }
         )
 
         msg = ws.receive_json()
         assert msg["type"] == "error"
-        assert msg["code"] == "forbidden"
+        assert msg["data"]["code"] == "forbidden"
 
         with pytest.raises(Exception):
             ws.receive_json()

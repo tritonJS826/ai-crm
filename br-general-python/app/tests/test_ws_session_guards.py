@@ -47,11 +47,16 @@ def test_ws_closes_when_token_expired(client, monkeypatch):
 
     with client.websocket_connect("/br-general/ws/ws?token=fake") as ws:
         # trigger the loop (any message works; ping is fine)
-        ws.send_json({"type": "ping", "ts": 123})
+        ws.send_json(
+            {
+                "type": "ping",
+                "data": {"ts": 123},
+            }
+        )
 
         msg = ws.receive_json()
         assert msg["type"] == "error"
-        assert msg["code"] == "token_expired"
+        assert msg["data"]["code"] == "token_expired"
 
         # after this, server closes; next recv should fail
         with pytest.raises(Exception):
@@ -71,11 +76,16 @@ def test_ws_closes_when_idle_timeout_exceeded(client, monkeypatch):
         ) - timedelta(hours=3)
 
         # send "real" message to trigger idle check (ping does not update last_seen anyway)
-        ws.send_json({"type": "subscribe", "scope": "conversation", "id": "abc"})
+        ws.send_json(
+            {
+                "type": "subscribe",
+                "data": {"scope": "conversation", "id": "abc"},
+            }
+        )
 
         msg = ws.receive_json()
         assert msg["type"] == "error"
-        assert msg["code"] == "idle_timeout"
+        assert msg["data"]["code"] == "idle_timeout"
 
         with pytest.raises(Exception):
             ws.receive_json()
