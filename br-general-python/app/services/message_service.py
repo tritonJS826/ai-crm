@@ -7,14 +7,13 @@ from typing import Optional
 from app.db import db
 from app.logging import logger
 from app.schemas.contact import Platform
-from app.schemas.message import MessageDirection
+from app.schemas.message import MessageDirection, NormalizedMessage
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
 from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
-
 
 # Opt-out keywords (case-insensitive)
 OPT_OUT_KEYWORDS = {"stop", "unsubscribe", "отписаться", "стоп"}
@@ -23,33 +22,25 @@ OPT_OUT_KEYWORDS = {"stop", "unsubscribe", "отписаться", "стоп"}
 class MessageService:
     """Service for handling message operations."""
 
-    async def handle_inbound_message(
-        self,
-        platform: Platform,
-        platform_user_id: str,
-        text: Optional[str] = None,
-        media_url: Optional[str] = None,
-        remote_message_id: Optional[str] = None,
-        contact_name: Optional[str] = None,
-        contact_phone: Optional[str] = None,
-    ) -> dict:
+    async def handle_inbound(self, msg: NormalizedMessage) -> dict:
         """
         Process an inbound message from a customer.
         """
+
         # 1. Upsert contact
         contact = await contact_repo.upsert(
             db,
-            platform=platform,
-            platform_user_id=platform_user_id,
-            phone=contact_phone,
-            name=contact_name,
+            platform=msg.platform,
+            platform_user_id=msg.from_number,
+            phone=msg.from_number,
+            name=msg.name,
         )
 
         # 2. Get or create conversation
         conversation = await conversation_repo.get_or_create(db, contact.id)
 
         # 3. Check for opt-out
-        if text and text.strip().lower() in OPT_OUT_KEYWORDS:
+        if msg.text and msg.text.strip().lower() in OPT_OUT_KEYWORDS:
             await contact_repo.update_opt_out(db, contact.id, opt_out=True)
             logger.info(f"Contact {contact.id} opted out")
 
@@ -58,11 +49,11 @@ class MessageService:
             db,
             conversation_id=conversation.id,
             direction=MessageDirection.IN,
-            platform=platform,
+            platform=msg.platform,
             from_user_id=None,
-            text=text,
-            media_url=media_url,
-            remote_message_id=remote_message_id,
+            text=msg.text,
+            media_url=None,
+            remote_message_id=msg.message_id,
         )
 
         # 5. Update conversation timestamp
@@ -76,8 +67,8 @@ class MessageService:
                 "message_id": message.id,
                 "direction": MessageDirection.IN.value,
                 "from_user_id": None,
-                "platform": platform.value,
-                "text": text,
+                "platform": msg.platform.value,
+                "text": msg.text,
             },
         )
 
