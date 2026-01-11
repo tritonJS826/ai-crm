@@ -17,9 +17,9 @@ import {WsEvent} from "src/services/websocketClient";
 //     created_at: Date;
 // }
 
-export const messageListAtom = atom<MessageOut[]>([]);
-export const messageListLoadingAtom = atom<boolean>(false);
-export const messageListErrorAtom = atom<string | null>(null);
+const messageListAtom = atom<MessageOut[]>([]);
+const messageListLoadingAtom = atom<boolean>(false);
+const messageListErrorAtom = atom<string | null>(null);
 
 export const messageListStateAtom = atom((get) => ({
   messageList: get(messageListAtom),

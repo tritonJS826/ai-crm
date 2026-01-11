@@ -24,9 +24,9 @@ import {WsEvent} from "src/services/websocketClient";
 //     };
 // }
 
-export const conversationWithContactAtom = atom<ConversationWithContact | null>(null);
-export const conversationWithContactLoadingAtom = atom<boolean>(false);
-export const conversationWithContactErrorAtom = atom<string | null>(null);
+const conversationWithContactAtom = atom<ConversationWithContact | null>(null);
+const conversationWithContactLoadingAtom = atom<boolean>(false);
+const conversationWithContactErrorAtom = atom<string | null>(null);
 
 export const conversationWithContactStateAtom = atom((get) => ({
   conversationWithContact: get(conversationWithContactAtom),

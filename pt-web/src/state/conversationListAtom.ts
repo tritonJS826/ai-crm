@@ -30,9 +30,9 @@ import {WsEvent} from "src/services/websocketClient";
 //     offset: number;
 // }
 
-export const conversationListAtom = atom<ConversationListResponse | null>(null);
-export const conversationListLoadingAtom = atom<boolean>(false);
-export const conversationListErrorAtom = atom<string | null>(null);
+const conversationListAtom = atom<ConversationListResponse | null>(null);
+const conversationListLoadingAtom = atom<boolean>(false);
+const conversationListErrorAtom = atom<string | null>(null);
 
 export const conversationListStateAtom = atom((get) => ({
   conversationList: get(conversationListAtom),
