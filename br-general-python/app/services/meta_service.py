@@ -13,6 +13,8 @@ from app.settings import settings
 from app.schemas.platform import Platform
 from app.schemas.message import NormalizedMessage, MessageDirection
 
+logger = logging.getLogger(__name__)
+
 META_API_VERSION = "v24.0"
 META_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}"
 WHATSAPP_API_BASE = META_API_BASE
