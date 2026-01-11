@@ -1,4 +1,5 @@
-import {ConversationStatus} from "src/constants/conversationStatuses";
+import {ConversationStatus} from "src/constants/conversationStatus";
+import {MessageDirection} from "src/constants/messageDirection";
 import {Platform} from "src/constants/platform";
 import {apiClient} from "src/services/apiClient";
 import {ContactOptOutUpdate, ContactOut} from "src/services/contactService";
@@ -7,6 +8,7 @@ import {ContactOptOutUpdate, ContactOut} from "src/services/contactService";
 export type MessageOut = {
     id: string;
     conversationId: string;
+    direction: MessageDirection;
     fromUserId?: string;
     platform: Platform;
     text?: string;

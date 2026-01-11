@@ -67,6 +67,7 @@ export const updateMessageListByNewMessageEventAtom = atom(
       platform: event.data.platform,
       fromUserId: event.data.from_user_id,
       text: event.data.text,
+      direction: event.data.direction,
     };
     set(messageListAtom, [
       ...messageList,
