@@ -5,7 +5,7 @@ import {
   getConversationList,
 } from "src/services/conversation";
 import {NewMessage} from "src/services/conversationWs";
-import {WsIncomingEvent} from "src/services/websocketClient";
+import {WsEvent} from "src/services/websocketClient";
 
 // ConversationListResponse = {
 //     items: {
@@ -63,7 +63,7 @@ export const loadConversationListAtom = atom(
 
 export const updateConversationListByNewMessageEventAtom = atom(
   null,
-  async (get, set, event: WsIncomingEvent<NewMessage>): Promise<void> => {
+  async (get, set, event: WsEvent<NewMessage>): Promise<void> => {
     let conversationList = get(conversationListAtom);
 
     // Load list if missing

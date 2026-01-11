@@ -56,18 +56,20 @@ export function ConversationList() {
           ConversationList
         </h1>
         <ul>
-          {conversationListElement.length > 0 ? conversationListElement : "{conversation list is empty}"}
+          {conversationListElement.length > 0 ? conversationListElement : "INFO conversation list is empty"}
         </ul>
         {conversationListLoading && <p>
           loading...
         </p>}
         {conversationListError && <p>
+          ERROR
+          {" "}
           {conversationListError}
         </p>}
       </div>
       <div className={styles.wrapper}>
         {currentConversationId && <>
-          <MessageList conversation_id={currentConversationId} />
+          <MessageList conversationId={currentConversationId} />
         </>
         }
       </div>

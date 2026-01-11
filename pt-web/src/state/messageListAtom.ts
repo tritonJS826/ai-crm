@@ -4,7 +4,7 @@ import {
   MessageOut,
 } from "src/services/conversation";
 import {NewMessage} from "src/services/conversationWs";
-import {WsIncomingEvent} from "src/services/websocketClient";
+import {WsEvent} from "src/services/websocketClient";
 
 // MessageOut = {
 //     id: string;
@@ -51,7 +51,7 @@ export const loadMessageListAtom = atom(
 
 export const updateMessageListByNewMessageEventAtom = atom(
   null,
-  (get, set, event: WsIncomingEvent<NewMessage>): void => {
+  (get, set, event: WsEvent<NewMessage>): void => {
     const messageList = get(messageListAtom);
 
     // Message exists in list → return

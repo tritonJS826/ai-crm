@@ -1,18 +1,15 @@
-import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
-export type WsIncomingEvent<T> = {
+export type WsEvent<T> = {
   v: number;
   type: WsEventType;
   ts: Date;
   data: T;
 }
 
-export type WsOutgoingEvent<T> = {
-  action: WsActionType;
-} & Record<string, T>
+export const defaultWsEvent = {v: 1, ts: new Date()};
 
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 5;
@@ -94,7 +91,7 @@ class SocketClient {
     }
   }
 
-  public emit<T>(payload: WsOutgoingEvent<T>) {
+  public emit<T>(payload: WsEvent<T>) {
     const socket = this.connect();
     const message = JSON.stringify(payload);
 
