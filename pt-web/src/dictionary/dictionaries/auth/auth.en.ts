@@ -14,11 +14,12 @@ export const authDict = {
   placeholders: {
     fullName: "Your name",
     email: "name@example.com",
-    password: "At least 6 characters",
+    password: "At least 8 characters",
     passwordRepeat: "Repeat the password",
   },
   errors: {
     nameRequired: "Please enter your name",
+    passwordTooShort: "Password must be at least 8 characters",
     passwordsMismatch: "Passwords do not match",
     requestFailed: "Request failed. Try again.",
   },
