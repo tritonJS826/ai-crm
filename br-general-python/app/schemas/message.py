@@ -3,6 +3,8 @@ from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
 
+from app.schemas.platform import Platform
+
 
 class MessageDirection(str, Enum):
     """Direction of a message relative to the customer."""
@@ -12,7 +14,7 @@ class MessageDirection(str, Enum):
 
 
 class NormalizedMessage(BaseModel):
-    platform: str = "whatsapp"
+    platform: Platform
 
     # WhatsApp identifiers
     from_number: str

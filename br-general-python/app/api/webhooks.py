@@ -7,6 +7,7 @@ from app.logging import logger
 from fastapi import APIRouter, Request, HTTPException, Query, Response
 
 from app.db import db
+from app.schemas.platform import Platform
 from app.settings import settings
 from app.services.meta_service import meta_service
 from app.services.stripe_service import stripe_service
@@ -72,9 +73,10 @@ async def handle_meta_webhook(request: Request) -> dict:
     try:
         await message_service.handle_inbound(normalized)
         logger.info(
-            "Inbound %s message from %s",
-            normalized.platform,
+            "Inbound message '%s' from '%s' platform %s",
+            normalized.text,
             normalized.from_number,
+            Platform(normalized.platform).name,
         )
     except Exception:
         logger.exception("Error processing inbound Meta message")
