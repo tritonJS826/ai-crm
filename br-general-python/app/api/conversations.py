@@ -46,6 +46,7 @@ async def list_conversations(
     """
     conversations, total = await conversation_repo.list_conversations(
         db,
+        user_id=current_user.id,
         status=status,
         limit=limit,
         offset=offset,
@@ -201,6 +202,15 @@ async def update_contact_opt_out(
     contact = await contact_repo.get_by_id(db, contact_id)
     if not contact:
         raise HTTPException(status_code=404, detail="Contact not found")
+
+    has_access = await conversation_repo.user_has_conversation_with_contact(
+        db,
+        user_id=current_user.id,
+        contact_id=contact_id,
+    )
+
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied")
 
     await contact_repo.update_opt_out(db, contact_id, payload.opt_out)
 
