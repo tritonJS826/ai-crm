@@ -3,13 +3,12 @@ import {localStorageWorker, Token as LSToken} from "src/globalServices/localStor
 import {env} from "src/utils/env/env";
 
 export type WsEvent<T> = {
-  v: number;
   type: WsEventType;
   ts: Date;
   data: T;
 }
 
-export const defaultWsEvent = {v: 1, ts: new Date()};
+export const defaultWsEvent = {ts: new Date()};
 
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 5;
