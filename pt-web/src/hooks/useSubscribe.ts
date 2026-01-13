@@ -17,6 +17,13 @@ export function useSubscribe<T>(
 
     const socket = socketClient.connect();
 
+    if (!socket) {
+      // eslint-disable-next-line no-console
+      console.log("WS error during subscribe: socket not init");
+
+      return;
+    }
+
     if (socket.readyState === WebSocket.OPEN) {
       socket.addEventListener("message", handler);
     } else {

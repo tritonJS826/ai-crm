@@ -3,9 +3,11 @@ from time import time
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
-from app.api.access_control import can_user_subscribe_to_conversation
+from app.api.access_control import can_user_access_conversation
 from app.api.auth import auth_service
 from app.ws.manager import ws_manager
+
+from app.ws.events import ws_event
 
 from app.settings import settings
 
@@ -60,10 +62,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 data = await websocket.receive_json()
             except ValueError:
                 await websocket.send_json(
-                    {
-                        "type": "error",
-                        "code": "invalid_json",
-                    }
+                    ws_event(
+                        "error",
+                        {"code": "invalid_json"},
+                    )
                 )
                 await websocket.close(code=1003)  # unsupported data
                 ws_manager.disconnect(connection_id)
@@ -76,10 +78,10 @@ async def websocket_endpoint(websocket: WebSocket):
             # 0. JWT expiration check
             if is_token_expired(conn.token_exp):
                 await websocket.send_json(
-                    {
-                        "type": "error",
-                        "code": "token_expired",
-                    }
+                    ws_event(
+                        "error",
+                        {"code": "token_expired"},
+                    )
                 )
                 await websocket.close(code=1008)
                 ws_manager.disconnect(connection_id)
@@ -88,10 +90,10 @@ async def websocket_endpoint(websocket: WebSocket):
             # 1. Idle timeout check
             if is_idle_expired(conn.last_seen):
                 await websocket.send_json(
-                    {
-                        "type": "error",
-                        "code": "idle_timeout",
-                    }
+                    ws_event(
+                        "error",
+                        {"code": "idle_timeout"},
+                    )
                 )
                 await websocket.close(code=1001)
                 ws_manager.disconnect(connection_id)
@@ -108,15 +110,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # 4. Handle subscribe
             if msg_type == "subscribe":
-                scope = data.get("scope")
-                scope_id = data.get("id")
+                scope = data["data"]["scope"]
+                scope_id = data["data"]["id"]
 
                 if scope != "conversation" or not scope_id:
                     await websocket.send_json(
-                        {
-                            "type": "error",
-                            "code": "invalid_subscribe",
-                        }
+                        ws_event(
+                            "error",
+                            {"code": "invalid_subscribe"},
+                        )
                     )
                     continue
 
@@ -135,7 +137,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     if cache_key in acl_cache:
                         allowed = acl_cache[cache_key]
                     else:
-                        allowed = await can_user_subscribe_to_conversation(
+                        allowed = await can_user_access_conversation(
                             user_id=str(user_id),
                             conversation_id=scope_id,
                         )
@@ -143,10 +145,10 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 if not allowed:
                     await websocket.send_json(
-                        {
-                            "type": "error",
-                            "code": "forbidden",
-                        }
+                        ws_event(
+                            "error",
+                            {"code": "forbidden"},
+                        )
                     )
                     await websocket.close(code=1008)
                     ws_manager.disconnect(connection_id)
@@ -154,6 +156,13 @@ async def websocket_endpoint(websocket: WebSocket):
 
                 full_scope = f"ws:conversation:{scope_id}"
                 ws_manager.subscribe(connection_id, full_scope)
+
+                await websocket.send_json(
+                    ws_event(
+                        "subscribed",
+                        {"scope": scope, "id": scope_id},
+                    )
+                )
 
     except WebSocketDisconnect:
         pass

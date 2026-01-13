@@ -8,10 +8,6 @@ export const profileDictEn = {
     title: "User data",
     name: "Name",
     preferredContactEmail: "Email",
-    city: "City",
-    phone: "Phone",
-    language: "Language",
-    preferredContactPhone: "Phone",
   },
   actions: {
     save: "Save",

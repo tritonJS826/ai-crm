@@ -4,7 +4,6 @@ API endpoints for authentication.
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from jose import JWTError
 
 from app.db import db
 from app.schemas.user import (
@@ -17,59 +16,56 @@ from app.schemas.user import (
     Role,
 )
 from app.repositories.user_repository import user_repo
-from app.services.auth_service import AuthService
+from app.services.auth_service import auth_service
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/br-general/auth/login")
 
-
-async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-) -> dict:
-    """
-    Dependency to get current authenticated user from JWT token.
-
-    Returns dict with user_id.
-    Raises HTTPException 401 if token is invalid.
-    """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
-    try:
-        payload = auth_service.decode_token(token)
-        if payload is None:
-            raise credentials_exception
-
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-
-        return {"user_id": user_id}
-
-    except JWTError:
-        raise credentials_exception
-
-
 router = APIRouter()
 
-auth_service = AuthService()
+
+# -------------------------
+# Dependencies
+# -------------------------
 
 
-@router.post("/register", response_model=UserWithTokens, summary="Register new user")
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
+    """Get currently authenticated user (access token required)."""
+    try:
+        payload = auth_service.require_access_token(token)
+        user_id = payload.get("sub")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    user = await user_repo.get_by_id(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return UserOut(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=Role(user.role),
+    )
+
+
+# -------------------------
+# Routes
+# -------------------------
+
+
+@router.post("/register", response_model=UserWithTokens)
 async def register(user_in: UserCreate):
-    """Register a new user (agent or admin)."""
-    # Check if user exists
-    existing = await user_repo.get_by_email(db, user_in.email)
-    if existing:
+    """Register a new user."""
+    if await user_repo.get_by_email(db, user_in.email):
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hash password
-    hashed_pw = auth_service.get_password_hash(user_in.password)
+    hashed_pw = auth_service.hash_password(user_in.password)
 
-    # Create user
-    user = await user_repo.create_user(
+    user = await user_repo.create(
         db,
         email=user_in.email,
         hashed_password=hashed_pw,
@@ -77,19 +73,16 @@ async def register(user_in: UserCreate):
         role=user_in.role,
     )
 
-    # Create tokens
-    access_token = auth_service.create_access_token({"sub": str(user.id)})
-    refresh_token = auth_service.create_refresh_token({"sub": str(user.id)})
-
-    user_out = UserOut(
-        id=str(user.id),
-        email=user.email,
-        name=user.name,
-        role=Role(user.role),
-    )
+    access_token = auth_service.create_access_token(user.id)
+    refresh_token = auth_service.create_refresh_token(user.id)
 
     return UserWithTokens(
-        user=user_out,
+        user=UserOut(
+            id=user.id,
+            email=user.email,
+            name=user.name,
+            role=Role(user.role),
+        ),
         tokens=Token(
             access_token=access_token,
             refresh_token=refresh_token,
@@ -100,29 +93,23 @@ async def register(user_in: UserCreate):
 
 @router.post("/login", response_model=UserWithTokens)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    """Login with email and password."""
-    # Check if user exists
     user = await user_repo.get_by_email(db, form_data.username)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Verify password
     if not auth_service.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    # Create tokens
-    access_token = auth_service.create_access_token({"sub": str(user.id)})
-    refresh_token = auth_service.create_refresh_token({"sub": str(user.id)})
-
-    user_out = UserOut(
-        id=str(user.id),
-        email=user.email,
-        name=user.name,
-        role=Role(user.role),
-    )
+    access_token = auth_service.create_access_token(user.id)
+    refresh_token = auth_service.create_refresh_token(user.id)
 
     return UserWithTokens(
-        user=user_out,
+        user=UserOut(
+            id=user.id,
+            email=user.email,
+            name=user.name,
+            role=Role(user.role),
+        ),
         tokens=Token(
             access_token=access_token,
             refresh_token=refresh_token,
@@ -133,58 +120,34 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.post("/refresh", response_model=UserWithTokens)
 async def refresh_tokens(body: RefreshTokenRequest):
-    """Refresh access token using refresh token."""
-    access_payload = auth_service.decode_token(body.access_token)
-    refresh_payload = auth_service.decode_token(body.refresh_token)
-
-    if not refresh_payload or refresh_payload.get("type") != "refresh":
+    try:
+        refresh_payload = auth_service.require_refresh_token(body.refresh_token)
+        user_id = refresh_payload.get("sub")
+    except Exception:
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
-    # Check sub match
-    if access_payload and access_payload.get("sub") != refresh_payload.get("sub"):
-        raise HTTPException(status_code=401, detail="Token pair mismatch")
-
-    user_id = refresh_payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token payload")
-
-    new_access = auth_service.create_access_token({"sub": user_id})
-    new_refresh = auth_service.create_refresh_token({"sub": user_id})
-
-    user = await db.user.find_unique(where={"id": str(user_id)})
+    user = await user_repo.get_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user_out = UserOut(
-        id=str(user.id),
-        email=user.email,
-        name=user.name,
-        role=Role(user.role),
-    )
-
     return UserWithTokens(
-        user=user_out,
+        user=UserOut(
+            id=user.id,
+            email=user.email,
+            name=user.name,
+            role=Role(user.role),
+        ),
         tokens=Token(
-            access_token=new_access,
-            refresh_token=new_refresh,
+            access_token=auth_service.create_access_token(user.id),
+            refresh_token=auth_service.create_refresh_token(user.id),
             token_type="bearer",
         ),
     )
 
 
-@router.post(
-    "/logout",
-    response_model=LogoutResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Logout user",
-)
+@router.post("/logout", response_model=LogoutResponse)
 async def logout():
-    """
-    Stateless logout.
-
-    The server does not revoke tokens.
-    The client must discard tokens locally.
-    """
+    """Stateless logout. Client discards tokens."""
     return LogoutResponse(
         message="Successfully logged out. Please discard your tokens on the client."
     )

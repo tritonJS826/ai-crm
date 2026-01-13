@@ -36,7 +36,7 @@ export const updateUserProfileAtom = atom(
   async (
     get,
     set,
-    update: Partial<Pick<UserProfile, "city" | "phone" | "language">>,
+    update: Partial<Pick<UserProfile, "name" | "email">>,
   ): Promise<void> => {
     await patchUserProfile(update);
 

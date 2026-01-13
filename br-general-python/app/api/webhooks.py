@@ -2,11 +2,12 @@
 API endpoints for Meta and Stripe webhooks.
 """
 
-import logging
+from app.logging import logger
 
 from fastapi import APIRouter, Request, HTTPException, Query, Response
 
 from app.db import db
+from app.schemas.platform import Platform
 from app.settings import settings
 from app.services.meta_service import meta_service
 from app.services.stripe_service import stripe_service
@@ -14,12 +15,9 @@ from app.services.message_service import message_service
 from app.repositories.order_repository import order_repo
 from app.repositories.product_repository import product_repo
 from app.repositories.conversation_repository import conversation_repo
-from app.schemas.contact import Platform
 from app.schemas.order import OrderStatus
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -50,11 +48,6 @@ async def verify_meta_webhook(
 
 @router.post("/meta")
 async def handle_meta_webhook(request: Request) -> dict:
-    """
-    Handle incoming Meta webhook events.
-
-    Processes messages from WhatsApp, Messenger, and Instagram.
-    """
     if not meta_service.is_configured:
         logger.warning("Meta webhook received but service not configured")
         return {"status": "ok", "message": "Service not configured"}
@@ -74,19 +67,19 @@ async def handle_meta_webhook(request: Request) -> dict:
 
     normalized = meta_service.normalize_webhook(payload)
 
-    if normalized is not None:
-        try:
-            await message_service.handle_inbound_message(
-                platform=Platform(normalized.platform),
-                platform_user_id=normalized.platform_user_id,
-                text=normalized.text,
-                media_url=normalized.media_url,
-                remote_message_id=normalized.remote_message_id,
-                contact_name=normalized.contact_name,
-                contact_phone=normalized.contact_phone,
-            )
-        except Exception as e:
-            logger.error(f"Error processing inbound message: {e}")
+    if normalized is None:
+        return {"status": "ignored"}
+
+    try:
+        await message_service.handle_inbound(normalized)
+        logger.info(
+            "Inbound message '%s' from '%s' platform %s",
+            normalized.text,
+            normalized.from_number,
+            Platform(normalized.platform).name,
+        )
+    except Exception:
+        logger.exception("Error processing inbound Meta message")
 
     return {"status": "ok"}
 
@@ -121,8 +114,8 @@ async def handle_stripe_webhook(request: Request) -> dict:
         if session_data:
             try:
                 await _handle_checkout_completed(session_data)
-            except Exception as e:
-                logger.error(f"Error handling checkout completed: {e}")
+            except Exception:
+                logger.exception("Error handling checkout.session.completed")
 
     return {"status": "ok"}
 
