@@ -1,7 +1,7 @@
 @use "src/styles/variables" as vars;
 
 .navbar {
-  margin: 2rem;
+  padding: vars.$pad-sm;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -10,16 +10,56 @@
 .navList {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: vars.$gap-md;
 }
 
 .link {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: vars.$gap-md;
+  padding: 0.25rem vars.$pad-sm;
+  border-radius: vars.$radius-sm;
+  color: vars.$color-primary;
+}
+
+.link:hover {
+  background-color: vars.$color-bg-hover;
 }
 
 .icon {
   width: vars.$icon-md;
   height: vars.$icon-md;
+}
+
+.label {
+  font-size: vars.$font-md;
+  color: vars.$color-primary;
+}
+
+.link:hover > .label {
+  color: vars.$color-primary-hover;
+}
+
+@media (width <= 640px) {
+  .navbar {
+    padding: vars.$pad-xs;
+  }
+
+  .navList {
+    gap: vars.$gap-sm;
+  }
+
+  .link {
+    padding: 0.25rem vars.$pad-xs;
+    border-radius: 0;
+  }
+
+  .icon {
+    width: vars.$icon-sm;
+    height: vars.$icon-sm;
+  }
+
+  .label {
+    display: none;
+  }
 }
