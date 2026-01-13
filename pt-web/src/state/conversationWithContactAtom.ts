@@ -2,9 +2,9 @@ import {atom} from "jotai";
 import {
   ConversationWithContact,
   getConversation,
-} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
-import {WsIncomingEvent} from "src/services/websocketClient";
+} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
+import {WsEvent} from "src/services/websocketClient";
 
 // ConversationWithContact = {
 //     id: string;
@@ -24,9 +24,9 @@ import {WsIncomingEvent} from "src/services/websocketClient";
 //     };
 // }
 
-export const conversationWithContactAtom = atom<ConversationWithContact | null>(null);
-export const conversationWithContactLoadingAtom = atom<boolean>(false);
-export const conversationWithContactErrorAtom = atom<string | null>(null);
+const conversationWithContactAtom = atom<ConversationWithContact | null>(null);
+const conversationWithContactLoadingAtom = atom<boolean>(false);
+const conversationWithContactErrorAtom = atom<string | null>(null);
 
 export const conversationWithContactStateAtom = atom((get) => ({
   conversationWithContact: get(conversationWithContactAtom),
@@ -58,7 +58,7 @@ export const loadConversationWithContactAtom = atom(
 
 export const updateConversationWithContactByNewMessageEventAtom = atom(
   null,
-  async (get, set, event: WsIncomingEvent<NewMessage>): Promise<void> => {
+  async (get, set, event: WsEvent<NewMessage>): Promise<void> => {
     let conversationWithContact = get(conversationWithContactAtom);
 
     // Load list if missing
@@ -80,7 +80,7 @@ export const updateConversationWithContactByNewMessageEventAtom = atom(
     // Update existing conversationWithContact immutably
     set(conversationWithContactAtom, {
       ...conversationWithContact,
-      last_message_at: event.ts,
+      lastMessageAt: event.ts,
     });
   },
 

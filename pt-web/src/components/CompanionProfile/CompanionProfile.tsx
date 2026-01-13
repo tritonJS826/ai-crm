@@ -21,6 +21,8 @@ export function CompanionProfile() {
         loading...
       </p>}
       {conversationWithContactError && <p>
+        ERROR
+        {" "}
         {conversationWithContactError}
       </p>}
     </div>

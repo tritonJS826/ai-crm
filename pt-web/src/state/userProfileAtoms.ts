@@ -3,7 +3,7 @@ import {
   getUserProfile,
   patchUserProfile,
   UserProfile,
-} from "src/services/profile";
+} from "src/services/profileService";
 
 export const userProfileAtom = atom<UserProfile | null>(null);
 export const userLoadingAtom = atom<boolean>(false);

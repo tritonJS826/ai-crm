@@ -3,7 +3,7 @@ import {Platform} from "src/constants/platform";
 // Base schema for contact data.
 export type ContactBase = {
     platform: Platform;
-    platform_user_id: string;
+    platformUserId: string;
     phone?: string;
     name?: string;
 }
@@ -14,12 +14,12 @@ export type ContactCreate = ContactBase
 // Schema for contact data in responses.
 export type ContactOut = ContactBase & {
     id: string;
-    opt_out: boolean;
-    created_at: Date;
-    updated_at: Date;
+    optOut: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 // Schema for updating contact opt-out status
 export type ContactOptOutUpdate = {
-    opt_out: boolean;
+    optOut: boolean;
 }
