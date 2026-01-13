@@ -12,7 +12,11 @@ import {
 } from "src/state/conversationListAtom";
 import styles from "src/components/Chat/ConversationList/ConversationList.module.scss";
 
-export function ConversationList() {
+interface ConversationListProps {
+  onCardClickHandler: (conversationId: string) => void;
+}
+
+export function ConversationList({onCardClickHandler}: ConversationListProps) {
   const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
   const loadConversationList = useSetAtom(loadConversationListAtom);
   const updateConversationListByNewMessageEvent = useSetAtom(updateConversationListByNewMessageEventAtom);
@@ -34,6 +38,7 @@ export function ConversationList() {
       <ConversationCard
         key={item.id}
         conversation={item}
+        onCardClick = {() => onCardClickHandler(item.id)}
       />
     ))
     : [];

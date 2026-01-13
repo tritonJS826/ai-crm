@@ -4,13 +4,17 @@ import styles from "src/components/Chat/ConversationList/ConversationCard/Conver
 
 interface ConversationCardProps {
   conversation: ConversationWithContact;
+  onCardClick: () => void;
 }
 
-export function ConversationCard({conversation}: ConversationCardProps) {
+export function ConversationCard({conversation, onCardClick}: ConversationCardProps) {
   const defaultLastMessage = "Lorem, ipsum dolor sit amet consectetur adipisicing elit";
 
   return (
-    <div className={styles.conversationCard}>
+    <div
+      className={styles.conversationCard}
+      onClick={onCardClick}
+    >
       <div className={styles.avatarWrapper}>
         <p className={styles.avatar}>
           {conversation.contact.name ? conversation.contact.name[0] : "?"}
