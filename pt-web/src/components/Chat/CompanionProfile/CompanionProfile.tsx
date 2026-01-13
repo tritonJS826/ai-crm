@@ -1,7 +1,7 @@
 
 import {useAtomValue} from "jotai";
 import {conversationWithContactStateAtom} from "src/state/conversationWithContactAtom";
-import styles from "src/components/CompanionProfile/CompanionProfile.module.scss";
+import styles from "src/components/Chat/CompanionProfile/CompanionProfile.module.scss";
 
 export function CompanionProfile() {
 

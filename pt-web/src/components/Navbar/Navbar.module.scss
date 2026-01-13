@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  border-right: 1px solid vars.$color-border;
+  font-family: vars.$font-main;
 }
 
 .navList {

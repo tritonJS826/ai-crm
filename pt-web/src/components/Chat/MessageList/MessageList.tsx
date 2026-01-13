@@ -12,7 +12,7 @@ import {
   updateConversationWithContactByNewMessageEventAtom,
 } from "src/state/conversationWithContactAtom";
 import {loadMessageListAtom, messageListStateAtom, updateMessageListByNewMessageEventAtom} from "src/state/messageListAtom";
-import styles from "src/components/MessageList/MessageList.module.scss";
+import styles from "src/components/Chat/MessageList/MessageList.module.scss";
 
 export type MessageListProps = {
   conversationId: string;

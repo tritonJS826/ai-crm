@@ -1,6 +1,7 @@
-import {ConversationList} from "src/components/ConversationList/ConversationList";
+import {Chat} from "src/components/Chat/Chat";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
+import styles from "src/pages/chatPage/ChatPage.module.scss";
 
 export function ChatPage() {
   const dictionary = useDictionary(DictionaryKey.CHAT);
@@ -15,10 +16,10 @@ export function ChatPage() {
 
   return (
     <section aria-label={dictionary.title}>
-      <div>
+      <h3 className={styles.title}>
         {dictionary.title}
-        <ConversationList />
-      </div>
+      </h3>
+      <Chat />
     </section>
   );
 }
