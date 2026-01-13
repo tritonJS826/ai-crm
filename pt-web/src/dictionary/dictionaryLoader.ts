@@ -2,6 +2,8 @@ import type {AboutDictEn} from "src/dictionary/dictionaries/about/about.en";
 import type {AboutDictRu} from "src/dictionary/dictionaries/about/about.ru";
 import type {AuthDictEn} from "src/dictionary/dictionaries/auth/auth.en";
 import type {AuthDictRu} from "src/dictionary/dictionaries/auth/auth.ru";
+import type {ChatDictEn} from "src/dictionary/dictionaries/chat/chat.en";
+import type {ChatDictRu} from "src/dictionary/dictionaries/chat/chat.ru";
 import type {FooterDictEn} from "src/dictionary/dictionaries/footer/footer.en";
 import type {FooterDictRu} from "src/dictionary/dictionaries/footer/footer.ru";
 import type {HeaderDictEn} from "src/dictionary/dictionaries/header/header.en";
@@ -26,7 +28,8 @@ export enum DictionaryKey {
   AUTH = "auth",
   NOT_FOUND = "notFound",
   PAYMENT_SUCCESS = "paymentSuccess",
-  NAVBAR = "navbar"
+  NAVBAR = "navbar",
+  CHAT = "chat",
 }
 
 export type Language = "en" | "ru";
@@ -41,6 +44,7 @@ export type DictionaryMap = {
   [DictionaryKey.NOT_FOUND]: NotFoundDictEn | NotFoundDictRu;
   [DictionaryKey.PAYMENT_SUCCESS]: PaymentSuccessDictEn | PaymentSuccessDictRu;
   [DictionaryKey.NAVBAR]: NavbarDictEn | NavbarDictRu;
+  [DictionaryKey.CHAT]: ChatDictEn | ChatDictRu;
 };
 
 const loaders: {
@@ -83,6 +87,10 @@ const loaders: {
   [DictionaryKey.NAVBAR]: {
     en: async () => (await import("./dictionaries/navbar/navbar.en")).navbar,
     ru: async () => (await import("./dictionaries/navbar/navbar.ru")).navbar,
+  },
+  [DictionaryKey.CHAT]: {
+    en: async () => (await import("./dictionaries/chat/chat.en")).chat,
+    ru: async () => (await import("./dictionaries/chat/chat.ru")).chat,
   },
 };
 

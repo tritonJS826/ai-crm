@@ -12,7 +12,7 @@ export const navbarConfig: {key: string; iconSrc: string; href: string}[] = [
   {
     key: NavbarKeys.CHAT,
     iconSrc: `src/assets/navbarIcons/${NavbarKeys.CHAT}.avif`,
-    href: PATHS.HOME,
+    href: PATHS.CHAT,
   },
   {
     key: NavbarKeys.TASKS,
