@@ -15,7 +15,10 @@ export function ChatPage() {
   }
 
   return (
-    <section aria-label={dictionary.title}>
+    <section
+      aria-label={dictionary.title}
+      className={styles.chatPage}
+    >
       <h3 className={styles.title}>
         {dictionary.title}
       </h3>

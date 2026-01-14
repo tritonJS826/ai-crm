@@ -1,16 +1,18 @@
 @use "src/styles/variables" as vars;
 @use "src/styles/mixins" as mixins;
 
-.conversationCard {
+.messageCard {
+  font-family: vars.$font-main;
   padding: vars.$pad-xs vars.$pad-sm;
-  border-bottom: 1px solid vars.$color-border;
+  padding-right: 20%;
   display: flex;
   gap: vars.$pad-sm;
 }
 
-.conversationCard:hover {
-  background-color: vars.$color-bg-hover;
-  cursor: pointer;
+.messageCard.own {
+  padding-right: vars.$pad-sm;
+  padding-left: 20%;
+  flex-direction: row-reverse;
 }
 
 .avatarWrapper {
@@ -26,29 +28,30 @@
   font-size: vars.$font-2xl;
 }
 
-.infoWrapper {
+.messageWrapper {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: vars.$pad-xs;
 }
 
-.nameWrapper {
-  display: flex;
-  justify-content: space-between;
-}
-
-.name {
-  font-size: vars.$font-lg;
-  font-weight: 500;
-}
-
-.lastMessageDate {
+.createdAt {
   font-size: vars.$font-sm;
   color: vars.$color-text-secondary;
 }
 
 .messageText {
+  padding: vars.$pad-xs;
   font-size: vars.$font-md;
-  color: vars.$color-text-secondary;
+  color: #fff;
+  background-color: vars.$color-primary;
+  border-radius: vars.$radius-md;
+  border-top-left-radius: 0;
+}
+
+.messageText.own {
+  color: #000;
+  background-color: vars.$color-bg-hover;
+  border-top-left-radius: vars.$radius-md;
+  border-top-right-radius: 0;
 }

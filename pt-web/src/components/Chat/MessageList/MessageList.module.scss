@@ -1,3 +1,61 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
 .messageList {
-  font-size: large;
+  font-family: vars.$font-main;
+}
+
+.header {
+  padding: vars.$pad-sm vars.$pad-md;
+  border-bottom: 1px solid vars.$color-border;
+  font-size: vars.$font-lg;
+  height: vars.$chat-header-height;
+}
+
+.messageElementsRelativeWrapper {
+  position: relative;
+  height: 70%;
+}
+
+.messageElementsWrapper {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.messageInputWrapper {
+  padding: vars.$pad-sm;
+  border-top: 1px solid vars.$color-border;
+  height: vars.$chat-header-height;
+  display: flex;
+  justify-content: space-between;
+}
+
+.messageInput {
+  width: 100%;
+  border: none;
+  height: vars.$font-lg;
+  outline: none;
+  color: vars.$color-text;
+  font-size: vars.$font-lg;
+  padding-block: 0;
+}
+
+.messageInput::placeholder {
+  color: vars.$color-placeholder;
+  font-size: vars.$font-lg;
+}
+
+.messageSendButton {
+  @include mixins.flex-center;
+
+  border-radius: vars.$radius-sm;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: vars.$font-sm;
+  background-color: #000;
+  color: #fff;
 }

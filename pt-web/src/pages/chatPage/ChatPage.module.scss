@@ -1,5 +1,9 @@
 @use "src/styles/variables" as vars;
 
+.chatPage {
+  height: 100%;
+}
+
 .title {
   padding: vars.$pad-sm vars.$pad-md;
   font-size: vars.$font-xl;

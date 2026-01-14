@@ -50,3 +50,18 @@ export const toAgoString = (date: string): string => {
 
   return result;
 };
+
+export const toChatDateString = (date: string): string => {
+  const nowDate = DateTime.now();
+  const inputDate = DateTime.fromISO(date);
+  const diff = nowDate.diff(inputDate);
+
+  let result;
+  if (diff.as("days") > STEP) {
+    result = inputDate.toFormat("dd.LL.yyyy HH:mm");
+  } else {
+    result = inputDate.toFormat("HH:mm");
+  }
+
+  return result;
+};

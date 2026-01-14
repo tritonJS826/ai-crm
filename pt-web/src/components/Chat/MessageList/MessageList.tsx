@@ -1,6 +1,7 @@
 
 import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
+import {MessageCard} from "src/components/Chat/MessageList/MessageCard/MessageCard";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {MessageOut, sendMessage} from "src/services/conversationService";
@@ -54,36 +55,47 @@ export function MessageList({conversationId = "1"}: MessageListProps) {
   };
 
   const messageListElement = messageList.map((message: MessageOut) => (
-    <li key={message.id}>
-      {conversationWithContact?.contact.name}
-      -
-      {message.text}
-    </li>));
+    <MessageCard
+      key={message.id}
+      message={message}
+      contactName={conversationWithContact?.contact.name || "?"}
+      own={false}
+    />));
 
   return (
     <div className={styles.messageList}>
-      <h1>
-        MessageList
-      </h1>
-      <h2>
-        {conversationWithContact?.contact.name}
-      </h2>
-      <ul>
-        {messageListElement}
-      </ul>
-      <input
-        type={"text"}
-        value={text}
-        onChange={(event) => {
-          setText(event.target.value);
-        }}
-      />
-      <button
-        type="button"
-        onClick={handler}
-      >
-        SEND
-      </button>
+      <div>
+        <h2 className={styles.header}>
+          {conversationWithContact?.contact.name}
+        </h2>
+      </div>
+      <div className={styles.messageElementsRelativeWrapper}>
+        <ul className={styles.messageElementsWrapper}>
+          {messageListElement}
+        </ul>
+      </div>
+
+      <div className={styles.messageInputWrapper}>
+        <input
+          type={"text"}
+          value={text}
+          onChange={(event) => {
+            setText(event.target.value);
+          }}
+          name="messageInput"
+          placeholder="Type your message here..."
+          className={styles.messageInput}
+        />
+
+        <button
+          type="button"
+          onClick={handler}
+          className={styles.messageSendButton}
+        >
+          SEND
+        </button>
+      </div>
+
       {(messageListLoading || conversationWithContactLoading) && <p>
         loading...
       </p>}
