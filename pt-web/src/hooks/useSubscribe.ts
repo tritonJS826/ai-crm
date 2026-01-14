@@ -1,14 +1,14 @@
 import {useEffect} from "react";
 import {WsEventType} from "src/constants/wsEventTypes";
-import {socketClient, WsIncomingEvent} from "src/services/websocketClient";
+import {socketClient, WsEvent} from "src/services/websocketClient";
 
 export function useSubscribe<T>(
   eventType: WsEventType,
-  eventHandler: (event: WsIncomingEvent<T>) => void,
+  eventHandler: (event: WsEvent<T>) => void,
 ) {
   useEffect(() => {
     const handler = (event: MessageEvent) => {
-      const parsed = JSON.parse(event.data) as WsIncomingEvent<T>;
+      const parsed = JSON.parse(event.data) as WsEvent<T>;
 
       if (parsed.type === WsEventType.NEW_MESSAGE) {
         eventHandler(parsed);

@@ -5,7 +5,7 @@ import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 import {localStorageWorker, type Token as LSToken} from "src/globalServices/localStorageWorker";
 import {PATHS} from "src/routes/routes";
-import {loginByEmail, registerByEmail} from "src/services/auth";
+import {loginByEmail, registerByEmail} from "src/services/authService";
 import {
   accessTokenAtomWithPersistence,
   refreshTokenAtomWithPersistence,

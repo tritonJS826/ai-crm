@@ -1,27 +1,29 @@
-import {ConversationStatus} from "src/constants/conversationStatuses";
+import {ConversationStatus} from "src/constants/conversationStatus";
+import {MessageDirection} from "src/constants/messageDirection";
 import {Platform} from "src/constants/platform";
 import {apiClient} from "src/services/apiClient";
-import {ContactOptOutUpdate, ContactOut} from "src/services/contact";
+import {ContactOptOutUpdate, ContactOut} from "src/services/contactService";
 
 // Schema for message data in responses.
 export type MessageOut = {
     id: string;
-    conversation_id: string;
-    from_user_id?: string;
+    conversationId: string;
+    direction: MessageDirection;
+    fromUserId?: string;
     platform: Platform;
     text?: string;
-    media_url?: string;
-    remote_message_id?: string;
-    created_at: Date;
+    mediaUrl?: string;
+    remoteMessageId?: string;
+    createdAt: Date;
 }
 
 // Schema for conversation data in responses.
 export type ConversationOut = {
     id: string;
-    contact_id: string;
+    contactId: string;
     status: ConversationStatus;
-    last_message_at: Date;
-    created_at: Date;
+    lastMessageAt: Date;
+    createdAt: Date;
 }
 
 // Schema for conversation with nested contact data.
@@ -44,15 +46,15 @@ export type ConversationListResponse = {
 
 // Schema for sending a message.
 export type SendMessageRequest={
-    conversation_id: string;
+    conversationId: string;
     text?: string;
-    image_url?: string;
+    imageUrl?: string;
 }
 
 // Schema for send message response.
 export type SendMessageResponse = {
     message: MessageOut;
-    remote_message_id?: string;
+    remoteMessageId?: string;
 }
 
 export async function getConversationList(

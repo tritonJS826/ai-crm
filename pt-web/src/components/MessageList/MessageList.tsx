@@ -1,12 +1,11 @@
 
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
-import {WsActionType} from "src/constants/wsActionTypes";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {MessageOut} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
-import {socketClient} from "src/services/websocketClient";
+import {MessageOut, sendMessage} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
+import {defaultWsEvent, socketClient} from "src/services/websocketClient";
 import {
   conversationWithContactStateAtom,
   loadConversationWithContactAtom,
@@ -16,10 +15,10 @@ import {loadMessageListAtom, messageListStateAtom, updateMessageListByNewMessage
 import styles from "src/components/MessageList/MessageList.module.scss";
 
 export type MessageListProps = {
-  conversation_id: string;
+  conversationId: string;
 }
 
-export function MessageList({conversation_id}: MessageListProps) {
+export function MessageList({conversationId = "1"}: MessageListProps) {
   const {messageList, messageListLoading, messageListError} = useAtomValue(messageListStateAtom);
   const loadMessageList = useSetAtom(loadMessageListAtom);
   const updateMessageListByNewMessageEvent = useSetAtom(updateMessageListByNewMessageEventAtom);
@@ -29,6 +28,8 @@ export function MessageList({conversation_id}: MessageListProps) {
   const loadConversationWithContact = useSetAtom(loadConversationWithContactAtom);
   const updateConversationWithContactByNewMessageEvent = useSetAtom(updateConversationWithContactByNewMessageEventAtom);
 
+  const [text, setText] = useState<string>("");
+
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, (event) => {
     updateMessageListByNewMessageEvent(event);
@@ -37,20 +38,25 @@ export function MessageList({conversation_id}: MessageListProps) {
 
   // Emit for sending NEW_MESSAGE events by server
   useEffect(() => {
-    socketClient.emit<string>({action: WsActionType.SUBSCRIBE, conversation_id});
-  }, [conversation_id]);
+    socketClient.emit({...defaultWsEvent, type: WsEventType.SUBSCRIBE, data: {scope: "conversation", id: conversationId}});
+  }, [conversationId]);
 
   useEffect(() => {
     const fetchData = async () => {
-      await loadMessageList(conversation_id);
-      await loadConversationWithContact(conversation_id);
+      await loadMessageList(conversationId);
+      await loadConversationWithContact(conversationId);
     };
     fetchData();
-  }, [conversation_id]);
+  }, [conversationId]);
+
+  const handler = () => {
+    sendMessage({conversationId: "1", text});
+  };
 
   const messageListElement = messageList.map((message: MessageOut) => (
     <li key={message.id}>
       {conversationWithContact?.contact.name}
+      -
       {message.text}
     </li>));
 
@@ -58,18 +64,37 @@ export function MessageList({conversation_id}: MessageListProps) {
     <div className={styles.messageList}>
       <h1>
         MessageList
-        {conversationWithContact?.contact.name}
       </h1>
+      <h2>
+        {conversationWithContact?.contact.name}
+      </h2>
       <ul>
         {messageListElement}
       </ul>
+      <input
+        type={"text"}
+        value={text}
+        onChange={(event) => {
+          setText(event.target.value);
+        }}
+      />
+      <button
+        type="button"
+        onClick={handler}
+      >
+        SEND
+      </button>
       {(messageListLoading || conversationWithContactLoading) && <p>
         loading...
       </p>}
       {messageListError && <p>
+        ERROR
+        {" "}
         {messageListError}
       </p>}
       {conversationWithContactError && <p>
+        ERROR
+        {" "}
         {conversationWithContactError}
       </p>}
     </div>

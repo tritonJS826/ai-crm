@@ -2,9 +2,9 @@ import {atom} from "jotai";
 import {
   getMessages,
   MessageOut,
-} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
-import {WsIncomingEvent} from "src/services/websocketClient";
+} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
+import {WsEvent} from "src/services/websocketClient";
 
 // MessageOut = {
 //     id: string;
@@ -17,9 +17,9 @@ import {WsIncomingEvent} from "src/services/websocketClient";
 //     created_at: Date;
 // }
 
-export const messageListAtom = atom<MessageOut[]>([]);
-export const messageListLoadingAtom = atom<boolean>(false);
-export const messageListErrorAtom = atom<string | null>(null);
+const messageListAtom = atom<MessageOut[]>([]);
+const messageListLoadingAtom = atom<boolean>(false);
+const messageListErrorAtom = atom<string | null>(null);
 
 export const messageListStateAtom = atom((get) => ({
   messageList: get(messageListAtom),
@@ -51,7 +51,7 @@ export const loadMessageListAtom = atom(
 
 export const updateMessageListByNewMessageEventAtom = atom(
   null,
-  (get, set, event: WsIncomingEvent<NewMessage>): void => {
+  (get, set, event: WsEvent<NewMessage>): void => {
     const messageList = get(messageListAtom);
 
     // Message exists in list → return
@@ -62,11 +62,12 @@ export const updateMessageListByNewMessageEventAtom = atom(
     // Update existing messageList immutably
     const updatedItem: MessageOut = {
       id: event.data.message_id,
-      conversation_id: event.data.conversation_id,
-      created_at: event.ts,
+      conversationId: event.data.conversation_id,
+      createdAt: event.ts,
       platform: event.data.platform,
-      from_user_id: event.data.from_user_id,
+      fromUserId: event.data.from_user_id,
       text: event.data.text,
+      direction: event.data.direction,
     };
     set(messageListAtom, [
       ...messageList,

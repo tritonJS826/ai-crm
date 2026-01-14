@@ -3,9 +3,9 @@ import {
   ConversationListResponse,
   getConversation,
   getConversationList,
-} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
-import {WsIncomingEvent} from "src/services/websocketClient";
+} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
+import {WsEvent} from "src/services/websocketClient";
 
 // ConversationListResponse = {
 //     items: {
@@ -30,9 +30,9 @@ import {WsIncomingEvent} from "src/services/websocketClient";
 //     offset: number;
 // }
 
-export const conversationListAtom = atom<ConversationListResponse | null>(null);
-export const conversationListLoadingAtom = atom<boolean>(false);
-export const conversationListErrorAtom = atom<string | null>(null);
+const conversationListAtom = atom<ConversationListResponse | null>(null);
+const conversationListLoadingAtom = atom<boolean>(false);
+const conversationListErrorAtom = atom<string | null>(null);
 
 export const conversationListStateAtom = atom((get) => ({
   conversationList: get(conversationListAtom),
@@ -63,7 +63,7 @@ export const loadConversationListAtom = atom(
 
 export const updateConversationListByNewMessageEventAtom = atom(
   null,
-  async (get, set, event: WsIncomingEvent<NewMessage>): Promise<void> => {
+  async (get, set, event: WsEvent<NewMessage>): Promise<void> => {
     let conversationList = get(conversationListAtom);
 
     // Load list if missing
@@ -109,7 +109,7 @@ export const updateConversationListByNewMessageEventAtom = atom(
     // Update existing conversation immutably
     const updatedItems = conversationList.items.map((conversation, idx) =>
       idx === existingIndex
-        ? {...conversation, last_message_at: event.ts}
+        ? {...conversation, lastMessageAt: event.ts}
         : conversation,
     );
     set(conversationListAtom, {

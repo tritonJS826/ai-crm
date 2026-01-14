@@ -4,8 +4,8 @@ import {CompanionProfile} from "src/components/CompanionProfile/CompanionProfile
 import {MessageList} from "src/components/MessageList/MessageList";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {ConversationWithContact} from "src/services/conversation";
-import {NewMessage} from "src/services/conversationWs";
+import {ConversationWithContact} from "src/services/conversationService";
+import {NewMessage} from "src/services/conversationWsService";
 import {
   conversationListStateAtom,
   loadConversationListAtom,
@@ -40,28 +40,45 @@ export function ConversationList() {
     ? conversationList.items.map((item: ConversationWithContact) => (
       <li key={item.id}>
         {item.contact.name}
+        <p>
+          last message at
+          {" "}
+          {String(item.lastMessageAt)}
+        </p>
+
       </li>))
-    : "";
+    : [];
 
   return (
     <div className={styles.conversationList}>
-      <h1>
-        ConversationList
-      </h1>
-      <ul>
-        {conversationListElement}
-      </ul>
-      {conversationListLoading && <p>
-        loading...
-      </p>}
-      {conversationListError && <p>
-        {conversationListError}
-      </p>}
-      {currentConversationId && <>
-        <MessageList conversation_id={currentConversationId} />
-        <CompanionProfile />
-      </>
-      }
+      <div className={styles.wrapper}>
+        <h1>
+          ConversationList
+        </h1>
+        <ul>
+          {conversationListElement.length > 0 ? conversationListElement : "INFO conversation list is empty"}
+        </ul>
+        {conversationListLoading && <p>
+          loading...
+        </p>}
+        {conversationListError && <p>
+          ERROR
+          {" "}
+          {conversationListError}
+        </p>}
+      </div>
+      <div className={styles.wrapper}>
+        {currentConversationId && <>
+          <MessageList conversationId={currentConversationId} />
+        </>
+        }
+      </div>
+      <div className={styles.wrapper}>
+        {currentConversationId && <>
+          <CompanionProfile />
+        </>
+        }
+      </div>
     </div>
   );
 }
