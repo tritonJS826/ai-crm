@@ -18,6 +18,20 @@ services:
       retries: 10
       start_period: 10s
 
+  br-migrate:
+    build:
+      context: .
+      dockerfile: br-general-python/Dockerfile
+    command: [ "python", "-m", "prisma", "migrate", "deploy" ]
+    depends_on:
+      br-postgres-general:
+        condition: service_healthy
+    env_file:
+      - ./br-general-python/.env
+    networks:
+      - app-network
+    restart: on-failure:3
+
   br-general-python:
     build:
       context: .
@@ -27,6 +41,8 @@ services:
     depends_on:
       br-postgres-general:
         condition: service_healthy
+      br-migrate:
+        condition: service_completed_successfully
     env_file:
       - ./br-general-python/.env
     networks:
