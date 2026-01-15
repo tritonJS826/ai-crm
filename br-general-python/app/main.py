@@ -38,7 +38,12 @@ async def lifespan(app: FastAPI):
                 logger.exception("DB disconnect failed")
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    lifespan=lifespan,
+    docs_url="/br-general/docs",
+    redoc_url="/br-general/redoc",
+    openapi_url="/br-general/openapi.json",
+)
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,0 +1,23 @@
+# Python virtual environments
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+
+# Node
+**/node_modules
+
+# IDE
+**/.idea
+**/.vscode
+
+# Git
+.git
+
+# Build artifacts
+**/dist
+**/*.egg-info

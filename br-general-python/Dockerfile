@@ -43,6 +43,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     ca-certificates \
+    libatomic1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy python deps + binaries
@@ -57,4 +58,4 @@ COPY --from=builder /root/.cache/prisma-python /root/.cache/prisma-python
 
 VOLUME /app/logs
 EXPOSE 8000
-CMD ["python", "app/run.py"]
+CMD ["python", "-m", "app.run"]
