@@ -20,7 +20,7 @@ export type MessageListProps = {
   conversationId: string;
 }
 
-export function MessageList({conversationId = "1"}: MessageListProps) {
+export function MessageList({conversationId}: MessageListProps) {
   const [userProfile] = useAtom(userProfileAtom);
 
   const {messageList, messageListLoading, messageListError} = useAtomValue(messageListStateAtom);
@@ -54,7 +54,7 @@ export function MessageList({conversationId = "1"}: MessageListProps) {
   }, [conversationId]);
 
   const handler = () => {
-    sendMessage({conversationId: "1", text});
+    sendMessage({conversationId, text});
     setText("");
   };
 
