@@ -26,7 +26,6 @@ from app.schemas.conversation import (
 )
 from app.schemas.contact import ContactOptOutUpdate, Platform
 
-
 router = APIRouter()
 
 
@@ -85,9 +84,7 @@ async def get_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(
-        user_id=current_user.id, conversation_id=conversation_id
-    ):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     return ConversationWithContact(
@@ -112,7 +109,7 @@ async def close_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     await conversation_repo.close(db, conversation_id)
@@ -137,9 +134,7 @@ async def get_messages(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(
-        user_id=current_user.id, conversation_id=conversation_id
-    ):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     messages = await message_repo.get_by_conversation(
@@ -171,7 +166,7 @@ async def send_message(
         raise HTTPException(status_code=404, detail="Conversation not found")
 
     if not await can_user_access_conversation(
-        user_id=current_user.id, conversation_id=payload.conversation_id
+        db, current_user.id, payload.conversation_id
     ):
         raise HTTPException(status_code=403, detail="Access denied")
 
@@ -238,7 +233,7 @@ async def send_product_to_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     product = await product_repo.get_by_id(db, product_id)
