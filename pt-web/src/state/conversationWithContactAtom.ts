@@ -80,7 +80,7 @@ export const updateConversationWithContactByNewMessageEventAtom = atom(
     // Update existing conversationWithContact immutably
     set(conversationWithContactAtom, {
       ...conversationWithContact,
-      lastMessageAt: event.ts,
+      lastMessageAt: event.timestamp,
     });
   },
 
