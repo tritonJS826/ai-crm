@@ -1,5 +1,25 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
 .chat {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.title {
+  padding: vars.$pad-sm vars.$pad-md;
+  font-size: vars.$font-xl;
+  color: vars.$color-title;
+  font-family: vars.$font-main;
+  border-bottom: 1px solid vars.$color-border;
+}
+
+.content {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  height: 100%;
+  grid-template-columns: 1fr 2fr 1fr;
+
+  // height: 100%;
+  // max-height: 100%;
 }

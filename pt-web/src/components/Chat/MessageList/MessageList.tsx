@@ -73,31 +73,32 @@ export function MessageList({conversationId = "1"}: MessageListProps) {
           {conversationWithContact?.contact.name}
         </h2>
       </div>
-      <div className={styles.messageElementsRelativeWrapper}>
+
+      <div className={styles.content}>
         <ul className={styles.messageElementsWrapper}>
           {messageListElement}
         </ul>
-      </div>
 
-      <div className={styles.messageInputWrapper}>
-        <input
-          type={"text"}
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
-          }}
-          name="messageInput"
-          placeholder="Type your message here..."
-          className={styles.messageInput}
-        />
+        <div className={styles.messageInputWrapper}>
+          <input
+            type={"text"}
+            value={text}
+            onChange={(event) => {
+              setText(event.target.value);
+            }}
+            name="messageInput"
+            placeholder="Type your message here..."
+            className={styles.messageInput}
+          />
 
-        <button
-          type="button"
-          onClick={handler}
-          className={styles.messageSendButton}
-        >
-          SEND
-        </button>
+          <button
+            type="button"
+            onClick={handler}
+            className={styles.messageSendButton}
+          >
+            SEND
+          </button>
+        </div>
       </div>
 
       {(messageListLoading || conversationWithContactLoading) && <p>

@@ -48,7 +48,16 @@
   color: vars.$color-text-secondary;
 }
 
-.messageText {
+.lastMessage {
   font-size: vars.$font-md;
   color: vars.$color-text-secondary;
+  max-height: vars.$font-md;
+  -webkit-box-orient: vertical;
+  display: block;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  line-height: vars.$font-md;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  overflow: hidden !important;
 }

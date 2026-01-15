@@ -19,9 +19,6 @@ export function ChatPage() {
       aria-label={dictionary.title}
       className={styles.chatPage}
     >
-      <h3 className={styles.title}>
-        {dictionary.title}
-      </h3>
       <Chat />
     </section>
   );

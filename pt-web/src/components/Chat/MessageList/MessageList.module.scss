@@ -3,6 +3,9 @@
 
 .messageList {
   font-family: vars.$font-main;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
 }
 
 .header {
@@ -12,19 +15,22 @@
   height: vars.$chat-header-height;
 }
 
-.messageElementsRelativeWrapper {
-  position: relative;
-  height: 70%;
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+
+  // height: 100%;
 }
 
 .messageElementsWrapper {
   width: 100%;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  overflow-y: auto;
+  overflow: auto;
+  height: 400px;
   display: flex;
   flex-direction: column-reverse;
+  padding-bottom: 2rem;
 }
 
 .messageInputWrapper {

@@ -10,13 +10,59 @@ export function CompanionProfile() {
 
   return (
     <div className={styles.companionProfile}>
-      <h1>
-        Profile
-      </h1>
-      <ul>
-        {conversationWithContact?.contact.name}
-        {conversationWithContact?.contact.phone}
-      </ul>
+      <div className={styles.headerWrapper}>
+        <h1 className={styles.header}>
+          Profile
+        </h1>
+      </div>
+
+      <div className={styles.layout}>
+        <div className={styles.profile}>
+          <div className={styles.avatarWrapper}>
+            <p className={styles.avatar}>
+              {conversationWithContact?.contact.name ? conversationWithContact?.contact.name[0] : "?"}
+            </p>
+          </div>
+          <p className={styles.name}>
+            {conversationWithContact?.contact.name}
+          </p>
+          <p className={styles.phone}>
+            {conversationWithContact?.contact.phone}
+          </p>
+        </div>
+
+        <div className={styles.reassignment}>
+          <h1 className={styles.header}>
+            Reassignment
+          </h1>
+          <select
+            name="reassignment"
+            className={styles.reassignmentSelect}
+          >
+            <option
+              value="default"
+              selected
+            />
+          </select>
+
+        </div>
+        <div className={styles.notes}>
+          <div className={styles.notesHeaderWrapper}>
+            <h1 className={styles.header}>
+              Notes
+            </h1>
+            <button
+              type="button"
+              className={styles.addNoteButton}
+            >
+              +Add Note
+            </button>
+          </div>
+
+          <textarea className={styles.textarea} />
+        </div>
+      </div>
+
       {(conversationWithContactLoading) && <p>
         loading...
       </p>}
