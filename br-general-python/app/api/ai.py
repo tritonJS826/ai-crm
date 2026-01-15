@@ -23,7 +23,7 @@ async def generate_draft(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     recent_messages = await message_repo.get_recent(

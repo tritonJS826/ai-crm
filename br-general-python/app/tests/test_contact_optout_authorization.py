@@ -1,4 +1,6 @@
 import pytest
+import pytest_asyncio
+
 from uuid import uuid4
 
 from prisma import Prisma
@@ -10,7 +12,7 @@ from app.schemas.platform import Platform
 pytestmark = pytest.mark.asyncio(loop_scope="session")
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def prisma():
     client = Prisma()
     await client.connect()
