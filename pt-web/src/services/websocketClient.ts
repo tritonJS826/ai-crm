@@ -4,7 +4,7 @@ import {env} from "src/utils/env/env";
 
 export type WsEvent<T> = {
   type: WsEventType;
-  ts: Date;
+  timestamp: Date;
   data: T;
 }
 
