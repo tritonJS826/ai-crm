@@ -4,6 +4,7 @@ export const PATHS = {
   PROFILE: {PAGE: "/profile"},
   AUTH: {PAGE: "/auth"},
   PAYMENT_SUCCESS: "/payment-success",
+  CHAT: "/chat",
   NOT_FOUND: "*",
 } as const;
 

@@ -1,0 +1,65 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
+.conversationCard {
+  padding: vars.$pad-xs vars.$pad-sm;
+  border-bottom: 1px solid vars.$color-border;
+  display: flex;
+  gap: vars.$pad-sm;
+}
+
+.conversationCard:hover {
+  background-color: vars.$color-bg-hover;
+  cursor: pointer;
+}
+
+.avatarWrapper {
+  @include mixins.flex-center;
+
+  border-radius: 50%;
+  background-color: vars.$color-bg-alt;
+  height: vars.$icon-xl;
+  width: vars.$icon-xl;
+}
+
+.avatar {
+  font-size: vars.$font-2xl;
+}
+
+.infoWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.nameWrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.name {
+  font-size: vars.$font-lg;
+  font-weight: 500;
+}
+
+.lastMessageDate {
+  font-size: vars.$font-sm;
+  color: vars.$color-text-secondary;
+  text-align: right;
+  max-width: 40%;
+}
+
+.lastMessage {
+  font-size: vars.$font-md;
+  color: vars.$color-text-secondary;
+  max-height: vars.$font-md;
+  -webkit-box-orient: vertical;
+  display: block;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  line-height: vars.$font-md;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  overflow: hidden !important;
+}

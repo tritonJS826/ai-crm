@@ -1,0 +1,26 @@
+@use "src/styles/variables" as vars;
+
+.conversationList {
+  font-family: vars.$font-main;
+  border-right: 1px solid vars.$color-border;
+}
+
+.searchWrapper {
+  padding: vars.$pad-sm vars.$pad-md;
+  border-bottom: 1px solid vars.$color-border;
+  height: vars.$chat-header-height;
+}
+
+.search {
+  border: none;
+  height: vars.$font-lg;
+  outline: none;
+  color: vars.$color-text;
+  font-size: vars.$font-lg;
+  padding-block: 0;
+}
+
+.search::placeholder {
+  color: vars.$color-placeholder;
+  font-size: vars.$font-lg;
+}

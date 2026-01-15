@@ -1,4 +1,3 @@
-import {ConversationList} from "src/components/ConversationList/ConversationList";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 
@@ -17,7 +16,6 @@ export function HomePage() {
     <section aria-label={dictionary.title}>
       <div>
         {dictionary.title}
-        <ConversationList />
       </div>
     </section>
   );
