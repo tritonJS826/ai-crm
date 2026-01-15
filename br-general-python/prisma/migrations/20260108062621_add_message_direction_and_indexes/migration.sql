@@ -28,18 +28,5 @@ CREATE UNIQUE INDEX "messages_platform_remote_message_id_key" ON "messages" ("pl
 CREATE INDEX "orders_conversation_id_idx" ON "orders" ("conversation_id");
 
 -- AddForeignKey
--- ALTER TABLE "messages" ADD CONSTRAINT "messages_from_user_id_fkey" FOREIGN KEY ("from_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-ALTER TABLE "messages"
-    ADD COLUMN "direction" "MessageDirection";
-
--- Backfill existing rows
-UPDATE "messages"
-SET "direction" = CASE
-                      WHEN "from_user_id" IS NULL THEN 'IN'
-                      ELSE 'OUT'
-    END;
-
--- Enforce NOT NULL after backfill
-ALTER TABLE "messages"
-    ALTER COLUMN "direction" SET NOT NULL;
+ALTER TABLE "messages" ADD CONSTRAINT "messages_from_user_id_fkey" FOREIGN KEY ("from_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 

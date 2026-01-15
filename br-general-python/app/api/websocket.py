@@ -157,6 +157,13 @@ async def websocket_endpoint(websocket: WebSocket):
                 full_scope = f"ws:conversation:{scope_id}"
                 ws_manager.subscribe(connection_id, full_scope)
 
+                await websocket.send_json(
+                    ws_event(
+                        "subscribed",
+                        {"scope": scope, "id": scope_id},
+                    )
+                )
+
     except WebSocketDisconnect:
         pass
     finally:

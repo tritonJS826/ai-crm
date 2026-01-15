@@ -4,12 +4,10 @@ Service for AI-assisted message drafting.
 TODO: Implement actual OpenAI/LLM integration when API key is available.
 """
 
-import logging
+from app.logging import logger
 from typing import List, Optional
 
 from app.settings import settings
-
-logger = logging.getLogger(__name__)
 
 # Canned prompt templates for quick responses
 CANNED_PROMPTS = {
