@@ -1,16 +1,7 @@
-from enum import Enum
-
 from pydantic import BaseModel
 from typing import Optional
 
 from app.schemas.platform import Platform
-
-
-class MessageDirection(str, Enum):
-    """Direction of a message relative to the customer."""
-
-    IN = "IN"
-    OUT = "OUT"
 
 
 class NormalizedMessage(BaseModel):
@@ -31,4 +22,3 @@ class NormalizedMessage(BaseModel):
 
     # Routing / infra
     phone_number_id: str
-    direction: MessageDirection = MessageDirection.IN

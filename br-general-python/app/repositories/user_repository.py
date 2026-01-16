@@ -52,8 +52,8 @@ class UserRepository:
             skip=offset,
         )
 
-    async def get_admin(self, db: Prisma) -> User | None:
-        return await db.user.find_first(
+    async def get_admins(self, db: Prisma) -> User | None:
+        return await db.user.find_many(
             where={"role": Role.ADMIN.value},
             order={"createdAt": "asc"},
         )

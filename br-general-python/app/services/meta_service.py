@@ -11,7 +11,7 @@ import httpx
 
 from app.settings import settings
 from app.schemas.platform import Platform
-from app.schemas.message import NormalizedMessage, MessageDirection
+from app.schemas.message import NormalizedMessage
 
 META_API_VERSION = "v24.0"
 META_API_BASE = f"https://graph.facebook.com/{META_API_VERSION}"
@@ -108,7 +108,6 @@ class MetaService:
             type=msg.get("type", "text"),
             text=msg.get("text", {}).get("body"),
             phone_number_id=value.get("metadata", {}).get("phone_number_id"),
-            direction=MessageDirection.IN,
         )
 
     def _normalize_messenger_instagram(
@@ -137,7 +136,6 @@ class MetaService:
             type="text",
             text=message.get("text"),
             phone_number_id="",
-            direction=MessageDirection.IN,
         )
 
     # -------------------------

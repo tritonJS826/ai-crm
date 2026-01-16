@@ -7,7 +7,7 @@ from typing import Optional
 from app.db import db
 from app.logging import logger
 from app.schemas.contact import Platform
-from app.schemas.message import MessageDirection, NormalizedMessage
+from app.schemas.message import NormalizedMessage
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
@@ -52,7 +52,6 @@ class MessageService:
         message = await message_repo.create(
             db,
             conversation_id=conversation.id,
-            direction=MessageDirection.IN,
             platform=msg.platform,
             from_user_id=None,
             text=msg.text,
@@ -63,7 +62,6 @@ class MessageService:
         inbound_count = await message_repo.count_by_conversation(
             db,
             conversation_id=conversation.id,
-            direction=MessageDirection.IN,
         )
 
         if inbound_count == 1 and not contact.optOut:
@@ -78,7 +76,6 @@ class MessageService:
             {
                 "conversation_id": conversation.id,
                 "message_id": message.id,
-                "direction": MessageDirection.IN.value,
                 "from_user_id": None,
                 "platform": msg.platform.value,
                 "text": msg.text,
@@ -133,7 +130,6 @@ class MessageService:
         message = await message_repo.create(
             db,
             conversation_id=conversation_id,
-            direction=MessageDirection.OUT,
             platform=platform,
             from_user_id=agent_user_id,
             text=text,
@@ -150,7 +146,6 @@ class MessageService:
             {
                 "conversation_id": conversation_id,
                 "message_id": message.id,
-                "direction": MessageDirection.OUT.value,
                 "from_user_id": agent_user_id,
                 "platform": platform.value,
                 "text": text,
