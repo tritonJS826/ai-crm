@@ -16,6 +16,7 @@ import {
   accessTokenAtomWithPersistence,
   clearTokensAtom,
 } from "src/state/authAtom";
+import {clearUserProfileAtom} from "src/state/userProfileAtoms";
 import styles from "src/pages/profilePage/ProfilePage.module.scss";
 
 type EditableField = "name" | "email";
@@ -144,6 +145,7 @@ export function ProfilePage() {
   const accessTokens = useAtomValue(accessTokenAtomWithPersistence);
   const isAuthenticated = Boolean(accessTokens?.token);
   const clearTokens = useSetAtom(clearTokensAtom);
+  const clearUserProfile = useSetAtom(clearUserProfileAtom);
 
   const [isLoading, setIsLoading] = useState(true);
   const [pageError, setPageError] = useState<string | null>(null);
@@ -196,6 +198,7 @@ export function ProfilePage() {
   const handleLogout = async (): Promise<void> => {
     await logoutUser();
     clearTokens();
+    clearUserProfile();
     navigate(PATHS.HOME);
   };
 

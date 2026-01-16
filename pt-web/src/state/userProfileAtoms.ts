@@ -46,3 +46,9 @@ export const updateUserProfileAtom = atom(
     }
   },
 );
+
+export const clearUserProfileAtom = atom(null, (_get, set) => {
+  set(userProfileAtom, null);
+  set(userLoadingAtom, false);
+  set(userErrorAtom, null);
+});

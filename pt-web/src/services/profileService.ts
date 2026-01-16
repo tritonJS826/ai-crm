@@ -5,7 +5,7 @@ export type UserProfile = {
   email: string;
   name: string;
   role: "ADMIN" | "AGENT";
-  createdAt?: string;
+  createdAt: string;
 };
 
 export async function getUserProfile(init?: { signal?: AbortSignal }): Promise<UserProfile> {
