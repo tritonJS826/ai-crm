@@ -46,11 +46,8 @@ export function MessageList({conversationId}: MessageListProps) {
   }, [conversationId]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await loadMessageList(conversationId);
-      await loadConversationWithContact(conversationId);
-    };
-    fetchData();
+    loadMessageList(conversationId);
+    loadConversationWithContact(conversationId);
   }, [conversationId]);
 
   const handler = () => {

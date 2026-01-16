@@ -27,10 +27,7 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      await loadConversationList();
-    };
-    fetchData();
+    loadConversationList();
   }, []);
 
   const conversationListElement = conversationList
