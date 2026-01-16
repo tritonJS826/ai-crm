@@ -8,7 +8,7 @@ export type WsEvent<T> = {
   data: T;
 }
 
-export const defaultWsEvent = {ts: new Date()};
+export const defaultWsEvent = {timestamp: new Date()};
 
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 5;
