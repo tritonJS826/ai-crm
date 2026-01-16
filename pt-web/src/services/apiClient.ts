@@ -1,3 +1,4 @@
+import {refreshTokens} from "src/services/authService";
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
 import {env} from "src/utils/env/env";
 
@@ -12,7 +13,6 @@ const HTTP_STATUS = {
 const HEADER = {
   CONTENT_TYPE: "Content-Type",
   AUTHORIZATION: "Authorization",
-  REFRESH: "x-refresh-token",
 } as const;
 
 const MIME = {JSON: "application/json"} as const;
@@ -53,14 +53,10 @@ class ApiClient {
 
   private getAuthHeaders(): Record<string, string> {
     const accessObj = localStorageWorker.getItemByKey<LSToken>("accessToken");
-    const refreshObj = localStorageWorker.getItemByKey<LSToken>("refreshToken");
 
     const headers: Record<string, string> = {};
     if (accessObj?.token) {
       headers[HEADER.AUTHORIZATION] = `Bearer ${accessObj.token}`;
-    }
-    if (refreshObj?.token) {
-      headers[HEADER.REFRESH] = refreshObj.token;
     }
 
     return headers;
@@ -129,6 +125,7 @@ class ApiClient {
     url: string,
     body?: unknown,
     init?: RequestInit,
+    retryOnUnauthorized: boolean = true,
   ): Promise<T> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -149,6 +146,31 @@ class ApiClient {
         signal: controller.signal,
         ...init,
       });
+
+      if (response.status === HTTP_STATUS.UNAUTHORIZED && retryOnUnauthorized) {
+        try {
+          await refreshTokens();
+          const retryHeaders = this.buildHeaders(init, body);
+          const retryResponse = await fetch(`${this.baseUrl}${url}`, {
+            method,
+            headers: retryHeaders,
+            body:
+              body === undefined
+                ? undefined
+                : isFormData
+                  ? (body as BodyInit)
+                  : JSON.stringify(body),
+            signal: controller.signal,
+            ...init,
+          });
+
+          await this.ensureOkOrThrow(retryResponse);
+
+          return this.parseJsonSafe<T>(retryResponse);
+        } catch {
+          await this.ensureOkOrThrow(response);
+        }
+      }
 
       await this.ensureOkOrThrow(response);
 

@@ -24,12 +24,8 @@ export function clearTokens(): void {
 async function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   const access = getAccessToken();
-  const refresh = getRefreshToken();
   if (access) {
     headers.set("Authorization", `Bearer ${access}`);
-  }
-  if (refresh) {
-    headers.set("x-refresh-token", refresh);
   }
 
   return fetch(`${env.API_BASE_PATH}${path}`, {...init, headers});
@@ -58,6 +54,26 @@ export async function registerByEmail(email: string, password: string, fullName:
   if (!res.ok) {
     throw new Error(`Registration request failed: ${res.statusText}`);
   }
+  const data = (await res.json()) as UserWithTokens;
+  saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
+}
+
+export async function refreshTokens(): Promise<void> {
+  const access = getAccessToken();
+  const refresh = getRefreshToken();
+  if (!refresh) {
+    throw new Error("Refresh token not found");
+  }
+
+  const res = await fetch(`${env.API_BASE_PATH}/auth/refresh`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({access_token: access, refresh_token: refresh}),
+  });
+  if (!res.ok) {
+    throw new Error(`Refresh request failed: ${res.statusText}`);
+  }
+
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
 }
