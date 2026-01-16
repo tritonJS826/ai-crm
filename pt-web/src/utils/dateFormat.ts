@@ -41,8 +41,7 @@ const DAYS_PER_YEAR = 366;
 
 export function toAgoString (dateISO: string): string {
   const nowDateMs = Date.now();
-  const inputDateMs = new Date(dateISO).valueOf()
-  + (new Date(dateISO).getTimezoneOffset() * MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE);
+  const inputDateMs = new Date(dateISO).valueOf();
 
   const diffInMinutes = (nowDateMs - inputDateMs)
   / MILLISECONDS_PER_SECOND
@@ -88,10 +87,8 @@ const DATE_PART_MIN_LENGTH = 1;
  * Converts an ISO date string into a chat-friendly time or date-time string.
  *
  * The function compares the provided date with the current time:
- * - If the difference is less than or equal to `STEP` days, it returns only the UTC time (`HH:mm`).
- * - If the difference is greater than `STEP` days, it returns the full UTC date and time (`DD.MM.YYYY HH:mm`).
- *
- * All formatting is done in UTC.
+ * - If the difference is less than or equal to `STEP` days, it returns only the time (`HH:mm`).
+ * - If the difference is greater than `STEP` days, it returns the full date and time (`DD.MM.YYYY HH:mm`).
  *
  * @param dateISO - A valid ISO 8601 date string (e.g. `"2026-01-15T10:30:00.000Z"`).
  *
@@ -110,8 +107,7 @@ const DATE_PART_MIN_LENGTH = 1;
 export function toChatDateString (dateISO: string): string {
   const nowDateMs = Date.now();
   const inputDate = new Date(dateISO);
-  const inputDateMs = inputDate.valueOf()
-  + (inputDate.getTimezoneOffset() * MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE);
+  const inputDateMs = inputDate.valueOf();
 
   const diffInDays = (nowDateMs - inputDateMs)
   / MILLISECONDS_PER_SECOND
@@ -119,20 +115,20 @@ export function toChatDateString (dateISO: string): string {
   / MINUTES_PER_HOUR
   / HOURS_PER_DAY;
 
-  const utcMonth = inputDate.getUTCMonth().toString().length === DATE_PART_MIN_LENGTH
-    ? `0${inputDate.getUTCMonth() + OFFSET}`
-    : `${inputDate.getUTCMonth() + OFFSET}`;
+  const utcMonth = inputDate.getMonth().toString().length === DATE_PART_MIN_LENGTH
+    ? `0${inputDate.getMonth() + OFFSET}`
+    : `${inputDate.getMonth() + OFFSET}`;
 
-  const utcHours = inputDate.getUTCHours().toString().length === DATE_PART_MIN_LENGTH
-    ? `0${inputDate.getUTCHours()}`
-    : `${inputDate.getUTCHours()}`;
+  const utcHours = inputDate.getHours().toString().length === DATE_PART_MIN_LENGTH
+    ? `0${inputDate.getHours()}`
+    : `${inputDate.getHours()}`;
 
-  const utcMinutes = inputDate.getUTCMinutes().toString().length === DATE_PART_MIN_LENGTH
-    ? `0${inputDate.getUTCMinutes()}`
-    : `${inputDate.getUTCMinutes()}`;
+  const utcMinutes = inputDate.getMinutes().toString().length === DATE_PART_MIN_LENGTH
+    ? `0${inputDate.getMinutes()}`
+    : `${inputDate.getMinutes()}`;
 
   const utcTime = `${utcHours}:${utcMinutes}`;
-  const utcDate = `${inputDate.getUTCDate()}.${utcMonth}.${inputDate.getUTCFullYear()}`;
+  const utcDate = `${inputDate.getDate()}.${utcMonth}.${inputDate.getFullYear()}`;
 
   if (diffInDays > STEP) {
     return `${utcDate} ${utcTime}`;

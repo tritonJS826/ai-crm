@@ -1,20 +1,30 @@
 
 import {useAtomValue} from "jotai";
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
 import {conversationWithContactStateAtom} from "src/state/conversationWithContactAtom";
 import styles from "src/components/Chat/CompanionProfile/CompanionProfile.module.scss";
 
 const DEFAULT_AVATAR_SYMBOL = "?";
 
 export function CompanionProfile() {
-
+  const dictionary = useDictionary(DictionaryKey.CHAT);
   const {conversationWithContact, conversationWithContactLoading, conversationWithContactError}
   = useAtomValue(conversationWithContactStateAtom);
+
+  if (!dictionary) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className={styles.companionProfile}>
       <div className={styles.headerWrapper}>
         <h1 className={styles.header}>
-          Profile
+          {dictionary.companionProfile.title}
         </h1>
       </div>
 
@@ -37,7 +47,7 @@ export function CompanionProfile() {
 
         <div className={styles.reassignment}>
           <h1 className={styles.header}>
-            Reassignment
+            {dictionary.companionProfile.reassignmentTitle}
           </h1>
           <select
             name="reassignment"
@@ -48,13 +58,13 @@ export function CompanionProfile() {
         <div className={styles.notes}>
           <div className={styles.notesHeaderWrapper}>
             <h1 className={styles.header}>
-              Notes
+              {dictionary.companionProfile.notesTitle}
             </h1>
             <button
               type="button"
               className={styles.addNoteButton}
             >
-              +Add Note
+              {dictionary.companionProfile.notesAddButtonLabel}
             </button>
           </div>
 

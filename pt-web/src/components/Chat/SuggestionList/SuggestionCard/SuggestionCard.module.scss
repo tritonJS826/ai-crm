@@ -1,0 +1,47 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
+.suggestionCard {
+  font-family: vars.$font-main;
+  padding: vars.$pad-xs vars.$pad-sm;
+  display: flex;
+  gap: vars.$pad-sm;
+  cursor: pointer;
+}
+
+.suggestionCard:hover {
+  background-color: vars.$color-bg-hover;
+}
+
+.insertButton {
+  width: vars.$icon-md;
+  height: vars.$icon-md;
+  border: none;
+  background-color: unset;
+}
+
+.insertIcon {
+  width: 100%;
+  height: 100%;
+}
+
+.messageWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: vars.$pad-xs;
+}
+
+.createdAt {
+  font-size: vars.$font-sm;
+  color: vars.$color-text-secondary;
+}
+
+.messageText {
+  padding: vars.$pad-xs;
+  font-size: vars.$font-md;
+  color: #000;
+  background-color: vars.$color-bg-alt;
+  border-radius: vars.$radius-md;
+  border-top-left-radius: 0;
+}
