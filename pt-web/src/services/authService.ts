@@ -43,16 +43,7 @@ export async function loginByEmail(email: string, password: string): Promise<voi
     body,
   });
   if (!res.ok) {
-    let message = "Login request failed";
-    try {
-      const errorBody = (await res.json()) as {detail?: unknown};
-      if (typeof errorBody?.detail === "string") {
-        message = errorBody.detail;
-      }
-    } catch {
-      // Ignore JSON parse errors and fall back to the default message.
-    }
-    throw new Error(message);
+    throw new Error(`Login request failed: ${res.statusText}`);
   }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
@@ -65,16 +56,7 @@ export async function registerByEmail(email: string, password: string, fullName:
     body: JSON.stringify({email, password, name: fullName, role: "AGENT"}),
   });
   if (!res.ok) {
-    let message = "Registration request failed";
-    try {
-      const errorBody = (await res.json()) as {detail?: unknown};
-      if (typeof errorBody?.detail === "string") {
-        message = errorBody.detail;
-      }
-    } catch {
-      // Ignore JSON parse errors and fall back to the default message.
-    }
-    throw new Error(message);
+    throw new Error(`Registration request failed: ${res.statusText}`);
   }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
