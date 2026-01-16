@@ -6,6 +6,13 @@ export type Token = { access_token: string; refresh_token: string; token_type: s
 export type User = { id: string; email: string; name: string; role: Role };
 export type UserWithTokens = { user: User; tokens: Token };
 
+const AUTH_PATH = {
+  LOGIN: "/auth/login",
+  LOGOUT: "/auth/logout",
+  REFRESH: "/auth/refresh",
+  REGISTER: "/auth/register",
+} as const;
+
 export function getAccessToken(): string {
   return localStorageWorker.getItemByKey<LSToken>("accessToken")?.token ?? "";
 }
@@ -33,7 +40,7 @@ async function apiFetch(path: string, init: RequestInit = {}): Promise<Response>
 
 export async function loginByEmail(email: string, password: string): Promise<void> {
   const body = new URLSearchParams({username: email, password});
-  const res = await fetch(`${env.API_BASE_PATH}/auth/login`, {
+  const res = await fetch(`${env.API_BASE_PATH}${AUTH_PATH.LOGIN}`, {
     method: "POST",
     headers: {"Content-Type": "application/x-www-form-urlencoded"},
     body,
@@ -46,7 +53,7 @@ export async function loginByEmail(email: string, password: string): Promise<voi
 }
 
 export async function registerByEmail(email: string, password: string, fullName: string): Promise<void> {
-  const res = await fetch(`${env.API_BASE_PATH}/auth/register`, {
+  const res = await fetch(`${env.API_BASE_PATH}${AUTH_PATH.REGISTER}`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({email, password, name: fullName, role: "AGENT"}),
@@ -65,7 +72,7 @@ export async function refreshTokens(): Promise<void> {
     throw new Error("Refresh token not found");
   }
 
-  const res = await fetch(`${env.API_BASE_PATH}/auth/refresh`, {
+  const res = await fetch(`${env.API_BASE_PATH}${AUTH_PATH.REFRESH}`, {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({access_token: access, refresh_token: refresh}),
@@ -87,7 +94,7 @@ export async function fetchCurrentUser(): Promise<User> {
 
 export async function logoutUser(): Promise<void> {
   try {
-    await fetch(`${env.API_BASE_PATH}/auth/logout`, {method: "POST"});
+    await fetch(`${env.API_BASE_PATH}${AUTH_PATH.LOGOUT}`, {method: "POST"});
   } finally {
     clearTokens();
   }
