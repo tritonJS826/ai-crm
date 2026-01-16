@@ -42,12 +42,7 @@ export function CompanionProfile() {
           <select
             name="reassignment"
             className={styles.reassignmentSelect}
-          >
-            <option
-              value="default"
-              selected
-            />
-          </select>
+          />
 
         </div>
         <div className={styles.notes}>
