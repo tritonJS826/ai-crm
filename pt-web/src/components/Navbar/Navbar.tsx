@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom";
-import {navbarConfig, NavbarKeys} from "src/components/Navbar/navbarConfig";
+import {navbarConfig} from "src/components/Navbar/navbarConfig";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 import {PATHS} from "src/routes/routes";
@@ -31,7 +31,7 @@ export function Navbar() {
         />
 
         <span className={styles.label}>
-          {dictionary.labels[item.key as NavbarKeys]}
+          {dictionary.labels[item.key]}
         </span>
       </Link>
     </li>));

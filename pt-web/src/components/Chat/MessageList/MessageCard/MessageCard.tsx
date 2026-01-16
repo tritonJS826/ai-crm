@@ -15,7 +15,7 @@ export function MessageCard({message, contactName, own = true}: MessageCardProps
     <li className={`${styles.messageCard} ${own && styles.own}`}>
       <div className={styles.avatarWrapper}>
         <p className={styles.avatar}>
-          {contactName[0]}
+          {contactName[0].toUpperCase()}
         </p>
       </div>
       <div className={styles.messageWrapper}>

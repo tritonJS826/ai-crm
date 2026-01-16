@@ -84,7 +84,9 @@ async def get_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(current_user.id, conversation_id):
+    if not await can_user_access_conversation(
+        user_id=current_user.id, conversation_id=conversation_id
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
 
     return ConversationWithContact(
@@ -134,7 +136,9 @@ async def get_messages(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(current_user.id, conversation_id):
+    if not await can_user_access_conversation(
+        user_id=current_user.id, conversation_id=conversation_id
+    ):
         raise HTTPException(status_code=403, detail="Access denied")
 
     messages = await message_repo.get_by_conversation(
@@ -166,7 +170,7 @@ async def send_message(
         raise HTTPException(status_code=404, detail="Conversation not found")
 
     if not await can_user_access_conversation(
-        db, current_user.id, payload.conversation_id
+        user_id=current_user.id, conversation_id=payload.conversation_id
     ):
         raise HTTPException(status_code=403, detail="Access denied")
 
