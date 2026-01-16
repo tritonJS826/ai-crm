@@ -8,7 +8,6 @@ from prisma import Prisma
 from prisma.models import Message
 
 from app.schemas.platform import Platform
-from app.schemas.message import MessageDirection
 
 
 class MessageRepository:
@@ -20,7 +19,6 @@ class MessageRepository:
         *,
         conversation_id: str,
         platform: Platform,
-        direction: MessageDirection,
         from_user_id: Optional[str] = None,
         text: Optional[str] = None,
         media_url: Optional[str] = None,
@@ -30,7 +28,6 @@ class MessageRepository:
         return await db.message.create(
             data={
                 "conversationId": conversation_id,
-                "direction": direction.value,
                 "fromUserId": from_user_id,
                 "platform": platform.value,
                 "text": text,
@@ -83,6 +80,18 @@ class MessageRepository:
     ) -> Optional[Message]:
         """Get message by ID."""
         return await db.message.find_unique(where={"id": message_id})
+
+    async def count_by_conversation(
+        self,
+        db: Prisma,
+        *,
+        conversation_id: str,
+    ) -> int:
+        where = {
+            "conversationId": conversation_id,
+        }
+
+        return await db.message.count(where=where)
 
 
 message_repo = MessageRepository()
