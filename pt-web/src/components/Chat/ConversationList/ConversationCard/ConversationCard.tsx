@@ -19,7 +19,7 @@ export function ConversationCard({conversation, onCardClick}: ConversationCardPr
     >
       <div className={styles.avatarWrapper}>
         <p className={styles.avatar}>
-          {conversation.contact.name ? conversation.contact.name[0] : DEFAULT_AVATAR_SYMBOL}
+          {conversation.contact.name ? conversation.contact.name[0].toUpperCase() : DEFAULT_AVATAR_SYMBOL}
         </p>
       </div>
       <div className={styles.infoWrapper}>

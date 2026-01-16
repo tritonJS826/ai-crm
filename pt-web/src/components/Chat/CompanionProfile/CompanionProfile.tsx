@@ -22,7 +22,9 @@ export function CompanionProfile() {
         <div className={styles.profile}>
           <div className={styles.avatarWrapper}>
             <p className={styles.avatar}>
-              {conversationWithContact?.contact.name ? conversationWithContact?.contact.name[0] : DEFAULT_AVATAR_SYMBOL}
+              {conversationWithContact?.contact.name
+                ? conversationWithContact?.contact.name[0].toUpperCase()
+                : DEFAULT_AVATAR_SYMBOL}
             </p>
           </div>
           <p className={styles.name}>

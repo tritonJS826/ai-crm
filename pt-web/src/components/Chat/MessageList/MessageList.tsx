@@ -4,8 +4,9 @@ import {useAtom, useAtomValue, useSetAtom} from "jotai";
 import {MessageCard} from "src/components/Chat/MessageList/MessageCard/MessageCard";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {useSubscribe} from "src/hooks/useSubscribe";
-import {MessageOut, sendMessage} from "src/services/conversationService";
+import {ConversationWithContact, MessageOut, sendMessage} from "src/services/conversationService";
 import {NewMessage} from "src/services/conversationWsService";
+import {UserProfile} from "src/services/profileService";
 import {defaultWsEvent, socketClient} from "src/services/websocketClient";
 import {
   conversationWithContactStateAtom,
@@ -17,6 +18,28 @@ import {userProfileAtom} from "src/state/userProfileAtoms";
 import styles from "src/components/Chat/MessageList/MessageList.module.scss";
 
 const DEFAULT_AVATAR_SYMBOL = "?";
+
+const getFromUserName = (
+  userProfile: UserProfile | null,
+  conversationWithContact: ConversationWithContact | null,
+  fromUserId: string | undefined,
+): string => {
+
+  if (!userProfile) {
+    return DEFAULT_AVATAR_SYMBOL;
+  }
+  if (userProfile.id === fromUserId) {
+    return userProfile.name;
+  }
+  if (!conversationWithContact) {
+    return DEFAULT_AVATAR_SYMBOL;
+  }
+  if (conversationWithContact.contact.id === fromUserId) {
+    return conversationWithContact.contact.name ?? DEFAULT_AVATAR_SYMBOL;
+  }
+
+  return DEFAULT_AVATAR_SYMBOL;
+};
 
 export type MessageListProps = {
   conversationId: string;
@@ -61,10 +84,7 @@ export function MessageList({conversationId}: MessageListProps) {
     <MessageCard
       key={message.id}
       message={message}
-      contactName={(userProfile && userProfile.id === message.fromUserId
-        ? userProfile.name
-        : conversationWithContact?.contact.name)
-        ?? DEFAULT_AVATAR_SYMBOL}
+      contactName={getFromUserName(userProfile, conversationWithContact, message.fromUserId)}
       own={message.fromUserId === userProfile?.id}
     />));
 
