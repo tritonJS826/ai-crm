@@ -84,5 +84,21 @@ class MessageRepository:
         """Get message by ID."""
         return await db.message.find_unique(where={"id": message_id})
 
+    async def count_by_conversation(
+        self,
+        db: Prisma,
+        *,
+        conversation_id: str,
+        direction: MessageDirection | None = None,
+    ) -> int:
+        where = {
+            "conversationId": conversation_id,
+        }
+
+        if direction is not None:
+            where["direction"] = direction.value
+
+        return await db.message.count(where=where)
+
 
 message_repo = MessageRepository()

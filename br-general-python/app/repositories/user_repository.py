@@ -52,5 +52,23 @@ class UserRepository:
             skip=offset,
         )
 
+    async def get_admin(self, db: Prisma) -> User | None:
+        return await db.user.find_first(
+            where={"role": Role.ADMIN.value},
+            order={"createdAt": "asc"},
+        )
+
+    async def list_agents(self, db: Prisma) -> list[User]:
+        return await db.user.find_many(
+            where={"role": Role.AGENT.value},
+            order={"createdAt": "asc"},
+        )
+
+    async def list_admins(self, db: Prisma):
+        return await db.user.find_many(
+            where={"role": Role.ADMIN.value},
+            order={"createdAt": "asc"},
+        )
+
 
 user_repo = UserRepository()

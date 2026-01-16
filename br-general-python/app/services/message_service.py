@@ -11,6 +11,7 @@ from app.schemas.message import MessageDirection, NormalizedMessage
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
+from app.services.conversation_service import conversation_service
 from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
@@ -38,7 +39,9 @@ class MessageService:
         )
 
         # 2. Get or create conversation
-        conversation = await conversation_repo.get_or_create(db, contact.id)
+        conversation = await conversation_service.start_for_contact(
+            contact_id=contact.id,
+        )
 
         # 3. Check for opt-out
         if msg.text and msg.text.strip().lower() in OPT_OUT_KEYWORDS:
@@ -56,6 +59,15 @@ class MessageService:
             media_url=None,
             remote_message_id=msg.message_id,
         )
+
+        inbound_count = await message_repo.count_by_conversation(
+            db,
+            conversation_id=conversation.id,
+            direction=MessageDirection.IN,
+        )
+
+        if inbound_count == 1 and not contact.optOut:
+            await self._send_auto_greeting(conversation.id)
 
         # 5. Update conversation timestamp
         await conversation_repo.update_last_message_at(db, conversation.id)
@@ -178,6 +190,18 @@ class MessageService:
         except Exception as e:
             logger.error(f"Failed to send order confirmation: {e}")
             return None
+
+    async def _send_auto_greeting(self, conversation_id: str) -> None:
+        text = "Hi 👋 Thanks for contacting us! How can we help you?"
+
+        try:
+            await self.send_outbound_message(
+                conversation_id=conversation_id,
+                agent_user_id=None,
+                text=text,
+            )
+        except Exception as e:
+            logger.warning(f"Auto-greeting failed: {e}")
 
 
 message_service = MessageService()
