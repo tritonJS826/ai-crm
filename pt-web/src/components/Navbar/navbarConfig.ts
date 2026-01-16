@@ -8,30 +8,30 @@ export enum NavbarKeys {
     SETTINGS = "settings",
 }
 
-export const navbarConfig: {key: string; iconSrc: string; href: string}[] = [
+export const navbarConfig: {key: NavbarKeys; iconSrc: string; href: string}[] = [
   {
     key: NavbarKeys.CHAT,
-    iconSrc: `src/assets/navbarIcons/${NavbarKeys.CHAT}.avif`,
+    iconSrc: "src/assets/navbarIcons/chat.avif",
     href: PATHS.CHAT,
   },
   {
     key: NavbarKeys.TASKS,
-    iconSrc: `src/assets/navbarIcons/${NavbarKeys.TASKS}.avif`,
+    iconSrc: "src/assets/navbarIcons/tasks.avif",
     href: PATHS.HOME,
   },
   {
     key: NavbarKeys.NOTES,
-    iconSrc: `src/assets/navbarIcons/${NavbarKeys.NOTES}.avif`,
+    iconSrc: "src/assets/navbarIcons/notes.avif",
     href: PATHS.HOME,
   },
   {
     key: NavbarKeys.CUSTOMERS,
-    iconSrc: `src/assets/navbarIcons/${NavbarKeys.CUSTOMERS}.avif`,
+    iconSrc: "src/assets/navbarIcons/customers.avif",
     href: PATHS.HOME,
   },
   {
     key: NavbarKeys.SETTINGS,
-    iconSrc: `src/assets/navbarIcons/${NavbarKeys.SETTINGS}.avif`,
+    iconSrc: "src/assets/navbarIcons/settings.avif",
     href: PATHS.HOME,
   },
 ];
