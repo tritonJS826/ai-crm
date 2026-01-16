@@ -37,11 +37,6 @@ enum OrderStatus {
   REFUNDED
 }
 
-enum MessageDirection {
-  IN
-  OUT
-}
-
 // ============================================
 // CORE MODELS
 // ============================================
@@ -102,25 +97,11 @@ model Conversation {
   @@map("conversations")
 }
 
-/// Message stores individual chat messages.
-/// direction:
-///   IN  = from contact to agent
-///   OUT = from agent to contact
-///
-/// fromUserId:
-///   NULL     = message sent by contact
-///   NOT NULL = message sent by agent (User)
-/// =========================================
-/// direction  fromUserId    Meaning
-/// IN	          NULL	      Customer → Agent
-/// OUT	        NOT NULL	    Agent → Customer
-/// =========================================
 model Message {
   id             String       @id @default(cuid())
   conversationId String       @map("conversation_id")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  direction  MessageDirection
   fromUserId String?          @map("from_user_id")
   fromUser   User?            @relation("UserMessages", fields: [fromUserId], references: [id], onDelete: SetNull)
 
@@ -132,7 +113,6 @@ model Message {
 
   @@unique([platform, remoteMessageId])
   @@index([conversationId, createdAt])
-  @@index([direction])
   @@index([fromUserId])
   @@map("messages")
 }

@@ -15,6 +15,7 @@
     "web:test": "pnpm --filter pt-web test",
     "prepare": "husky",
     "br-general-python:prisma:migrate": "pnpm --filter br-general-python prisma:migrate",
+    "br-general-python:prisma:migrate:dev": "pnpm --filter br-general-python prisma:migrate:dev",
     "br-general-python:prisma:generate": "pnpm --filter br-general-python prisma:generate",
     "swag": "pnpm --stream --recursive --workspace-concurrency 100 swag",
     "start": "pnpm  --stream --recursive --workspace-concurrency 100 start",
