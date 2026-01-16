@@ -1,0 +1,70 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
+.suggestions {
+  font-family: vars.$font-main;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  border-left: 1px solid vars.$color-border;
+}
+
+.header {
+  padding: vars.$pad-sm vars.$pad-md;
+  border-bottom: 1px solid vars.$color-border;
+  font-size: vars.$font-lg;
+  height: vars.$chat-header-height;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+
+  // height: 100%;
+}
+
+.messageElementsWrapper {
+  width: 100%;
+  overflow: auto;
+  height: 400px;
+  display: flex;
+  flex-direction: column-reverse;
+  padding-bottom: 2rem;
+}
+
+.messageInputWrapper {
+  padding: vars.$pad-sm;
+  border-top: 1px solid vars.$color-border;
+  height: vars.$chat-header-height;
+  display: flex;
+  justify-content: space-between;
+}
+
+.messageInput {
+  width: 100%;
+  border: none;
+  height: vars.$font-lg;
+  outline: none;
+  color: vars.$color-text;
+  font-size: vars.$font-lg;
+  padding-block: 0;
+}
+
+.messageInput::placeholder {
+  color: vars.$color-placeholder;
+  font-size: vars.$font-lg;
+}
+
+.messageSendButton {
+  @include mixins.flex-center;
+
+  border-radius: vars.$radius-sm;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: vars.$font-sm;
+  background-color: #000;
+  color: #fff;
+}

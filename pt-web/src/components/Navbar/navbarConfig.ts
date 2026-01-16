@@ -1,6 +1,6 @@
 import {PATHS} from "src/routes/routes";
 
-export enum NavbarKeys {
+export enum NavbarKey {
     CHAT ="chat",
     TASKS = "tasks",
     NOTES = "notes",
@@ -8,29 +8,29 @@ export enum NavbarKeys {
     SETTINGS = "settings",
 }
 
-export const navbarConfig: {key: NavbarKeys; iconSrc: string; href: string}[] = [
+export const navbarConfig: {key: NavbarKey; iconSrc: string; href: string}[] = [
   {
-    key: NavbarKeys.CHAT,
+    key: NavbarKey.CHAT,
     iconSrc: "src/assets/navbarIcons/chat.avif",
     href: PATHS.CHAT,
   },
   {
-    key: NavbarKeys.TASKS,
+    key: NavbarKey.TASKS,
     iconSrc: "src/assets/navbarIcons/tasks.avif",
     href: PATHS.HOME,
   },
   {
-    key: NavbarKeys.NOTES,
+    key: NavbarKey.NOTES,
     iconSrc: "src/assets/navbarIcons/notes.avif",
     href: PATHS.HOME,
   },
   {
-    key: NavbarKeys.CUSTOMERS,
+    key: NavbarKey.CUSTOMERS,
     iconSrc: "src/assets/navbarIcons/customers.avif",
     href: PATHS.HOME,
   },
   {
-    key: NavbarKeys.SETTINGS,
+    key: NavbarKey.SETTINGS,
     iconSrc: "src/assets/navbarIcons/settings.avif",
     href: PATHS.HOME,
   },

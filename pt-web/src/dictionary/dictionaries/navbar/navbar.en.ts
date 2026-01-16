@@ -1,6 +1,6 @@
-import {NavbarKeys} from "src/components/Navbar/navbarConfig";
+import {NavbarKey} from "src/components/Navbar/navbarConfig";
 
-export const navbar: {labels: Record<NavbarKeys, string>} = {
+export const navbar: {labels: Record<NavbarKey, string>} = {
   labels: {
     chat: "Chat",
     tasks: "Tasks",

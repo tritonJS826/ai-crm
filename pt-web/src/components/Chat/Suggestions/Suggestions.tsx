@@ -1,7 +1,7 @@
 
 import {useEffect, useState} from "react";
 import {useAtom, useAtomValue, useSetAtom} from "jotai";
-import {MessageCard} from "src/components/Chat/MessageList/MessageCard/MessageCard";
+import {SuggestionCard} from "src/components/Chat/Suggestions/SuggestionCard/SuggestionCard";
 import {WsEventType} from "src/constants/wsEventTypes";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
@@ -17,7 +17,7 @@ import {
 } from "src/state/conversationWithContactAtom";
 import {loadMessageListAtom, messageListStateAtom, updateMessageListByNewMessageEventAtom} from "src/state/messageListAtom";
 import {userProfileAtom} from "src/state/userProfileAtoms";
-import styles from "src/components/Chat/MessageList/MessageList.module.scss";
+import styles from "src/components/Chat/Suggestions/Suggestions.module.scss";
 
 const DEFAULT_AVATAR_SYMBOL = "?";
 
@@ -43,11 +43,11 @@ const getFromUserName = (
   return DEFAULT_AVATAR_SYMBOL;
 };
 
-export type MessageListProps = {
+export type SuggestionsProps = {
   conversationId: string;
 }
 
-export function MessageList({conversationId}: MessageListProps) {
+export function Suggestions({conversationId}: SuggestionsProps) {
   const dictionary = useDictionary(DictionaryKey.CHAT);
   const [userProfile] = useAtom(userProfileAtom);
 
@@ -91,8 +91,8 @@ export function MessageList({conversationId}: MessageListProps) {
     setText("");
   };
 
-  const messageListElement = [...messageList].reverse().map((message: MessageOut) => (
-    <MessageCard
+  const suggestionsElement = [...messageList].reverse().map((message: MessageOut) => (
+    <SuggestionCard
       key={message.id}
       message={message}
       contactName={getFromUserName(userProfile, conversationWithContact, message.fromUserId)}
@@ -100,16 +100,16 @@ export function MessageList({conversationId}: MessageListProps) {
     />));
 
   return (
-    <div className={styles.messageList}>
+    <div className={styles.suggestions}>
       <div>
         <h2 className={styles.header}>
-          {conversationWithContact?.contact.name}
+          {dictionary.suggestions.title}
         </h2>
       </div>
 
       <div className={styles.content}>
         <ul className={styles.messageElementsWrapper}>
-          {messageListElement}
+          {suggestionsElement}
         </ul>
 
         <div className={styles.messageInputWrapper}>
@@ -120,7 +120,7 @@ export function MessageList({conversationId}: MessageListProps) {
               setText(event.target.value);
             }}
             name="messageInput"
-            placeholder={dictionary.messageList.messageInputPlaceholder}
+            placeholder="Type your message here..."
             className={styles.messageInput}
           />
 
@@ -129,7 +129,7 @@ export function MessageList({conversationId}: MessageListProps) {
             onClick={handler}
             className={styles.messageSendButton}
           >
-            {dictionary.messageList.sendButtonLabel}
+            SEND
           </button>
         </div>
       </div>

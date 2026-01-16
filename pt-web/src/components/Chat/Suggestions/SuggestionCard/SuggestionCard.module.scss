@@ -1,0 +1,57 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
+.suggestionCard {
+  font-family: vars.$font-main;
+  padding: vars.$pad-xs vars.$pad-sm;
+  padding-right: 20%;
+  display: flex;
+  gap: vars.$pad-sm;
+}
+
+.messageCard.own {
+  padding-right: vars.$pad-sm;
+  padding-left: 20%;
+  flex-direction: row-reverse;
+}
+
+.avatarWrapper {
+  @include mixins.flex-center;
+
+  border-radius: 50%;
+  background-color: vars.$color-bg-alt;
+  height: vars.$icon-xl;
+  width: vars.$icon-xl;
+}
+
+.avatar {
+  font-size: vars.$font-2xl;
+}
+
+.messageWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: vars.$pad-xs;
+}
+
+.createdAt {
+  font-size: vars.$font-sm;
+  color: vars.$color-text-secondary;
+}
+
+.messageText {
+  padding: vars.$pad-xs;
+  font-size: vars.$font-md;
+  color: #fff;
+  background-color: vars.$color-primary;
+  border-radius: vars.$radius-md;
+  border-top-left-radius: 0;
+}
+
+.messageText.own {
+  color: #000;
+  background-color: vars.$color-bg-hover;
+  border-top-left-radius: vars.$radius-md;
+  border-top-right-radius: 0;
+}
