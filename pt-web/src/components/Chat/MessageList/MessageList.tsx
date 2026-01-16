@@ -45,9 +45,10 @@ const getFromUserName = (
 
 export type MessageListProps = {
   conversationId: string;
+  messageInputValue: string;
 }
 
-export function MessageList({conversationId}: MessageListProps) {
+export function MessageList({conversationId, messageInputValue}: MessageListProps) {
   const dictionary = useDictionary(DictionaryKey.CHAT);
   const [userProfile] = useAtom(userProfileAtom);
 
@@ -77,6 +78,10 @@ export function MessageList({conversationId}: MessageListProps) {
     loadMessageList(conversationId);
     loadConversationWithContact(conversationId);
   }, [conversationId]);
+
+  useEffect(() => {
+    setText(messageInputValue);
+  }, [messageInputValue]);
 
   if (!dictionary) {
     return (
@@ -113,8 +118,7 @@ export function MessageList({conversationId}: MessageListProps) {
         </ul>
 
         <div className={styles.messageInputWrapper}>
-          <input
-            type={"text"}
+          <textarea
             value={text}
             onChange={(event) => {
               setText(event.target.value);

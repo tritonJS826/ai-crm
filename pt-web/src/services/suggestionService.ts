@@ -8,6 +8,6 @@ export type Suggestion = {
     createdAt: Date;
 }
 
-export async function getMessages(conversationId: string): Promise<Suggestion[]> {
+export async function getSuggestions(conversationId: string): Promise<Suggestion[]> {
   return apiClient.get<Suggestion[]>(`/conversations/${conversationId}/suggestions`);
 }

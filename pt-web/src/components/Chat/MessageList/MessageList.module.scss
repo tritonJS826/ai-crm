@@ -36,19 +36,23 @@
 .messageInputWrapper {
   padding: vars.$pad-sm;
   border-top: 1px solid vars.$color-border;
-  height: vars.$chat-header-height;
+  height: 128px;
   display: flex;
   justify-content: space-between;
+  gap: vars.$gap-md;
+  align-items: end;
 }
 
 .messageInput {
-  width: 100%;
+  flex: 1;
   border: none;
-  height: vars.$font-lg;
+  height: 100%;
   outline: none;
   color: vars.$color-text;
   font-size: vars.$font-lg;
   padding-block: 0;
+  overflow-y: auto;
+  resize: none;
 }
 
 .messageInput::placeholder {
@@ -59,6 +63,7 @@
 .messageSendButton {
   @include mixins.flex-center;
 
+  height: min-content;
   border-radius: vars.$radius-sm;
   padding: 10px;
   text-align: center;
