@@ -3,6 +3,8 @@ import {useAtomValue} from "jotai";
 import {conversationWithContactStateAtom} from "src/state/conversationWithContactAtom";
 import styles from "src/components/Chat/CompanionProfile/CompanionProfile.module.scss";
 
+const DEFAULT_AVATAR_SYMBOL = "?";
+
 export function CompanionProfile() {
 
   const {conversationWithContact, conversationWithContactLoading, conversationWithContactError}
@@ -20,7 +22,7 @@ export function CompanionProfile() {
         <div className={styles.profile}>
           <div className={styles.avatarWrapper}>
             <p className={styles.avatar}>
-              {conversationWithContact?.contact.name ? conversationWithContact?.contact.name[0] : "?"}
+              {conversationWithContact?.contact.name ? conversationWithContact?.contact.name[0] : DEFAULT_AVATAR_SYMBOL}
             </p>
           </div>
           <p className={styles.name}>

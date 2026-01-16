@@ -2,6 +2,8 @@ import {ConversationWithContact} from "src/services/conversationService";
 import {toAgoString} from "src/utils/dateFormat";
 import styles from "src/components/Chat/ConversationList/ConversationCard/ConversationCard.module.scss";
 
+const DEFAULT_AVATAR_SYMBOL = "?";
+
 interface ConversationCardProps {
   conversation: ConversationWithContact;
   onCardClick: () => void;
@@ -17,7 +19,7 @@ export function ConversationCard({conversation, onCardClick}: ConversationCardPr
     >
       <div className={styles.avatarWrapper}>
         <p className={styles.avatar}>
-          {conversation.contact.name ? conversation.contact.name[0] : "?"}
+          {conversation.contact.name ? conversation.contact.name[0] : DEFAULT_AVATAR_SYMBOL}
         </p>
       </div>
       <div className={styles.infoWrapper}>

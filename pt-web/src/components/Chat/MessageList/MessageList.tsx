@@ -16,6 +16,8 @@ import {loadMessageListAtom, messageListStateAtom, updateMessageListByNewMessage
 import {userProfileAtom} from "src/state/userProfileAtoms";
 import styles from "src/components/Chat/MessageList/MessageList.module.scss";
 
+const DEFAULT_AVATAR_SYMBOL = "?";
+
 export type MessageListProps = {
   conversationId: string;
 }
@@ -59,7 +61,10 @@ export function MessageList({conversationId}: MessageListProps) {
     <MessageCard
       key={message.id}
       message={message}
-      contactName={(message.fromUserId === userProfile?.id ? userProfile?.name : conversationWithContact?.contact.name) || "?"}
+      contactName={(userProfile && userProfile.id === message.fromUserId
+        ? userProfile.name
+        : conversationWithContact?.contact.name)
+        ?? DEFAULT_AVATAR_SYMBOL}
       own={message.fromUserId === userProfile?.id}
     />));
 
