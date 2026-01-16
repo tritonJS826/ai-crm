@@ -9,7 +9,6 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 from app.schemas.contact import ContactOut, Platform
-from app.schemas.message import MessageDirection
 
 
 class ConversationStatus(str, Enum):
@@ -22,7 +21,6 @@ class ConversationStatus(str, Enum):
 class MessageOut(BaseModel):
     id: str
     conversation_id: str = Field(..., alias="conversationId")
-    direction: MessageDirection
     from_user_id: Optional[str] = Field(default=None, alias="fromUserId")
     platform: Platform
     text: Optional[str] = None

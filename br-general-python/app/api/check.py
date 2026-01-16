@@ -11,7 +11,6 @@ from datetime import datetime, timezone
 import uuid
 
 from app.events.domain import publish_event
-from ..schemas.message import MessageDirection
 
 from ..settings import settings
 
@@ -44,7 +43,6 @@ async def inbound_message(payload: dict):
 
     message = {
         "id": str(uuid.uuid4()),
-        "direction": MessageDirection.IN,
         "text": payload["text"],
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
