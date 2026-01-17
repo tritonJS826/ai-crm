@@ -1,3 +1,4 @@
+import insertIcon from "src/assets/suggestionIcons/insert.avif";
 import {Suggestion} from "src/services/suggestionService";
 import {toChatDateString} from "src/utils/dateFormat";
 import styles from "src/components/Chat/SuggestionList/SuggestionCard/SuggestionCard.module.scss";
@@ -19,7 +20,7 @@ export function SuggestionCard({suggestion, onClickHandler}: SuggestionCardProps
       >
         <img
           className={styles.insertIcon}
-          src="src/assets/suggestionIcons/insert.avif"
+          src={insertIcon}
           alt=""
         />
       </button>

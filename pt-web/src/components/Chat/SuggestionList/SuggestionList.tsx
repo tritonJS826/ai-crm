@@ -1,5 +1,6 @@
 
 import {useAtomValue, useSetAtom} from "jotai";
+import refreshIcon from "src/assets/suggestionIcons/refresh.avif";
 import {SuggestionCard} from "src/components/Chat/SuggestionList/SuggestionCard/SuggestionCard";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
@@ -50,7 +51,7 @@ export function SuggestionList({conversationId, onCardClickHandler}: Suggestions
         >
           <img
             className={styles.refreshIcon}
-            src="src/assets/suggestionIcons/refresh.avif"
+            src={refreshIcon}
             alt=""
           />
         </button>
