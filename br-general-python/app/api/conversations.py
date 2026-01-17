@@ -4,15 +4,20 @@ API endpoints for conversations and messages.
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Security
 
 from app.api.access_control import can_user_access_conversation
+from app.api.auth import oauth2_scheme
 from app.api.users import get_current_user
 from app.db import db
+from app.logging import logger
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
 from app.repositories.contact_repository import contact_repo
 from app.repositories.product_repository import product_repo
+from app.repositories.suggestion_repository import suggestion_repo
+from app.schemas.source import Source
+from app.schemas.suggestion import SuggestionOut
 from app.services.message_service import message_service
 from app.services.meta_service import meta_service
 from app.settings import settings
@@ -26,7 +31,10 @@ from app.schemas.conversation import (
 )
 from app.schemas.contact import ContactOptOutUpdate, Platform
 
-router = APIRouter()
+from app.services.ai_service import ai_service
+from app.schemas.user import Role
+
+router = APIRouter(dependencies=[Security(oauth2_scheme)])
 
 
 # -------------------------------------------------------------------
@@ -255,7 +263,6 @@ async def send_product_to_conversation(
         f"{settings.app_base_url}/br-general/stripe/checkout"
         f"?product_id={product.id}"
         f"&conversation_id={conversation_id}"
-        f"&contact_id={contact.id}"
     )
 
     price_str = f"{product.priceCents / 100:.2f} {product.currency}"
@@ -284,6 +291,7 @@ async def send_product_to_conversation(
         from_user_id=current_user.id,
         text=f"[Product] {product.title} — {price_str}",
         remote_message_id=remote_id,
+        source=Source.AGENT,
     )
 
     await conversation_repo.update_last_message_at(db, conversation_id)
@@ -293,3 +301,99 @@ async def send_product_to_conversation(
         "remote_message_id": remote_id,
         "product_id": product.id,
     }
+
+
+# -------------------------------------------------------------------
+# Suggestions
+# -------------------------------------------------------------------
+
+
+@router.get(
+    "/{conversation_id}/suggestions",
+    response_model=list[SuggestionOut],
+)
+async def get_suggestions(
+    conversation_id: str,
+    current_user=Security(get_current_user),
+):
+    """
+    Get suggestions for a conversation.
+    AGENT / ADMIN only.
+    """
+
+    # 🔒 HARD ROLE GATE
+    if current_user.role not in {Role.ADMIN, Role.AGENT}:
+        raise HTTPException(
+            status_code=403,
+            detail="Only agents or admins can access suggestions",
+        )
+
+    conversation = await conversation_repo.get_by_id(db, conversation_id)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(
+        user_id=current_user.id,
+        conversation_id=conversation_id,
+    ):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    return await suggestion_repo.list_by_conversation(
+        db,
+        conversation_id=conversation_id,
+    )
+
+
+@router.post(
+    "/{conversation_id}/suggestions",
+    response_model=list[SuggestionOut],
+)
+async def create_suggestions(
+    conversation_id: str,
+    current_user=Security(get_current_user),
+):
+    # 🔒 AGENT / ADMIN ONLY
+    if current_user.role not in {Role.ADMIN, Role.AGENT}:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    conversation = await conversation_repo.get_by_id(db, conversation_id)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+
+    if not await can_user_access_conversation(
+        user_id=current_user.id,
+        conversation_id=conversation_id,
+    ):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    messages = await message_repo.get_by_conversation(
+        db,
+        conversation_id=conversation_id,
+        limit=30,
+        cursor=None,
+    )
+
+    # map to AI format
+    ai_messages = [
+        {
+            "direction": "OUT" if msg.fromUserId else "IN",
+            "text": msg.text,
+        }
+        for msg in reversed(messages)
+        if msg.text
+    ]
+
+    texts = await ai_service.generate_agent_suggestions(ai_messages)
+    logger.info(f"AI-generated suggestions: {texts}")
+
+    created = []
+    for t in texts:
+        created.append(
+            await suggestion_repo.create(
+                db,
+                conversation_id=conversation_id,
+                text=t,
+            )
+        )
+
+    return created

@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any
 
 import httpx
 
+from app.schemas.source import Source
 from app.settings import settings
 from app.schemas.platform import Platform
 from app.schemas.message import NormalizedMessage
@@ -108,6 +109,7 @@ class MetaService:
             type=msg.get("type", "text"),
             text=msg.get("text", {}).get("body"),
             phone_number_id=value.get("metadata", {}).get("phone_number_id"),
+            source=Source.CUSTOMER,
         )
 
     def _normalize_messenger_instagram(

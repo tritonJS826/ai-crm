@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 from app.schemas.platform import Platform
+from app.schemas.source import Source
 
 
 class NormalizedMessage(BaseModel):
@@ -22,3 +23,5 @@ class NormalizedMessage(BaseModel):
 
     # Routing / infra
     phone_number_id: str
+
+    source: Source

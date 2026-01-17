@@ -4,6 +4,8 @@ from app.repositories.conversation_participant_repository import (
     conversation_participant_repository,
 )
 from app.repositories.user_repository import user_repo
+from app.schemas.platform import Platform
+from app.schemas.source import Source
 
 
 class ConversationService:
@@ -53,6 +55,33 @@ class ConversationService:
             db,
             conversation_id=conversation_id,
             new_user_id=user_id,
+        )
+
+    async def create_with_initial_message(
+        self,
+        db,
+        *,
+        contact_id: str,
+        user_id: str | None = None,  # not stored on Conversation
+        text: str,
+        source: Source,
+        platform: Platform = Platform.WHATSAPP,  # or pass explicitly
+    ):
+        return await db.conversation.create(
+            data={
+                # ✅ REQUIRED scalar field
+                "contactId": contact_id,
+                # ✅ REQUIRED field
+                "source": source,
+                # ✅ REQUIRED initial message
+                "messages": {
+                    "create": {
+                        "text": text,
+                        "source": source,
+                        "platform": platform,
+                    }
+                },
+            }
         )
 
 

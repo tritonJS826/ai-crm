@@ -9,6 +9,7 @@ from prisma import Prisma
 from prisma.models import Conversation
 
 from app.schemas.conversation import ConversationStatus
+from app.schemas.source import Source
 
 
 class ConversationRepository:
@@ -79,6 +80,7 @@ class ConversationRepository:
                 "contactId": contact_id,
                 "status": ConversationStatus.OPEN.value,
                 "lastMessageAt": datetime.now(timezone.utc),
+                "source": Source.CUSTOMER.value,
             },
             include={"contact": True},
         )

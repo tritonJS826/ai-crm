@@ -1,13 +1,14 @@
 """
 Service for AI-assisted message drafting.
 
-TODO: Implement actual OpenAI/LLM integration when API key is available.
 """
 
 from app.logging import logger
 from typing import List, Optional
 
 from app.settings import settings
+
+from openai import OpenAI
 
 # Canned prompt templates for quick responses
 CANNED_PROMPTS = {
@@ -23,8 +24,6 @@ class AIService:
     """
     Service for generating AI-drafted message responses.
 
-    NOTE: This is a TODO placeholder. Actual OpenAI integration
-    will be implemented when OPENAI_API_KEY is configured.
     """
 
     def __init__(self) -> None:
@@ -95,19 +94,125 @@ class AIService:
 
         return base_prompt
 
-    def _format_messages(self, messages: List[dict]) -> List[dict]:
-        """Format messages for OpenAI API."""
-        formatted = []
+    def _format_messages(self, messages: list[dict]) -> list[dict]:
+        """
+        Build AI conversation context:
+        - Keep ALL customer messages
+        - Keep ONLY the LAST assistant message
+        - Strongly anchor the latest customer intent
+        """
+
+        formatted: list[dict] = []
+
+        last_assistant_message = None
+        customer_messages: list[str] = []
+
         for msg in messages:
-            role = "assistant" if msg.get("direction") == "OUT" else "user"
-            content = msg.get("text", "")
-            if content:
-                formatted.append({"role": role, "content": content})
+            text = (msg.get("text") or "").strip()
+            if not text:
+                continue
+
+            if msg.get("direction") == "OUT":
+                last_assistant_message = text
+            else:
+                customer_messages.append(text)
+
+        # Add earlier customer messages (light context)
+        for t in customer_messages[:-1]:
+            formatted.append(
+                {
+                    "role": "user",
+                    "content": f"Earlier customer message:\n{t}",
+                }
+            )
+
+        # Add last assistant reply (if any)
+        if last_assistant_message:
+            formatted.append(
+                {
+                    "role": "assistant",
+                    "content": last_assistant_message,
+                }
+            )
+
+        # Add latest customer intent (STRONG anchor)
+        if customer_messages:
+            formatted.append(
+                {
+                    "role": "user",
+                    "content": (
+                        "MOST RECENT CUSTOMER INTENT (this is what you must respond to):\n"
+                        f"{customer_messages[-1]}"
+                    ),
+                }
+            )
+
         return formatted
 
     def get_canned_prompts(self) -> dict:
         """Return available canned prompt options."""
         return CANNED_PROMPTS.copy()
+
+    async def generate_agent_suggestions(
+        self,
+        messages: List[dict],
+        max_suggestions: int = 5,
+    ) -> List[str]:
+        """
+        Generate multiple agent reply suggestions based on full conversation.
+        """
+        if not self.is_configured:
+            # MVP fallback
+            return [
+                "Thanks for reaching out! Could you please provide more details?",
+                "I understand. Let me check this for you and get back shortly.",
+                "Would you like help proceeding with the next step?",
+            ][:max_suggestions]
+
+        SYSTEM_PROMPT = """
+        You are an experienced sales assistant.
+
+        Context:
+        - You are replying to an existing conversation with a customer.
+        - You have access to the full chat history.
+        - The customer is already engaged.
+
+        Your goal:
+        - Help the customer buy what they want.
+        - Move the conversation toward a purchase or clear next step.
+
+        Rules:
+        - Read the FULL conversation before answering.
+        - Focus on the customer's most recent intent.
+        - Use earlier messages to be more specific (preferences, quantity, use case).
+        - Do NOT greet the customer.
+        - Do NOT ask generic questions like "How can I help?"
+        - Be concise, confident, and sales-oriented.
+        - Suggest next steps: quantity, options, pricing, or checkout.
+
+        Output:
+        - Generate 1 to 2 alternative reply suggestions.
+        - Each suggestion must be ready to send as-is.
+        - Return one suggestion per line.
+        """
+
+        conversation = self._format_messages(messages)
+
+        client = OpenAI(api_key=self.api_key)
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                *conversation,
+            ],
+            temperature=0.4,
+        )
+
+        text = response.choices[0].message.content or ""
+        lines = [line.strip("-• ").strip() for line in text.split("\n") if line.strip()]
+
+        return lines[:max_suggestions]
 
 
 ai_service = AIService()

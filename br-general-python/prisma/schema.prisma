@@ -96,6 +96,7 @@ model Conversation {
   source                   Source
   messages                 Message[]
   conversationParticipants ConversationParticipant[]
+  suggestions              Suggestions[]
 
   @@index([lastMessageAt(sort: Desc)])
   @@index([contactId])
@@ -108,8 +109,10 @@ model Message {
   conversationId String       @map("conversation_id")
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
-  fromUserId String?          @map("from_user_id")
-  fromUser   User?            @relation("UserMessages", fields: [fromUserId], references: [id], onDelete: SetNull)
+  fromUserId String? @map("from_user_id")
+  fromUser   User?   @relation("UserMessages", fields: [fromUserId], references: [id], onDelete: SetNull)
+
+  source Source
 
   platform        Platform
   text            String?

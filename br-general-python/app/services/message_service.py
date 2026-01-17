@@ -11,6 +11,7 @@ from app.schemas.message import NormalizedMessage
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
+from app.schemas.source import Source
 from app.services.conversation_service import conversation_service
 from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
@@ -57,6 +58,7 @@ class MessageService:
             text=msg.text,
             media_url=None,
             remote_message_id=msg.message_id,
+            source=Source.CUSTOMER,
         )
 
         inbound_count = await message_repo.count_by_conversation(
@@ -97,11 +99,8 @@ class MessageService:
     ) -> dict:
         """
         Send an outbound message to a customer.
-
-        agent_user_id:
-        - NOT NULL → agent message
-        - NULL → system / bot message
         """
+
         # 1. Get conversation with contact
         conversation = await conversation_repo.get_by_id(db, conversation_id)
         if not conversation:
@@ -126,16 +125,27 @@ class MessageService:
             if not remote_message_id:
                 raise ValueError("Failed to send message via Meta API")
 
+        # check user or system message
+        if agent_user_id is None:
+            source = Source.SYSTEM
+        else:
+            source = Source.AGENT
+
         # 4. Store outbound message (agent/system → customer)
-        message = await message_repo.create(
-            db,
-            conversation_id=conversation_id,
-            platform=platform,
-            from_user_id=agent_user_id,
-            text=text,
-            media_url=image_url,
-            remote_message_id=remote_message_id,
-        )
+        try:
+            message = await message_repo.create(
+                db,
+                conversation_id=conversation_id,
+                platform=platform,
+                from_user_id=agent_user_id,
+                text=text,
+                media_url=image_url,
+                remote_message_id=remote_message_id,
+                source=source,
+            )
+        except Exception:
+            logger.info("Duplicate inbound message ignored")
+            raise ValueError("Failed to store outbound message")
 
         # 5. Update conversation timestamp
         await conversation_repo.update_last_message_at(db, conversation_id)

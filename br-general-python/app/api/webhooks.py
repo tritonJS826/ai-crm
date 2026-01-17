@@ -137,8 +137,18 @@ async def _handle_checkout_completed(session: dict) -> None:
         return
 
     product_id = metadata.get("product_id")
+
     conversation_id = metadata.get("conversation_id")
-    contact_id = metadata.get("contact_id")
+    if not conversation_id:
+        logger.error(f"No conversation_id in session {session_id} metadata")
+        return
+
+    conversation = await conversation_repo.get_by_id(db, conversation_id)
+    if not conversation:
+        logger.error(f"Conversation {conversation_id} not found")
+        return
+
+    contact_id = conversation.contactId
 
     if not product_id:
         logger.error(f"No product_id in session {session_id} metadata")
@@ -152,15 +162,6 @@ async def _handle_checkout_completed(session: dict) -> None:
     existing = await order_repo.get_by_stripe_session(db, session_id)
     if existing is not None:
         logger.info(f"Order for session {session_id} already exists")
-        return
-
-    if not contact_id and conversation_id:
-        conversation = await conversation_repo.get_by_id(db, conversation_id)
-        if conversation is not None:
-            contact_id = conversation.contactId
-
-    if not contact_id:
-        logger.error(f"Cannot create order: no contact_id for session {session_id}")
         return
 
     order = await order_repo.create(
