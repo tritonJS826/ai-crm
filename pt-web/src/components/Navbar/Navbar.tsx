@@ -1,4 +1,5 @@
 import {Link} from "react-router-dom";
+import authIcon from "src/assets/navbarIcons/auth.avif";
 import {navbarConfig} from "src/components/Navbar/navbarConfig";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
@@ -46,7 +47,7 @@ export function Navbar() {
         className={styles.link}
       >
         <img
-          src={"src/assets/navbarIcons/auth.avif"}
+          src={authIcon}
           className={styles.icon}
         />
 

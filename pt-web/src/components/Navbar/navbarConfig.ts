@@ -1,3 +1,8 @@
+import chatIcon from "src/assets/navbarIcons/chat.avif";
+import customersIcon from "src/assets/navbarIcons/customers.avif";
+import notesIcon from "src/assets/navbarIcons/notes.avif";
+import settingsIcon from "src/assets/navbarIcons/settings.avif";
+import tasksIcon from "src/assets/navbarIcons/tasks.avif";
 import {PATHS} from "src/routes/routes";
 
 export enum NavbarKey {
@@ -11,27 +16,27 @@ export enum NavbarKey {
 export const navbarConfig: {key: NavbarKey; iconSrc: string; href: string}[] = [
   {
     key: NavbarKey.CHAT,
-    iconSrc: "src/assets/navbarIcons/chat.avif",
+    iconSrc: chatIcon,
     href: PATHS.CHAT,
   },
   {
     key: NavbarKey.TASKS,
-    iconSrc: "src/assets/navbarIcons/tasks.avif",
+    iconSrc: tasksIcon,
     href: PATHS.HOME,
   },
   {
     key: NavbarKey.NOTES,
-    iconSrc: "src/assets/navbarIcons/notes.avif",
+    iconSrc: notesIcon,
     href: PATHS.HOME,
   },
   {
     key: NavbarKey.CUSTOMERS,
-    iconSrc: "src/assets/navbarIcons/customers.avif",
+    iconSrc: customersIcon,
     href: PATHS.HOME,
   },
   {
     key: NavbarKey.SETTINGS,
-    iconSrc: "src/assets/navbarIcons/settings.avif",
+    iconSrc: settingsIcon,
     href: PATHS.HOME,
   },
 ];
