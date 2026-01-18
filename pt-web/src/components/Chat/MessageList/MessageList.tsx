@@ -91,9 +91,18 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
     );
   }
 
-  const handler = () => {
+  const submitMessage = () => {
+    if (text.trim() === "") {
+      return;
+    }
     sendMessage({conversationId, text});
     setText("");
+  };
+
+  const textareaHotkeyHandler = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.ctrlKey && event.key === "Enter") {
+      submitMessage();
+    }
   };
 
   const messageListElement = [...messageList].reverse().map((message: MessageOut) => (
@@ -126,11 +135,12 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
             name="messageInput"
             placeholder={dictionary.messageList.messageInputPlaceholder}
             className={styles.messageInput}
+            onKeyDown={textareaHotkeyHandler}
           />
 
           <button
             type="button"
-            onClick={handler}
+            onClick={submitMessage}
             className={styles.messageSendButton}
           >
             {dictionary.messageList.sendButtonLabel}
