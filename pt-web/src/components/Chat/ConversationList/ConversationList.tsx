@@ -54,15 +54,13 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
     );
   }
 
-  const conversationListElement = filteredConversations
-    ? filteredConversations.map((item: ConversationWithContact) => (
-      <ConversationCard
-        key={item.id}
-        conversation={item}
-        onCardClick = {() => onCardClickHandler(item.id)}
-      />
-    ))
-    : [];
+  const conversationListElement = filteredConversations.map((item: ConversationWithContact) => (
+    <ConversationCard
+      key={item.id}
+      conversation={item}
+      onCardClick = {() => onCardClickHandler(item.id)}
+    />
+  ));
 
   return (
     <div className={styles.conversationList}>
