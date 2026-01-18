@@ -50,7 +50,7 @@ class MessageRepository:
         if cursor:
             return await db.message.find_many(
                 where={"conversationId": conversation_id},
-                order={"createdAt": "asc"},
+                order={"createdAt": "desc"},
                 take=limit,
                 cursor={"id": cursor},
                 skip=1,
@@ -58,7 +58,7 @@ class MessageRepository:
 
         return await db.message.find_many(
             where={"conversationId": conversation_id},
-            order={"createdAt": "asc"},
+            order={"createdAt": "desc"},
             take=limit,
         )
 

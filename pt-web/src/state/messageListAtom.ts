@@ -70,8 +70,8 @@ export const updateMessageListByNewMessageEventAtom = atom(
       direction: event.data.direction,
     };
     set(messageListAtom, [
-      ...messageList,
       updatedItem,
+      ...messageList,
     ],
 
     );
