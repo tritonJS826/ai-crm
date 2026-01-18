@@ -1,0 +1,537 @@
+# ==============================================================================
+# CI/CD Pipeline for ai-crm project
+# ==============================================================================
+# FEATURES:
+#   - Builds only changed services
+#   - Health check after deployment
+#   - Automatic rollback on health check failure
+#
+# SERVICES MANAGED:
+#   - br-general-python (backend)     # Custom image
+#   - br-web (frontend)               # Custom image
+#   - br-postgres-general (database)  # Custom image
+#   - br-grafana (monitoring)         # Custom image
+#   - br-gateway (caddy)              # Public image + volume (no build needed)
+#
+# REQUIRED SECRETS:
+#   - DOCKER_REGISTRY_URL      : Docker registry URL
+#   - DOCKER_REGISTRY_USER     : Registry username
+#   - DOCKER_REGISTRY_PASSWORD : Registry password/token
+#   - SSH_HOST                 : Server IP/hostname
+#   - SSH_USER                 : SSH username
+#   - SSH_PRIVATE_KEY          : Private SSH key
+#   - SSH_PORT                 : SSH port (optional, default: 22)
+#   - DEPLOY_PATH              : Path to project on server
+#   - HEALTH_CHECK_URL         : URL for health check (https://demo.ai.crm.cs7.link/health)
+# ==============================================================================
+
+name: "Build and Deploy"
+
+# ==============================================================================
+# TRIGGERS
+# ==============================================================================
+on:
+  push:
+    branches:
+      - main # CONFIGURABLE
+    paths:
+      # Backend Python service
+      - "br-general-python/**"
+      # Frontend web application
+      - "pt-web/**"
+      # PostgreSQL database
+      - "postgres/**"
+      # Grafana monitoring
+      - "grafana/**"
+      # Caddy gateway (config only, no build)
+      - "gateway/**"
+      # Docker compose configuration
+      - "docker-compose.yml"
+
+  workflow_dispatch:
+    inputs:
+      force_build_all:
+        description: "Force rebuild ALL services"
+        required: false
+        default: "false"
+        type: boolean
+      skip_health_check:
+        description: "Skip health check after deploy"
+        required: false
+        default: "false"
+        type: boolean
+
+# ==============================================================================
+# GLOBAL VARIABLES
+# ==============================================================================
+env:
+  IMAGE_PREFIX: "ai-crm"
+  COMPOSE_FILE: "docker-compose.yml"
+  HEALTH_CHECK_RETRIES: 5
+  HEALTH_CHECK_INTERVAL: 10
+
+# ==============================================================================
+# JOBS
+# ==============================================================================
+jobs:
+  # ============================================================================
+  # JOB 1: Detect changes
+  # ============================================================================
+  detect-changes:
+    name: "Detect Changes"
+    runs-on: ubuntu-latest
+    outputs:
+      backend_changed: ${{ steps.changes.outputs.backend }}
+      frontend_changed: ${{ steps.changes.outputs.frontend }}
+      postgres_changed: ${{ steps.changes.outputs.postgres }}
+      grafana_changed: ${{ steps.changes.outputs.grafana }}
+      gateway_changed: ${{ steps.changes.outputs.gateway }}
+      any_image_changed: ${{ steps.check-any.outputs.any_changed }}
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: "Check for changes in paths"
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'br-general-python/**'
+            frontend:
+              - 'pt-web/**'
+            postgres:
+              - 'postgres/**'
+            grafana:
+              - 'grafana/**'
+            gateway:
+              - 'gateway/**'
+
+      - name: "Check if any image needs rebuild"
+        id: check-any
+        run: |
+          if [[ "${{ steps.changes.outputs.backend }}" == "true" ]] || \
+             [[ "${{ steps.changes.outputs.frontend }}" == "true" ]] || \
+             [[ "${{ steps.changes.outputs.postgres }}" == "true" ]] || \
+             [[ "${{ steps.changes.outputs.grafana }}" == "true" ]] || \
+             [[ "${{ github.event.inputs.force_build_all }}" == "true" ]]; then
+            echo "any_changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "any_changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Report detected changes"
+        run: |
+          echo "=========================================="
+          echo "CHANGE DETECTION RESULTS:"
+          echo "=========================================="
+          echo "Backend (br-general-python): ${{ steps.changes.outputs.backend }}"
+          echo "Frontend (pt-web):           ${{ steps.changes.outputs.frontend }}"
+          echo "PostgreSQL (postgres):       ${{ steps.changes.outputs.postgres }}"
+          echo "Grafana (grafana):           ${{ steps.changes.outputs.grafana }}"
+          echo "Gateway (gateway):           ${{ steps.changes.outputs.gateway }}"
+          echo "------------------------------------------"
+          echo "Any image needs rebuild:     ${{ steps.check-any.outputs.any_changed }}"
+          echo "Force build all:             ${{ github.event.inputs.force_build_all }}"
+          echo "=========================================="
+
+  # ============================================================================
+  # JOB 2: Build and push Docker images
+  # ============================================================================
+  build-and-push:
+    name: "Build & Push Images"
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.any_image_changed == 'true' ||
+      github.event.inputs.force_build_all == 'true'
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v3
+
+      - name: "Login to Docker Registry"
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_URL }}
+          username: ${{ secrets.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      # ----------------------------------------------------------------------
+      # Build Backend (br-general-python)
+      # ----------------------------------------------------------------------
+      - name: "Build Backend Image"
+        if: |
+          needs.detect-changes.outputs.backend_changed == 'true' ||
+          github.event.inputs.force_build_all == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./br-general-python/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/backend:latest
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/backend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ----------------------------------------------------------------------
+      # Build Frontend (pt-web)
+      # ----------------------------------------------------------------------
+      - name: "Build Frontend Image"
+        if: |
+          needs.detect-changes.outputs.frontend_changed == 'true' ||
+          github.event.inputs.force_build_all == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./pt-web/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/frontend:latest
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/frontend:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ----------------------------------------------------------------------
+      # Build PostgreSQL (br-postgres-general)
+      # ----------------------------------------------------------------------
+      - name: "Build PostgreSQL Image"
+        if: |
+          needs.detect-changes.outputs.postgres_changed == 'true' ||
+          github.event.inputs.force_build_all == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./postgres/postgres-general.Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/postgres:latest
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/postgres:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # ----------------------------------------------------------------------
+      # Build Grafana (br-grafana)
+      # ----------------------------------------------------------------------
+      - name: "Build Grafana Image"
+        if: |
+          needs.detect-changes.outputs.grafana_changed == 'true' ||
+          github.event.inputs.force_build_all == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./grafana/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/grafana:latest
+            ${{ secrets.DOCKER_REGISTRY_URL }}/${{ env.IMAGE_PREFIX }}/grafana:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: "Build Summary"
+        run: |
+          echo "=========================================="
+          echo "BUILD SUMMARY:"
+          echo "=========================================="
+          echo "Registry: ${{ secrets.DOCKER_REGISTRY_URL }}"
+          echo "Image prefix: ${{ env.IMAGE_PREFIX }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo ""
+          echo "Images built:"
+          echo "  Backend:    ${{ needs.detect-changes.outputs.backend_changed == 'true' || github.event.inputs.force_build_all == 'true' }}"
+          echo "  Frontend:   ${{ needs.detect-changes.outputs.frontend_changed == 'true' || github.event.inputs.force_build_all == 'true' }}"
+          echo "  PostgreSQL: ${{ needs.detect-changes.outputs.postgres_changed == 'true' || github.event.inputs.force_build_all == 'true' }}"
+          echo "  Grafana:    ${{ needs.detect-changes.outputs.grafana_changed == 'true' || github.event.inputs.force_build_all == 'true' }}"
+          echo "=========================================="
+
+  # ============================================================================
+  # JOB 3: Deploy to server
+  # ============================================================================
+  deploy:
+    name: "Deploy to Server"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, build-and-push]
+    if: |
+      always() &&
+      (needs.build-and-push.result == 'success' || needs.build-and-push.result == 'skipped') &&
+      (needs.detect-changes.outputs.any_image_changed == 'true' || 
+       needs.detect-changes.outputs.gateway_changed == 'true' ||
+       github.event.inputs.force_build_all == 'true')
+    outputs:
+      previous_commit: ${{ steps.get-previous.outputs.commit }}
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Get previous commit for rollback"
+        id: get-previous
+        run: |
+          PREV_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
+          echo "commit=$PREV_COMMIT" >> $GITHUB_OUTPUT
+          echo "Previous commit for rollback: $PREV_COMMIT"
+
+      - name: "Deploy via SSH"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 10m
+          script_stop: true
+          script: |
+            set -e
+            
+            echo "=========================================="
+            echo "DEPLOYMENT STARTED"
+            echo "=========================================="
+            echo "Timestamp: $(date)"
+            echo "Deploy path: ${{ secrets.DEPLOY_PATH }}"
+            echo ""
+            
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            echo "Saving current state for potential rollback..."
+            CURRENT_COMMIT=$(git rev-parse HEAD)
+            echo "Current commit: $CURRENT_COMMIT"
+            
+            echo ""
+            echo "Pulling latest changes from git..."
+            git fetch origin main
+            git reset --hard origin/main
+            
+            echo ""
+            echo "Logging into Docker Registry..."
+            echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login \
+              ${{ secrets.DOCKER_REGISTRY_URL }} \
+              -u ${{ secrets.DOCKER_REGISTRY_USER }} \
+              --password-stdin
+            
+            echo ""
+            echo "Pulling latest Docker images..."
+            docker compose pull --ignore-pull-failures || true
+            
+            echo ""
+            echo "Stopping current containers..."
+            docker compose down --remove-orphans || true
+            
+            echo ""
+            echo "Starting new containers..."
+            docker compose up -d
+            
+            echo ""
+            echo "Waiting for containers to start (30 seconds)..."
+            sleep 30
+            
+            echo ""
+            echo "Container status:"
+            docker compose ps
+            
+            echo ""
+            echo "Cleaning up old images..."
+            docker image prune -f || true
+            
+            echo ""
+            echo "=========================================="
+            echo "DEPLOYMENT COMPLETED"
+            echo "=========================================="
+
+  # ============================================================================
+  # JOB 4: Health check
+  # ============================================================================
+  health-check:
+    name: "Health Check"
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: |
+      success() &&
+      github.event.inputs.skip_health_check != 'true'
+    outputs:
+      health_status: ${{ steps.check.outputs.status }}
+
+    steps:
+      - name: "Wait for services to fully start"
+        run: sleep 30
+
+      - name: "Perform health check"
+        id: check
+        run: |
+          echo "=========================================="
+          echo "HEALTH CHECK STARTED"
+          echo "=========================================="
+          echo "URL: ${{ secrets.HEALTH_CHECK_URL }}"
+          echo "Retries: ${{ env.HEALTH_CHECK_RETRIES }}"
+          echo "Interval: ${{ env.HEALTH_CHECK_INTERVAL }}s"
+          echo ""
+          
+          HEALTH_URL="${{ secrets.HEALTH_CHECK_URL }}"
+          
+          # Default to /health endpoint if not specified
+          if [ -z "$HEALTH_URL" ]; then
+            echo "HEALTH_CHECK_URL not set, skipping..."
+            echo "status=skipped" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          for i in $(seq 1 ${{ env.HEALTH_CHECK_RETRIES }}); do
+            echo "Attempt $i/${{ env.HEALTH_CHECK_RETRIES }}..."
+            
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              --connect-timeout 10 \
+              --max-time 30 \
+              "$HEALTH_URL" || echo "000")
+            
+            echo "HTTP Response: $HTTP_CODE"
+            
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo ""
+              echo "Health check PASSED!"
+              echo "status=healthy" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            
+            if [ $i -lt ${{ env.HEALTH_CHECK_RETRIES }} ]; then
+              echo "Waiting ${{ env.HEALTH_CHECK_INTERVAL }} seconds before retry..."
+              sleep ${{ env.HEALTH_CHECK_INTERVAL }}
+            fi
+          done
+          
+          echo ""
+          echo "Health check FAILED after ${{ env.HEALTH_CHECK_RETRIES }} attempts!"
+          echo "status=unhealthy" >> $GITHUB_OUTPUT
+          exit 1
+
+  # ============================================================================
+  # JOB 5: Rollback on failure
+  # ============================================================================
+  rollback:
+    name: "Rollback"
+    runs-on: ubuntu-latest
+    needs: [deploy, health-check]
+    if: |
+      failure() &&
+      needs.health-check.outputs.health_status == 'unhealthy'
+
+    steps:
+      - name: "Initiating rollback"
+        run: |
+          echo "=========================================="
+          echo "ROLLBACK INITIATED"
+          echo "=========================================="
+          echo "Reason: Health check failed"
+          echo "Rolling back to previous commit: ${{ needs.deploy.outputs.previous_commit }}"
+          echo ""
+
+      - name: "Rollback via SSH"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 10m
+          script_stop: true
+          script: |
+            set -e
+            
+            echo "=========================================="
+            echo "ROLLBACK STARTED"
+            echo "=========================================="
+            
+            cd ${{ secrets.DEPLOY_PATH }}
+            
+            PREV_COMMIT="${{ needs.deploy.outputs.previous_commit }}"
+            
+            if [ -z "$PREV_COMMIT" ]; then
+              echo "No previous commit available for rollback!"
+              echo "Manual intervention required."
+              exit 1
+            fi
+            
+            echo "Rolling back to commit: $PREV_COMMIT"
+            git fetch origin
+            git reset --hard $PREV_COMMIT
+            
+            echo ""
+            echo "Logging into Docker Registry..."
+            echo "${{ secrets.DOCKER_REGISTRY_PASSWORD }}" | docker login \
+              ${{ secrets.DOCKER_REGISTRY_URL }} \
+              -u ${{ secrets.DOCKER_REGISTRY_USER }} \
+              --password-stdin
+            
+            echo ""
+            echo "Pulling previous Docker images..."
+            docker compose pull --ignore-pull-failures || true
+            
+            echo ""
+            echo "Restarting containers with previous version..."
+            docker compose down --remove-orphans || true
+            docker compose up -d
+            
+            echo ""
+            echo "Waiting for containers to start..."
+            sleep 30
+            
+            echo ""
+            echo "Container status after rollback:"
+            docker compose ps
+            
+            echo ""
+            echo "=========================================="
+            echo "ROLLBACK COMPLETED"
+            echo "=========================================="
+
+      - name: "Rollback summary"
+        run: |
+          echo "=========================================="
+          echo "ROLLBACK SUMMARY:"
+          echo "=========================================="
+          echo "Status: Completed"
+          echo "Rolled back to: ${{ needs.deploy.outputs.previous_commit }}"
+          echo "Server: ${{ secrets.SSH_HOST }}"
+          echo ""
+          echo "ATTENTION REQUIRED:"
+          echo "The deployment failed health check and was rolled back."
+          echo "Please investigate the issue before deploying again."
+          echo "=========================================="
+
+  # ============================================================================
+  # JOB 6: Final notification
+  # ============================================================================
+  notify:
+    name: "Notification"
+    runs-on: ubuntu-latest
+    needs: [detect-changes, build-and-push, deploy, health-check]
+    if: always()
+
+    steps:
+      - name: "Final Status Report"
+        run: |
+          echo "=========================================="
+          echo "PIPELINE EXECUTION SUMMARY"
+          echo "=========================================="
+          echo ""
+          echo "Detection:    ${{ needs.detect-changes.result }}"
+          echo "Build:        ${{ needs.build-and-push.result }}"
+          echo "Deploy:       ${{ needs.deploy.result }}"
+          echo "Health:       ${{ needs.health-check.result }}"
+          echo ""
+          echo "Details:"
+          echo "  Repository:    ${{ github.repository }}"
+          echo "  Branch:        ${{ github.ref_name }}"
+          echo "  Commit:        ${{ github.sha }}"
+          echo "  Author:        ${{ github.actor }}"
+          echo "  Workflow:      ${{ github.workflow }}"
+          echo "  Run ID:        ${{ github.run_id }}"
+          echo ""
+          echo "Workflow URL:"
+          echo "  https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo "=========================================="
