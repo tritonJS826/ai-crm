@@ -59,41 +59,6 @@
   width: 100%;
   overflow: auto;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   padding-bottom: 2rem;
-}
-
-.messageInputWrapper {
-  padding: vars.$pad-sm;
-  border-top: 1px solid vars.$color-border;
-  height: vars.$chat-header-height;
-  display: flex;
-  justify-content: space-between;
-}
-
-.messageInput {
-  width: 100%;
-  border: none;
-  height: vars.$font-lg;
-  outline: none;
-  color: vars.$color-text;
-  font-size: vars.$font-lg;
-  padding-block: 0;
-}
-
-.messageInput::placeholder {
-  color: vars.$color-placeholder;
-  font-size: vars.$font-lg;
-}
-
-.messageSendButton {
-  @include mixins.flex-center;
-
-  border-radius: vars.$radius-sm;
-  padding: 10px;
-  text-align: center;
-  vertical-align: middle;
-  font-size: vars.$font-sm;
-  background-color: #000;
-  color: #fff;
 }

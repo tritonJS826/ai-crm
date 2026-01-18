@@ -13,28 +13,28 @@ const suggestionListInit: Suggestion[] = [
   {
     id: "1",
     conversationId: "1",
-    text: "Of friendship on inhabiting diminution discovered as. "
+    text: "#1 Of friendship on inhabiting diminution discovered as. "
     + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
     createdAt: new Date(),
   },
   {
     id: "2",
     conversationId: "1",
-    text: "Of friendship on inhabiting diminution discovered as. "
+    text: "#2 Of friendship on inhabiting diminution discovered as. "
     + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
     createdAt: new Date(),
   },
   {
     id: "3",
     conversationId: "1",
-    text: "Of friendship on inhabiting diminution discovered as. "
+    text: "#3 Of friendship on inhabiting diminution discovered as. "
     + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
     createdAt: new Date(),
   },
   {
     id: "4",
     conversationId: "1",
-    text: "Of friendship on inhabiting diminution discovered as. "
+    text: "#4 Of friendship on inhabiting diminution discovered as. "
     + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
     createdAt: new Date(),
   },
