@@ -114,7 +114,7 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
     }
   };
 
-  const messageListElement = [...messageList].reverse().map((message: MessageOut) => (
+  const messageListElement = messageList.map((message: MessageOut) => (
     <MessageCard
       key={message.id}
       message={message}
