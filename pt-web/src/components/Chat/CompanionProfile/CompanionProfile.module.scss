@@ -1,0 +1,94 @@
+@use "src/styles/variables" as vars;
+@use "src/styles/mixins" as mixins;
+
+.companionProfile {
+  font-family: vars.$font-main;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border-left: 1px solid vars.$color-border;
+}
+
+.headerWrapper {
+  padding: vars.$pad-sm vars.$pad-md;
+  border-bottom: 1px solid vars.$color-border;
+  height: vars.$chat-header-height;
+}
+
+.header {
+  font-size: vars.$font-lg;
+}
+
+.layout {
+  display: grid;
+
+  // grid-template-rows: repeat(3, 1fr);
+  grid-template-rows: 1fr auto auto;
+}
+
+.profile {
+  @include mixins.flex-center;
+
+  flex-direction: column;
+  padding: vars.$pad-md;
+  gap: vars.$gap-sm;
+}
+
+.avatarWrapper {
+  @include mixins.flex-center;
+
+  border-radius: 50%;
+  background-color: vars.$color-bg-alt;
+  height: vars.$icon-xxl;
+  width: vars.$icon-xxl;
+}
+
+.avatar {
+  font-size: vars.$font-2xl;
+}
+
+.name {
+  font-size: vars.$font-xl;
+  font-weight: 600;
+}
+
+.phone {
+  font-size: vars.$font-lg;
+  font-weight: 600;
+  color: vars.$color-text-secondary;
+}
+
+.reassignment {
+  display: flex;
+  justify-content: space-between;
+  padding: vars.$pad-md;
+}
+
+.reassignmentSelect {
+  height: min-content;
+  border: none;
+  color: vars.$color-text-secondary;
+  font-size: vars.$font-lg;
+  outline: none;
+}
+
+.notes {
+  padding: vars.$pad-md;
+}
+
+.notesHeaderWrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addNoteButton {
+  border: none;
+  color: vars.$color-text-secondary;
+  background-color: #fff;
+}
+
+.textarea {
+  width: 100%;
+  height: 7rem;
+  border: 1px solid vars.$color-border;
+  outline: none;
+}

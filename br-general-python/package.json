@@ -8,6 +8,7 @@
     "installAll": "python3 -m venv .venv && .venv/bin/pip install --upgrade pip && .venv/bin/pip install -r requirements.txt && PRISMA_CACHE_DIR=.venv/.prisma PATH=.venv/bin:$PATH .venv/bin/python -m prisma py fetch",
     "prisma:generate": "PRISMA_CACHE_DIR=.venv/.prisma PATH=.venv/bin:$PATH .venv/bin/python -m prisma generate",
     "prisma:migrate": "PRISMA_CACHE_DIR=.venv/.prisma PATH=.venv/bin:$PATH .venv/bin/python -m prisma migrate deploy",
+    "prisma:migrate:dev": "PRISMA_CACHE_DIR=.venv/.prisma PATH=.venv/bin:$PATH .venv/bin/python -m prisma migrate dev",
     "prisma:reset": "PRISMA_CACHE_DIR=.venv/.prisma PATH=.venv/bin:$PATH .venv/bin/python -m prisma migrate reset --force --skip-generate",
     "start": "pnpm run prisma:generate && .venv/bin/python -m app.run",
     "py:lint": ".venv/bin/ruff check br-general-python",

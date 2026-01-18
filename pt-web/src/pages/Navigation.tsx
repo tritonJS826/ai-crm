@@ -2,6 +2,7 @@ import type {ReactNode} from "react";
 import {Route, Routes} from "react-router-dom";
 import {AboutPage} from "src/pages/aboutUsPage/AboutUsPage";
 import {AuthPage} from "src/pages/authPage/AuthPage";
+import {ChatPage} from "src/pages/chatPage/ChatPage";
 import {HomePage} from "src/pages/homePage/Homepage";
 import {NotFoundPage} from "src/pages/notFoundPage/NotFoundPage";
 import {PaymentSuccessPage} from "src/pages/PaymentSuccessPage/PaymentSuccessPage";
@@ -30,6 +31,10 @@ export function Navigation(): ReactNode {
       <Route
         path={PATHS.PROFILE.PAGE}
         element={<ProfilePage />}
+      />
+      <Route
+        path={PATHS.CHAT}
+        element={<ChatPage />}
       />
       <Route
         path={PATHS.NOT_FOUND}

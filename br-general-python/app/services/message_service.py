@@ -14,6 +14,7 @@ from app.repositories.message_repository import message_repo
 from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
+from app.settings import settings
 
 # Opt-out keywords (case-insensitive)
 OPT_OUT_KEYWORDS = {"stop", "unsubscribe", "отписаться", "стоп"}
@@ -112,8 +113,9 @@ class MessageService:
             image_url=image_url,
         )
 
-        if not remote_message_id:
-            raise ValueError("Failed to send message via Meta API")
+        if settings.env_type == "prod":
+            if not remote_message_id:
+                raise ValueError("Failed to send message via Meta API")
 
         # 4. Store outbound message (agent/system → customer)
         message = await message_repo.create(

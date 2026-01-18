@@ -4,11 +4,11 @@ import {env} from "src/utils/env/env";
 
 export type WsEvent<T> = {
   type: WsEventType;
-  ts: Date;
+  timestamp: Date;
   data: T;
 }
 
-export const defaultWsEvent = {ts: new Date()};
+export const defaultWsEvent = {timestamp: new Date()};
 
 const RECONNECT_DELAY = 3000;
 const MAX_RECONNECT_ATTEMPTS = 5;

@@ -26,7 +26,6 @@ from app.schemas.conversation import (
 )
 from app.schemas.contact import ContactOptOutUpdate, Platform
 
-
 router = APIRouter()
 
 
@@ -47,6 +46,7 @@ async def list_conversations(
     """
     conversations, total = await conversation_repo.list_conversations(
         db,
+        user_id=current_user.id,
         status=status,
         limit=limit,
         offset=offset,
@@ -111,7 +111,7 @@ async def close_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     await conversation_repo.close(db, conversation_id)
@@ -207,6 +207,15 @@ async def update_contact_opt_out(
     if not contact:
         raise HTTPException(status_code=404, detail="Contact not found")
 
+    has_access = await conversation_repo.user_has_conversation_with_contact(
+        db,
+        user_id=current_user.id,
+        contact_id=contact_id,
+    )
+
+    if not has_access:
+        raise HTTPException(status_code=403, detail="Access denied")
+
     await contact_repo.update_opt_out(db, contact_id, payload.opt_out)
 
 
@@ -228,7 +237,7 @@ async def send_product_to_conversation(
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
-    if not await can_user_access_conversation(db, current_user.id, conversation_id):
+    if not await can_user_access_conversation(current_user.id, conversation_id):
         raise HTTPException(status_code=403, detail="Access denied")
 
     product = await product_repo.get_by_id(db, product_id)

@@ -39,14 +39,23 @@ class ConversationRepository:
     async def list_conversations(
         self,
         db: Prisma,
+        *,
+        user_id: Optional[str] = None,
         status: Optional[ConversationStatus] = None,
         limit: int = 50,
         offset: int = 0,
     ) -> Tuple[List[Conversation], int]:
-        """List conversations with pagination."""
         where: dict = {}
+
         if status is not None:
             where["status"] = status.value
+
+        if user_id is not None:
+            where["conversationParticipants"] = {
+                "some": {
+                    "userId": user_id,
+                }
+            }
 
         conversations = await db.conversation.find_many(
             where=where if where else None,
@@ -57,7 +66,6 @@ class ConversationRepository:
         )
 
         total = await db.conversation.count(where=where if where else None)
-
         return conversations, total
 
     async def create(
@@ -114,6 +122,26 @@ class ConversationRepository:
         return await db.conversation.update(
             where={"id": conversation_id},
             data={"status": ConversationStatus.CLOSED.value},
+        )
+
+    async def user_has_conversation_with_contact(
+        self,
+        db: Prisma,
+        *,
+        user_id: str,
+        contact_id: str,
+    ) -> bool:
+        # Find any conversation for this contact where a participant row exists for user
+        return (
+            await db.conversation.count(
+                where={
+                    "contactId": contact_id,
+                    "conversationParticipants": {
+                        "some": {"userId": user_id},
+                    },
+                }
+            )
+            > 0
         )
 
 

@@ -63,7 +63,7 @@ export const updateMessageListByNewMessageEventAtom = atom(
     const updatedItem: MessageOut = {
       id: event.data.message_id,
       conversationId: event.data.conversation_id,
-      createdAt: event.ts,
+      createdAt: event.timestamp,
       platform: event.data.platform,
       fromUserId: event.data.from_user_id,
       text: event.data.text,
