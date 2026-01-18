@@ -142,6 +142,7 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
             type="button"
             onClick={submitMessage}
             className={styles.messageSendButton}
+            title="Ctrl+Enter"
           >
             {dictionary.messageList.sendButtonLabel}
           </button>
