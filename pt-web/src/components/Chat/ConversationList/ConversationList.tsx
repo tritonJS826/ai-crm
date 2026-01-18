@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
 import {ConversationCard} from "src/components/Chat/ConversationList/ConversationCard/ConversationCard";
 import {WsEventType} from "src/constants/wsEventTypes";
@@ -24,6 +24,10 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
   const loadConversationList = useSetAtom(loadConversationListAtom);
   const updateConversationListByNewMessageEvent = useSetAtom(updateConversationListByNewMessageEventAtom);
 
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [filteredConversations, setFilteredConversations]
+  = useState<ConversationWithContact[]>(conversationList?.items ?? []);
+
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, async (event) => {
     await updateConversationListByNewMessageEvent(event);
@@ -33,6 +37,15 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
     loadConversationList();
   }, []);
 
+  useEffect(() => {
+    if (!conversationList?.items) {
+      return;
+    }
+    setFilteredConversations(conversationList?.items
+      .filter(conversationWithContact => conversationWithContact.contact.name?.toLowerCase()
+        .includes(searchValue.toLowerCase())));
+  }, [conversationList, searchValue]);
+
   if (!dictionary) {
     return (
       <div>
@@ -41,8 +54,8 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
     );
   }
 
-  const conversationListElement = conversationList
-    ? conversationList.items.map((item: ConversationWithContact) => (
+  const conversationListElement = filteredConversations
+    ? filteredConversations.map((item: ConversationWithContact) => (
       <ConversationCard
         key={item.id}
         conversation={item}
@@ -59,6 +72,8 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
           type="text"
           placeholder={dictionary.conversationList.searchPlaceholder}
           name="search"
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.target.value)}
         />
       </div>
 
