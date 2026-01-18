@@ -1,5 +1,5 @@
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useAtom, useAtomValue, useSetAtom} from "jotai";
 import {MessageCard} from "src/components/Chat/MessageList/MessageCard/MessageCard";
 import {WsEventType} from "src/constants/wsEventTypes";
@@ -63,6 +63,8 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
 
   const [text, setText] = useState<string>("");
 
+  const messageElementsWrapperRef = useRef<HTMLUListElement>(null);
+
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, (event) => {
     updateMessageListByNewMessageEvent(event);
@@ -82,6 +84,13 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
   useEffect(() => {
     setText(messageInputValue);
   }, [messageInputValue]);
+
+  useEffect(() => {
+    if (!messageElementsWrapperRef.current) {
+      return;
+    }
+    messageElementsWrapperRef.current.scrollTop = messageElementsWrapperRef.current.scrollHeight;
+  }, [messageList]);
 
   if (!dictionary) {
     return (
@@ -122,9 +131,14 @@ export function MessageList({conversationId, messageInputValue}: MessageListProp
       </div>
 
       <div className={styles.content}>
-        <ul className={styles.messageElementsWrapper}>
-          {messageListElement}
-        </ul>
+        <div className={styles.relativeWrapper}>
+          <ul
+            className={styles.messageElementsWrapper}
+            ref={messageElementsWrapperRef}
+          >
+            {messageListElement}
+          </ul>
+        </div>
 
         <div className={styles.messageInputWrapper}>
           <textarea

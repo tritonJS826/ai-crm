@@ -58,9 +58,11 @@ export function SuggestionList({conversationId, onCardClickHandler}: Suggestions
       </div>
 
       <div className={styles.content}>
-        <ul className={styles.messageElementsWrapper}>
-          {suggestionsElement}
-        </ul>
+        <div className={styles.relativeWrapper}>
+          <ul className={styles.messageElementsWrapper}>
+            {suggestionsElement}
+          </ul>
+        </div>
 
       </div>
 

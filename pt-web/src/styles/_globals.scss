@@ -1,3 +1,5 @@
+@use "src/styles/variables" as vars;
+
 * {
   margin: 0;
   padding: 0;
@@ -9,7 +11,8 @@
 
   // flex-direction: column;
   grid-template-rows: auto 1fr auto;
-  height: 100vh;
+
+  // height: 100vh;
 
   // overflow-y: auto;
 }
@@ -17,6 +20,7 @@
 .main {
   // flex: 1;
   display: grid;
+  min-height: calc(100vh - vars.$header-height);
   grid-template-columns: auto 1fr;
 }
 
