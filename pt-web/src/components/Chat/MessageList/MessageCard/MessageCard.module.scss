@@ -47,6 +47,7 @@
   background-color: vars.$color-primary;
   border-radius: vars.$radius-md;
   border-top-left-radius: 0;
+  overflow-wrap: anywhere;
 }
 
 .messageText.own {

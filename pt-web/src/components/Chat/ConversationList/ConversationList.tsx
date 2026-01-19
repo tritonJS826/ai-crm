@@ -1,7 +1,9 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
 import {ConversationCard} from "src/components/Chat/ConversationList/ConversationCard/ConversationCard";
 import {WsEventType} from "src/constants/wsEventTypes";
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {ConversationWithContact} from "src/services/conversationService";
 import {NewMessage} from "src/services/conversationWsService";
@@ -17,9 +19,14 @@ interface ConversationListProps {
 }
 
 export function ConversationList({onCardClickHandler}: ConversationListProps) {
+  const dictionary = useDictionary(DictionaryKey.CHAT);
   const {conversationList, conversationListLoading, conversationListError} = useAtomValue(conversationListStateAtom);
   const loadConversationList = useSetAtom(loadConversationListAtom);
   const updateConversationListByNewMessageEvent = useSetAtom(updateConversationListByNewMessageEventAtom);
+
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [filteredConversations, setFilteredConversations]
+  = useState<ConversationWithContact[]>(conversationList?.items ?? []);
 
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, async (event) => {
@@ -30,15 +37,30 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
     loadConversationList();
   }, []);
 
-  const conversationListElement = conversationList
-    ? conversationList.items.map((item: ConversationWithContact) => (
-      <ConversationCard
-        key={item.id}
-        conversation={item}
-        onCardClick = {() => onCardClickHandler(item.id)}
-      />
-    ))
-    : [];
+  useEffect(() => {
+    if (!conversationList?.items) {
+      return;
+    }
+    setFilteredConversations(conversationList?.items
+      .filter(conversationWithContact => conversationWithContact.contact.name?.toLowerCase()
+        .includes(searchValue.toLowerCase())));
+  }, [conversationList, searchValue]);
+
+  if (!dictionary) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
+
+  const conversationListElement = filteredConversations.map((item: ConversationWithContact) => (
+    <ConversationCard
+      key={item.id}
+      conversation={item}
+      onCardClick = {() => onCardClickHandler(item.id)}
+    />
+  ));
 
   return (
     <div className={styles.conversationList}>
@@ -46,13 +68,15 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
         <input
           className={styles.search}
           type="text"
-          placeholder="Search..."
+          placeholder={dictionary.conversationList.searchPlaceholder}
           name="search"
+          value={searchValue}
+          onChange={(event) => setSearchValue(event.target.value)}
         />
       </div>
 
       <ul>
-        {conversationListElement.length > 0 ? conversationListElement : "INFO conversation list is empty"}
+        {conversationListElement.length > 0 ? conversationListElement : dictionary.conversationList.infoEmptyList}
       </ul>
       {conversationListLoading && <p>
         loading...

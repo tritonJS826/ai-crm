@@ -1,8 +1,10 @@
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useAtom, useAtomValue, useSetAtom} from "jotai";
 import {MessageCard} from "src/components/Chat/MessageList/MessageCard/MessageCard";
 import {WsEventType} from "src/constants/wsEventTypes";
+import {DictionaryKey} from "src/dictionary/dictionaryLoader";
+import {useDictionary} from "src/dictionary/useDictionary";
 import {useSubscribe} from "src/hooks/useSubscribe";
 import {ConversationWithContact, MessageOut, sendMessage} from "src/services/conversationService";
 import {NewMessage} from "src/services/conversationWsService";
@@ -43,9 +45,11 @@ const getFromUserName = (
 
 export type MessageListProps = {
   conversationId: string;
+  messageInputValue: string;
 }
 
-export function MessageList({conversationId}: MessageListProps) {
+export function MessageList({conversationId, messageInputValue}: MessageListProps) {
+  const dictionary = useDictionary(DictionaryKey.CHAT);
   const [userProfile] = useAtom(userProfileAtom);
 
   const {messageList, messageListLoading, messageListError} = useAtomValue(messageListStateAtom);
@@ -58,6 +62,8 @@ export function MessageList({conversationId}: MessageListProps) {
   const updateConversationWithContactByNewMessageEvent = useSetAtom(updateConversationWithContactByNewMessageEventAtom);
 
   const [text, setText] = useState<string>("");
+
+  const messageElementsWrapperRef = useRef<HTMLUListElement>(null);
 
   // Add ws listeners for NEW_MESSAGE event
   useSubscribe<NewMessage>(WsEventType.NEW_MESSAGE, (event) => {
@@ -75,12 +81,40 @@ export function MessageList({conversationId}: MessageListProps) {
     loadConversationWithContact(conversationId);
   }, [conversationId]);
 
-  const handler = () => {
+  useEffect(() => {
+    setText(messageInputValue);
+  }, [messageInputValue]);
+
+  useEffect(() => {
+    if (!messageElementsWrapperRef.current) {
+      return;
+    }
+    messageElementsWrapperRef.current.scrollTop = messageElementsWrapperRef.current.scrollHeight;
+  }, [messageList]);
+
+  if (!dictionary) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
+
+  const submitMessage = () => {
+    if (text.trim() === "") {
+      return;
+    }
     sendMessage({conversationId, text});
     setText("");
   };
 
-  const messageListElement = [...messageList].reverse().map((message: MessageOut) => (
+  const textareaHotkeyHandler = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.ctrlKey && event.key === "Enter") {
+      submitMessage();
+    }
+  };
+
+  const messageListElement = messageList.map((message: MessageOut) => (
     <MessageCard
       key={message.id}
       message={message}
@@ -97,28 +131,34 @@ export function MessageList({conversationId}: MessageListProps) {
       </div>
 
       <div className={styles.content}>
-        <ul className={styles.messageElementsWrapper}>
-          {messageListElement}
-        </ul>
+        <div className={styles.relativeWrapper}>
+          <ul
+            className={styles.messageElementsWrapper}
+            ref={messageElementsWrapperRef}
+          >
+            {messageListElement}
+          </ul>
+        </div>
 
         <div className={styles.messageInputWrapper}>
-          <input
-            type={"text"}
+          <textarea
             value={text}
             onChange={(event) => {
               setText(event.target.value);
             }}
             name="messageInput"
-            placeholder="Type your message here..."
+            placeholder={dictionary.messageList.messageInputPlaceholder}
             className={styles.messageInput}
+            onKeyDown={textareaHotkeyHandler}
           />
 
           <button
             type="button"
-            onClick={handler}
+            onClick={submitMessage}
             className={styles.messageSendButton}
+            title="Ctrl+Enter"
           >
-            SEND
+            {dictionary.messageList.sendButtonLabel}
           </button>
         </div>
       </div>
