@@ -1,5 +1,5 @@
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
-import {env} from "src/utils/env/env";
+import {API_ROUTES} from "src/services/apiRoutes";
 
 export type Role = "ADMIN" | "AGENT";
 export type Token = { access_token: string; refresh_token: string; token_type: string };
@@ -21,67 +21,65 @@ export function clearTokens(): void {
   localStorageWorker.removeItemByKey("refreshToken");
 }
 
-async function apiFetch(path: string, init: RequestInit = {}): Promise<Response> {
+async function apiFetch(url: string, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   const access = getAccessToken();
-  const refresh = getRefreshToken();
   if (access) {
     headers.set("Authorization", `Bearer ${access}`);
   }
-  if (refresh) {
-    headers.set("x-refresh-token", refresh);
-  }
 
-  return fetch(`${env.API_BASE_PATH}${path}`, {...init, headers});
+  return fetch(url, {...init, headers});
 }
 
 export async function loginByEmail(email: string, password: string): Promise<void> {
   const body = new URLSearchParams({username: email, password});
-  const res = await fetch(`${env.API_BASE_PATH}/auth/login`, {
+  const res = await fetch(API_ROUTES.LOGIN(), {
     method: "POST",
     headers: {"Content-Type": "application/x-www-form-urlencoded"},
     body,
   });
   if (!res.ok) {
-    let message = "Login request failed";
-    try {
-      const errorBody = (await res.json()) as {detail?: unknown};
-      if (typeof errorBody?.detail === "string") {
-        message = errorBody.detail;
-      }
-    } catch {
-      // Ignore JSON parse errors and fall back to the default message.
-    }
-    throw new Error(message);
+    throw new Error(`Login request failed: ${res.statusText}`);
   }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
 }
 
 export async function registerByEmail(email: string, password: string, fullName: string): Promise<void> {
-  const res = await fetch(`${env.API_BASE_PATH}/auth/register`, {
+  const res = await fetch(API_ROUTES.REGISTER(), {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({email, password, name: fullName, role: "AGENT"}),
   });
   if (!res.ok) {
-    let message = "Registration request failed";
-    try {
-      const errorBody = (await res.json()) as {detail?: unknown};
-      if (typeof errorBody?.detail === "string") {
-        message = errorBody.detail;
-      }
-    } catch {
-      // Ignore JSON parse errors and fall back to the default message.
-    }
-    throw new Error(message);
+    throw new Error(`Registration request failed: ${res.statusText}`);
   }
   const data = (await res.json()) as UserWithTokens;
   saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
 }
 
+export async function refreshTokens(): Promise<void> {
+  const access = getAccessToken();
+  const refresh = getRefreshToken();
+  if (!refresh) {
+    throw new Error("Refresh token not found");
+  }
+
+  const res = await fetch(API_ROUTES.REFRESH(), {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({access_token: access, refresh_token: refresh}),
+  });
+  if (!res.ok) {
+    throw new Error(`Refresh request failed: ${res.statusText}`);
+  }
+
+  const data = (await res.json()) as UserWithTokens;
+  saveTokens({access_token: data.tokens.access_token, refresh_token: data.tokens.refresh_token});
+}
+
 export async function fetchCurrentUser(): Promise<User> {
-  const res = await apiFetch("/users/me");
+  const res = await apiFetch(API_ROUTES.USERS_ME());
   const data = (await res.json()) as User;
 
   return data;
@@ -89,7 +87,7 @@ export async function fetchCurrentUser(): Promise<User> {
 
 export async function logoutUser(): Promise<void> {
   try {
-    await fetch(`${env.API_BASE_PATH}/auth/logout`, {method: "POST"});
+    await fetch(API_ROUTES.LOGOUT(), {method: "POST"});
   } finally {
     clearTokens();
   }
