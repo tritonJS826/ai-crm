@@ -1,5 +1,5 @@
 import {atom} from "jotai";
-import {getSuggestions, Suggestion} from "src/services/suggestionService";
+import {addSuggestions, getSuggestions, Suggestion} from "src/services/suggestionService";
 
 // Suggestion = {
 //     id: string;
@@ -8,39 +8,9 @@ import {getSuggestions, Suggestion} from "src/services/suggestionService";
 //     createdAt: Date;
 // }
 
-// TODO: remove this temporal init
-const suggestionListInit: Suggestion[] = [
-  {
-    id: "1",
-    conversationId: "1",
-    text: "#1 Of friendship on inhabiting diminution discovered as. "
-    + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
-    createdAt: new Date(),
-  },
-  {
-    id: "2",
-    conversationId: "1",
-    text: "#2 Of friendship on inhabiting diminution discovered as. "
-    + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
-    createdAt: new Date(),
-  },
-  {
-    id: "3",
-    conversationId: "1",
-    text: "#3 Of friendship on inhabiting diminution discovered as. "
-    + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
-    createdAt: new Date(),
-  },
-  {
-    id: "4",
-    conversationId: "1",
-    text: "#4 Of friendship on inhabiting diminution discovered as. "
-    + "Did friendly eat breeding building few nor. Object he barton no effect played valley afford.",
-    createdAt: new Date(),
-  },
-];
+const MAX_SUGGESTION_LIST_LENGTH = 10;
 
-const suggestionListAtom = atom<Suggestion[]>(suggestionListInit);
+const suggestionListAtom = atom<Suggestion[]>([]);
 const suggestionListLoadingAtom = atom<boolean>(false);
 const suggestionListErrorAtom = atom<string | null>(null);
 
@@ -49,6 +19,31 @@ export const suggestionListStateAtom = atom((get) => ({
   suggestionListLoading: get(suggestionListLoadingAtom),
   suggestionListError: get(suggestionListErrorAtom),
 }));
+
+export const addSuggestionsAtom = atom(
+  null,
+  async (get, set, conversationId: string): Promise<void> => {
+    set(suggestionListLoadingAtom, true);
+    set(suggestionListErrorAtom, null);
+
+    try {
+      const newSuggestions: Suggestion[] = await addSuggestions(conversationId);
+      const suggestionList = get(suggestionListAtom);
+      let newSuggestionList = [...newSuggestions, ...suggestionList];
+      if (newSuggestionList.length > MAX_SUGGESTION_LIST_LENGTH) {
+        newSuggestionList = newSuggestionList.slice(0, MAX_SUGGESTION_LIST_LENGTH);
+      }
+      set(suggestionListAtom, newSuggestionList);
+    } catch (error) {
+      set(
+        suggestionListErrorAtom,
+        error instanceof Error ? error.message : "Unknown fetch error",
+      );
+    } finally {
+      set(suggestionListLoadingAtom, false);
+    }
+  },
+);
 
 export const loadSuggestionListAtom = atom(
   null,

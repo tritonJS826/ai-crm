@@ -1,11 +1,12 @@
 
+import {useEffect} from "react";
 import {useAtomValue, useSetAtom} from "jotai";
 import refreshIcon from "src/assets/suggestionIcons/refresh.avif";
 import {SuggestionCard} from "src/components/Chat/SuggestionList/SuggestionCard/SuggestionCard";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
 import {Suggestion} from "src/services/suggestionService";
-import {loadSuggestionListAtom, suggestionListStateAtom} from "src/state/suggestionListAtom";
+import {addSuggestionsAtom, loadSuggestionListAtom, suggestionListStateAtom} from "src/state/suggestionListAtom";
 import styles from "src/components/Chat/SuggestionList/SuggestionList.module.scss";
 
 export type SuggestionsProps = {
@@ -18,6 +19,11 @@ export function SuggestionList({conversationId, onCardClickHandler}: Suggestions
 
   const {suggestionList, suggestionListError, suggestionListLoading} = useAtomValue(suggestionListStateAtom);
   const loadSuggestionList = useSetAtom(loadSuggestionListAtom);
+  const addSuggestions = useSetAtom(addSuggestionsAtom);
+
+  useEffect(() => {
+    loadSuggestionList(conversationId);
+  }, [conversationId]);
 
   if (!dictionary) {
     return (
@@ -28,7 +34,7 @@ export function SuggestionList({conversationId, onCardClickHandler}: Suggestions
   }
 
   const onRefreshClickHandler = () => {
-    loadSuggestionList(conversationId);
+    addSuggestions(conversationId);
   };
 
   const suggestionsElement = suggestionList.map((suggestion: Suggestion) => (
