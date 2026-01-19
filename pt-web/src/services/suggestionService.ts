@@ -11,3 +11,7 @@ export type Suggestion = {
 export async function getSuggestions(conversationId: string): Promise<Suggestion[]> {
   return apiClient.get<Suggestion[]>(`/conversations/${conversationId}/suggestions`);
 }
+
+export async function addSuggestions(conversationId: string): Promise<Suggestion[]> {
+  return apiClient.post<Suggestion[]>(`/conversations/${conversationId}/suggestions`);
+}
