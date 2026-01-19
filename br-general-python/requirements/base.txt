@@ -30,5 +30,5 @@ passlib[argon2]==1.7.4
 # Stripe Payments
 stripe==14.1.0
 
-# OpenAI (TODO - for AI drafting)
-# openai>=1.0.0
+# OpenAI API client
+openai==2.15.0

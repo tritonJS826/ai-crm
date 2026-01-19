@@ -16,7 +16,6 @@ def client():
 
 
 def get_test_token(client):
-    # Ensure user exists via public API
     client.post(
         "/br-general/auth/register",
         json={
@@ -35,8 +34,9 @@ def get_test_token(client):
         },
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
+
     assert response.status_code == 200
-    return response.json()["tokens"]["access_token"]
+    return response.json()["access_token"]
 
 
 def test_send_email_ok(monkeypatch, client):

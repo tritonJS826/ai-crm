@@ -8,7 +8,7 @@ from prisma import Prisma
 from prisma.models import Message
 
 from app.schemas.platform import Platform
-from app.schemas.message import MessageDirection
+from app.schemas.source import Source
 
 
 class MessageRepository:
@@ -20,22 +20,29 @@ class MessageRepository:
         *,
         conversation_id: str,
         platform: Platform,
-        direction: MessageDirection,
         from_user_id: Optional[str] = None,
         text: Optional[str] = None,
         media_url: Optional[str] = None,
         remote_message_id: Optional[str] = None,
+        source: Source,
     ) -> Message:
         """Create a new message."""
+
+        if source == Source.CUSTOMER and from_user_id is not None:
+            raise ValueError("Customer messages cannot have from_user_id")
+
+        if source == Source.AGENT and from_user_id is None:
+            raise ValueError("Agent messages must have from_user_id")
+
         return await db.message.create(
             data={
                 "conversationId": conversation_id,
-                "direction": direction.value,
                 "fromUserId": from_user_id,
                 "platform": platform.value,
                 "text": text,
                 "mediaUrl": media_url,
                 "remoteMessageId": remote_message_id,
+                "source": source.value,
             }
         )
 
@@ -83,6 +90,18 @@ class MessageRepository:
     ) -> Optional[Message]:
         """Get message by ID."""
         return await db.message.find_unique(where={"id": message_id})
+
+    async def count_by_conversation(
+        self,
+        db: Prisma,
+        *,
+        conversation_id: str,
+    ) -> int:
+        where = {
+            "conversationId": conversation_id,
+        }
+
+        return await db.message.count(where=where)
 
 
 message_repo = MessageRepository()

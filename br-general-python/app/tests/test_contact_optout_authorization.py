@@ -1,13 +1,13 @@
 import pytest
 import pytest_asyncio
-
 from uuid import uuid4
 
 from prisma import Prisma
 
 from app.repositories.conversation_repository import conversation_repo
-from app.schemas.conversation import ConversationStatus
 from app.schemas.platform import Platform
+from app.schemas.source import Source
+from app.services.conversation_service import conversation_service
 
 pytestmark = pytest.mark.asyncio(loop_scope="session")
 
@@ -23,7 +23,6 @@ async def prisma():
 
 
 async def _create_user(prisma: Prisma):
-    # NOTE: removed "role" because your schema doesn't have it
     return await prisma.user.create(
         data={
             "id": str(uuid4()),
@@ -46,15 +45,17 @@ async def _create_contact(prisma: Prisma):
     )
 
 
-async def _create_conversation(prisma: Prisma, *, user_id: str, contact_id: str):
-    conversation = await prisma.conversation.create(
-        data={
-            "id": str(uuid4()),
-            "contactId": contact_id,
-            "status": ConversationStatus.OPEN,
-        }
+async def _create_conversation(prisma: Prisma, user_id: str, contact_id: str):
+    # 1️⃣ create conversation + initial message
+    conversation = await conversation_service.create_with_initial_message(
+        prisma,
+        contact_id=contact_id,
+        user_id=None,
+        text="Initial message",
+        source=Source.SYSTEM,
     )
 
+    # 2️⃣ link user to conversation (THIS is what access check uses)
     await prisma.conversationparticipant.create(
         data={
             "conversationId": conversation.id,

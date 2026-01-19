@@ -7,10 +7,12 @@ from typing import Optional
 from app.db import db
 from app.logging import logger
 from app.schemas.contact import Platform
-from app.schemas.message import MessageDirection, NormalizedMessage
+from app.schemas.message import NormalizedMessage
 from app.repositories.contact_repository import contact_repo
 from app.repositories.conversation_repository import conversation_repo
 from app.repositories.message_repository import message_repo
+from app.schemas.source import Source
+from app.services.conversation_service import conversation_service
 from app.services.meta_service import meta_service
 from app.ws.dispatcher import emit
 from app.ws.event_types import WSEventType
@@ -38,7 +40,9 @@ class MessageService:
         )
 
         # 2. Get or create conversation
-        conversation = await conversation_repo.get_or_create(db, contact.id)
+        conversation = await conversation_service.start_for_contact(
+            contact_id=contact.id,
+        )
 
         # 3. Check for opt-out
         if msg.text and msg.text.strip().lower() in OPT_OUT_KEYWORDS:
@@ -49,13 +53,21 @@ class MessageService:
         message = await message_repo.create(
             db,
             conversation_id=conversation.id,
-            direction=MessageDirection.IN,
             platform=msg.platform,
             from_user_id=None,
             text=msg.text,
             media_url=None,
             remote_message_id=msg.message_id,
+            source=Source.CUSTOMER,
         )
+
+        inbound_count = await message_repo.count_by_conversation(
+            db,
+            conversation_id=conversation.id,
+        )
+
+        if inbound_count == 1 and not contact.optOut:
+            await self._send_auto_greeting(conversation.id)
 
         # 5. Update conversation timestamp
         await conversation_repo.update_last_message_at(db, conversation.id)
@@ -66,7 +78,6 @@ class MessageService:
             {
                 "conversation_id": conversation.id,
                 "message_id": message.id,
-                "direction": MessageDirection.IN.value,
                 "from_user_id": None,
                 "platform": msg.platform.value,
                 "text": msg.text,
@@ -88,11 +99,8 @@ class MessageService:
     ) -> dict:
         """
         Send an outbound message to a customer.
-
-        agent_user_id:
-        - NOT NULL → agent message
-        - NULL → system / bot message
         """
+
         # 1. Get conversation with contact
         conversation = await conversation_repo.get_by_id(db, conversation_id)
         if not conversation:
@@ -117,17 +125,27 @@ class MessageService:
             if not remote_message_id:
                 raise ValueError("Failed to send message via Meta API")
 
+        # check user or system message
+        if agent_user_id is None:
+            source = Source.SYSTEM
+        else:
+            source = Source.AGENT
+
         # 4. Store outbound message (agent/system → customer)
-        message = await message_repo.create(
-            db,
-            conversation_id=conversation_id,
-            direction=MessageDirection.OUT,
-            platform=platform,
-            from_user_id=agent_user_id,
-            text=text,
-            media_url=image_url,
-            remote_message_id=remote_message_id,
-        )
+        try:
+            message = await message_repo.create(
+                db,
+                conversation_id=conversation_id,
+                platform=platform,
+                from_user_id=agent_user_id,
+                text=text,
+                media_url=image_url,
+                remote_message_id=remote_message_id,
+                source=source,
+            )
+        except Exception:
+            logger.info("Duplicate inbound message ignored")
+            raise ValueError("Failed to store outbound message")
 
         # 5. Update conversation timestamp
         await conversation_repo.update_last_message_at(db, conversation_id)
@@ -138,7 +156,6 @@ class MessageService:
             {
                 "conversation_id": conversation_id,
                 "message_id": message.id,
-                "direction": MessageDirection.OUT.value,
                 "from_user_id": agent_user_id,
                 "platform": platform.value,
                 "text": text,
@@ -178,6 +195,18 @@ class MessageService:
         except Exception as e:
             logger.error(f"Failed to send order confirmation: {e}")
             return None
+
+    async def _send_auto_greeting(self, conversation_id: str) -> None:
+        text = "Hi 👋 Thanks for contacting us! How can we help you?"
+
+        try:
+            await self.send_outbound_message(
+                conversation_id=conversation_id,
+                agent_user_id=None,
+                text=text,
+            )
+        except Exception as e:
+            logger.warning(f"Auto-greeting failed: {e}")
 
 
 message_service = MessageService()

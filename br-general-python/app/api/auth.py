@@ -91,8 +91,24 @@ async def register(user_in: UserCreate):
     )
 
 
-@router.post("/login", response_model=UserWithTokens)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+@router.post("/login")
+async def login_oauth(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await user_repo.get_by_email(db, form_data.username)
+    if not user or not auth_service.verify_password(
+        form_data.password, user.hashed_password
+    ):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    access_token = auth_service.create_access_token(user.id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
+
+
+@router.post("/login/full", response_model=UserWithTokens)
+async def login_full(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await user_repo.get_by_email(db, form_data.username)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
