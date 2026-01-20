@@ -383,7 +383,15 @@ async def create_suggestions(
         if msg.text
     ]
 
-    texts = await ai_service.generate_agent_suggestions(ai_messages)
+    # if error, return default suggestions
+    try:
+        texts = await ai_service.generate_agent_suggestions(ai_messages)
+        logger.info(f"AI-generated suggestions: {texts}")
+    except Exception:
+        logger.exception("Failed to generate AI suggestions")
+        texts = [
+            "I'm sorry, I don't have a suggestion at this time.",
+        ]
     logger.info(f"AI-generated suggestions: {texts}")
 
     created = []
