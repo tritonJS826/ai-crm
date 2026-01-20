@@ -22,6 +22,8 @@
   padding: 0.25rem vars.$pad-sm;
   border-radius: vars.$radius-sm;
   color: vars.$color-primary;
+  background-color: unset;
+  border: none;
 }
 
 .link:hover {
@@ -42,7 +44,7 @@
   color: vars.$color-primary-hover;
 }
 
-@media (width <= 640px) {
+@media (width <=640px) {
   .navbar {
     padding: vars.$pad-xs;
   }

@@ -11,6 +11,7 @@ export enum NavbarKey {
     NOTES = "notes",
     CUSTOMERS = "customers",
     SETTINGS = "settings",
+    LOGOUT = "logout",
 }
 
 export const navbarConfig: {key: NavbarKey; iconSrc: string; href: string}[] = [
