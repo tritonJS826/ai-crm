@@ -383,14 +383,20 @@ async def create_suggestions(
         if msg.text
     ]
 
-    texts = [
-        "default suggestion text1",
-        "default suggestion text2",
-        "default suggestion text3",
-    ]
-    if settings.env_type == "prod":
+    try:
         texts = await ai_service.generate_agent_suggestions(ai_messages)
-    logger.info(f"AI-generated suggestions: {texts}")
+        logger.info(f"AI-generated suggestions: {texts}")
+    except Exception:
+        logger.exception("Failed to generate AI suggestions")
+        if settings.env_type == "dev":
+            texts = [
+                "I'm sorry, I don't have a suggestion at this time.",
+            ]
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to generate suggestions",
+            )
 
     created = []
     for t in texts:
