@@ -383,13 +383,7 @@ async def create_suggestions(
         if msg.text
     ]
 
-    texts = [
-        "default suggestion text1",
-        "default suggestion text2",
-        "default suggestion text3",
-    ]
-    if settings.env_type == "prod":
-        texts = await ai_service.generate_agent_suggestions(ai_messages)
+    texts = await ai_service.generate_agent_suggestions(ai_messages)
     logger.info(f"AI-generated suggestions: {texts}")
 
     created = []
