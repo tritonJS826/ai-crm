@@ -1,5 +1,5 @@
-import {refreshTokens} from "src/services/authService";
 import {localStorageWorker, Token as LSToken} from "src/globalServices/localStorageWorker";
+import {refreshTokens} from "src/services/authService";
 import {env} from "src/utils/env/env";
 
 const DEFAULT_TIMEOUT_MS = 10_000;

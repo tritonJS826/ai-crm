@@ -18,7 +18,7 @@ export function AuthPage() {
   const navigate = useNavigate();
   const dictionary = useDictionary(DictionaryKey.AUTH);
 
-  const [mode, setMode] = useState<"login" | "register">("register");
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

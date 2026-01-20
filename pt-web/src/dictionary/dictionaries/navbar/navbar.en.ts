@@ -7,6 +7,7 @@ export const navbar: {labels: Record<NavbarKey, string>} = {
     notes: "Notes",
     customers: "Customers",
     settings: "Settings",
+    logout: "Logout",
   },
 } as const;
 

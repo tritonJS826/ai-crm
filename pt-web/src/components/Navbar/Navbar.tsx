@@ -1,12 +1,15 @@
 import {Link} from "react-router-dom";
+import {useSetAtom} from "jotai";
 import authIcon from "src/assets/navbarIcons/auth.avif";
 import {navbarConfig} from "src/components/Navbar/navbarConfig";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
-import {PATHS} from "src/routes/routes";
+import {clearTokens, logoutUser} from "src/services/authService";
+import {clearUserProfileAtom} from "src/state/userProfileAtoms";
 import styles from "src/components/Navbar/Navbar.module.scss";
 
 export function Navbar() {
+  const clearUserProfile = useSetAtom(clearUserProfileAtom);
   const dictionary = useDictionary(DictionaryKey.NAVBAR);
 
   if (!dictionary) {
@@ -16,6 +19,12 @@ export function Navbar() {
       </div>
     );
   }
+
+  const handleLogout = async (): Promise<void> => {
+    await logoutUser();
+    clearTokens();
+    clearUserProfile();
+  };
 
   const elements = navbarConfig.map(item => (
     <li
@@ -42,9 +51,10 @@ export function Navbar() {
       <ul className={styles.navList}>
         {elements}
       </ul>
-      <Link
-        to={PATHS.AUTH.PAGE}
+      <button
+        type="button"
         className={styles.link}
+        onClick={handleLogout}
       >
         <img
           src={authIcon}
@@ -52,9 +62,10 @@ export function Navbar() {
         />
 
         <span className={styles.label}>
-          Authentication
+          {dictionary.labels.logout}
         </span>
-      </Link>
+      </button>
     </div>
   );
 }
+
