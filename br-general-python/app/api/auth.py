@@ -3,6 +3,7 @@ API endpoints for authentication.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.params import Security
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.db import db
@@ -28,7 +29,8 @@ router = APIRouter()
 # -------------------------
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
+# async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserOut:
+async def get_current_user(token: str = Security(oauth2_scheme)) -> UserOut:
     """Get currently authenticated user (access token required)."""
     try:
         payload = auth_service.require_access_token(token)

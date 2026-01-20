@@ -39,6 +39,28 @@ class UserRepository:
             }
         )
 
+    async def update(self, db, user_id: str, data: dict):
+        if not data:
+            return await self.get_by_id(db, user_id)
+
+        query = """
+                UPDATE users
+                SET name  = COALESCE(%(name)s, name),
+                    email = COALESCE(%(email)s, email)
+                WHERE id = %(user_id)s RETURNING id, email, name, role \
+                """
+
+        row = await db.fetch_one(
+            query,
+            {
+                "user_id": user_id,
+                "name": data.get("name"),
+                "email": data.get("email"),
+            },
+        )
+
+        return row
+
     async def list_users(
         self, db: Prisma, limit: int = 100, offset: int = 0
     ) -> List[User]:
