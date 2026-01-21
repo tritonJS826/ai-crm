@@ -31,7 +31,7 @@ from app.schemas.conversation import (
 )
 from app.schemas.contact import ContactOptOutUpdate, Platform
 
-from app.services.ai_service import ai_service
+from app.services.ai_service import ai_service, AISuggestionError
 from app.schemas.user import Role
 
 router = APIRouter(dependencies=[Security(oauth2_scheme)])
@@ -385,18 +385,12 @@ async def create_suggestions(
 
     try:
         texts = await ai_service.generate_agent_suggestions(ai_messages)
-        logger.info(f"AI-generated suggestions: {texts}")
-    except Exception:
-        logger.exception("Failed to generate AI suggestions")
-        if settings.env_type == "dev":
-            texts = [
-                "I'm sorry, I don't have a suggestion at this time.",
-            ]
-        else:
-            raise HTTPException(
-                status_code=500,
-                detail="Failed to generate suggestions",
-            )
+    except AISuggestionError as exc:
+        logger.warning("AI suggestions unavailable", exc_info=exc)
+        raise HTTPException(
+            status_code=503,
+            detail="AI suggestions temporarily unavailable",
+        )
 
     created = []
     for t in texts:
