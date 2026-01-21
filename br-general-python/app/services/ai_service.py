@@ -20,14 +20,18 @@ CANNED_PROMPTS = {
 }
 
 
+class AISuggestionError(RuntimeError):
+    pass
+
+
 class AIService:
     """
     Service for generating AI-drafted message responses.
 
     """
 
-    def __init__(self) -> None:
-        self.api_key = settings.openai_api_key
+    def __init__(self, api_key: str | None) -> None:
+        self.api_key = api_key
         self.is_configured = bool(self.api_key)
 
     async def generate_draft(
@@ -80,6 +84,13 @@ class AIService:
             return f"[AI TODO] {CANNED_PROMPTS[style]}"
 
         return "[AI TODO] Please compose a helpful response to the customer."
+
+    def _fallback_suggestions(self, limit: int) -> list[str]:
+        return [
+            "Thanks for reaching out! Could you please provide more details?",
+            "I understand. Let me check this for you and get back shortly.",
+            "Would you like help proceeding with the next step?",
+        ][:limit]
 
     def _build_system_prompt(self, style: Optional[str] = None) -> str:
         """Build system prompt for the AI model."""
@@ -162,12 +173,8 @@ class AIService:
         Generate multiple agent reply suggestions based on full conversation.
         """
         if not self.is_configured:
-            # MVP fallback
-            return [
-                "Thanks for reaching out! Could you please provide more details?",
-                "I understand. Let me check this for you and get back shortly.",
-                "Would you like help proceeding with the next step?",
-            ][:max_suggestions]
+            logger.warning("AI not configured, using fallback suggestions")
+            return self._fallback_suggestions(max_suggestions)
 
         SYSTEM_PROMPT = """
         You are an experienced sales assistant.
@@ -200,14 +207,17 @@ class AIService:
 
         client = OpenAI(api_key=self.api_key)
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                *conversation,
-            ],
-            temperature=0.4,
-        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    *conversation,
+                ],
+                temperature=0.4,
+            )
+        except TimeoutError as e:
+            raise AISuggestionError("LLM timeout") from e
 
         text = response.choices[0].message.content or ""
         lines = [line.strip("-• ").strip() for line in text.split("\n") if line.strip()]
@@ -215,4 +225,4 @@ class AIService:
         return lines[:max_suggestions]
 
 
-ai_service = AIService()
+ai_service = AIService(settings.openai_api_key)
