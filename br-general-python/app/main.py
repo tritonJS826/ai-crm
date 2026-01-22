@@ -12,6 +12,8 @@ from app.logging import logger
 
 from prisma.engine.errors import AlreadyConnectedError
 
+from fastapi.routing import APIRoute
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,11 +40,17 @@ async def lifespan(app: FastAPI):
                 logger.exception("DB disconnect failed")
 
 
+def custom_generate_unique_id(route: APIRoute):
+    # This example uses the function name as the operationId
+    return route.name
+
+
 app = FastAPI(
     lifespan=lifespan,
     docs_url="/br-general/docs",
     redoc_url="/br-general/redoc",
     openapi_url="/br-general/openapi.json",
+    generate_unique_id_function=custom_generate_unique_id,
 )
 
 app.add_middleware(
