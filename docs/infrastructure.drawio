@@ -1,0 +1,81 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram name="Page-1" id="WIZY4DhNLibgSxGpabqB">
+    <mxGraphModel dx="1422" dy="863" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-1" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="470" as="sourcePoint" />
+            <mxPoint x="400" y="40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-2" value="webapp" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="140" y="210" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-4" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1" target="GtM_J8E2HJzy9tyarGnu-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="470" as="sourcePoint" />
+            <mxPoint x="400" y="40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-3" value="nginx 5173" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="220" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-5" target="GtM_J8E2HJzy9tyarGnu-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-5" value="pt-web 5174" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="150" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-6" target="GtM_J8E2HJzy9tyarGnu-3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="495" y="300" />
+              <mxPoint x="495" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-6" value="pt-general 8000" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="530" y="270" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-9" target="GtM_J8E2HJzy9tyarGnu-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-9" value="postgres&lt;div&gt;5432&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="560" y="390" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-11" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=2;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="760" y="460" as="sourcePoint" />
+            <mxPoint x="760" y="40" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-12" value="facebook" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="210" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="310" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="820" y="310" />
+              <mxPoint x="820" y="310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-13" value="openaAI" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="830" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="GtM_J8E2HJzy9tyarGnu-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="GtM_J8E2HJzy9tyarGnu-12" target="GtM_J8E2HJzy9tyarGnu-6">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="890" y="240" />
+              <mxPoint x="680" y="240" />
+              <mxPoint x="680" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -76,7 +76,13 @@ export function ConversationList({onCardClickHandler}: ConversationListProps) {
       </div>
 
       <ul>
-        {conversationListElement.length > 0 ? conversationListElement : dictionary.conversationList.infoEmptyList}
+        {conversationListElement.length > 0
+          ? conversationListElement
+          : (
+            <h4 className={styles.listIsEmpty}>
+              {dictionary.conversationList.infoEmptyList}
+            </h4>
+          )}
       </ul>
       {conversationListLoading && <p>
         loading...

@@ -2,7 +2,7 @@ export const chat = {
   title: "Chat",
   conversationList: {
     searchPlaceholder: "Search",
-    infoEmptyList: "conversation list is empty",
+    infoEmptyList: "🚫 conversation list is empty 🚫",
   },
   messageList: {
     messageInputPlaceholder: "Type your message here...",
