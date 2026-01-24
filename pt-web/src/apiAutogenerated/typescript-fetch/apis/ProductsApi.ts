@@ -21,6 +21,18 @@ import type {
   ProductOut,
   ProductUpdate,
 } from '../models/index';
+import {
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+    ProductCreateFromJSON,
+    ProductCreateToJSON,
+    ProductListResponseFromJSON,
+    ProductListResponseToJSON,
+    ProductOutFromJSON,
+    ProductOutToJSON,
+    ProductUpdateFromJSON,
+    ProductUpdateToJSON,
+} from '../models/index';
 
 /**
  * 
@@ -46,7 +58,7 @@ export class ProductsApi {
         return await apiClient.request(
           "POST",
           urlPath,
-          productCreate,
+          ProductCreateToJSON(productCreate),
           initOverrides);
 
     }
@@ -148,7 +160,7 @@ export class ProductsApi {
         return await apiClient.request(
           "PUT",
           urlPath,
-          productUpdate,
+          ProductUpdateToJSON(productUpdate),
           initOverrides);
 
     }

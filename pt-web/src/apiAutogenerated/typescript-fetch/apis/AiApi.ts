@@ -17,6 +17,10 @@ import { apiClient } from "src/services/apiClient";
 import type {
   HTTPValidationError,
 } from '../models/index';
+import {
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+} from '../models/index';
 
 /**
  * 

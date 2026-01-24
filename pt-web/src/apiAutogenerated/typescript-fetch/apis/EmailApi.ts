@@ -19,6 +19,14 @@ import type {
   EmailSendResponse,
   HTTPValidationError,
 } from '../models/index';
+import {
+    EmailSendRequestFromJSON,
+    EmailSendRequestToJSON,
+    EmailSendResponseFromJSON,
+    EmailSendResponseToJSON,
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+} from '../models/index';
 
 /**
  * 
@@ -43,7 +51,7 @@ export class EmailApi {
         return await apiClient.request(
           "POST",
           urlPath,
-          emailSendRequest,
+          EmailSendRequestToJSON(emailSendRequest),
           initOverrides);
 
     }

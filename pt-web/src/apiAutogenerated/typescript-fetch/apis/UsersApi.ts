@@ -19,6 +19,14 @@ import type {
   UserOut,
   UserProfileUpdate,
 } from '../models/index';
+import {
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+    UserOutFromJSON,
+    UserOutToJSON,
+    UserProfileUpdateFromJSON,
+    UserProfileUpdateToJSON,
+} from '../models/index';
 
 /**
  * 
@@ -61,7 +69,7 @@ export class UsersApi {
         return await apiClient.request(
           "PATCH",
           urlPath,
-          userProfileUpdate,
+          UserProfileUpdateToJSON(userProfileUpdate),
           initOverrides);
 
     }

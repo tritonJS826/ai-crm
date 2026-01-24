@@ -15,7 +15,6 @@
           "withInterfaces": false,
           "supportsES6": true,
           "useSingleRequestParameter": false,
-          "withoutRuntimeChecks": true,
           "validationAttributes": false
         },
         "globalProperty": {

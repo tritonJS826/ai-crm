@@ -21,6 +21,18 @@ import type {
   UserCreate,
   UserWithTokens,
 } from '../models/index';
+import {
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+    LogoutResponseFromJSON,
+    LogoutResponseToJSON,
+    RefreshTokenRequestFromJSON,
+    RefreshTokenRequestToJSON,
+    UserCreateFromJSON,
+    UserCreateToJSON,
+    UserWithTokensFromJSON,
+    UserWithTokensToJSON,
+} from '../models/index';
 
 /**
  * 
@@ -118,7 +130,7 @@ export class AuthApi {
         return await apiClient.request(
           "POST",
           urlPath,
-          refreshTokenRequest,
+          RefreshTokenRequestToJSON(refreshTokenRequest),
           initOverrides);
 
     }
@@ -142,7 +154,7 @@ export class AuthApi {
         return await apiClient.request(
           "POST",
           urlPath,
-          userCreate,
+          UserCreateToJSON(userCreate),
           initOverrides);
 
     }
