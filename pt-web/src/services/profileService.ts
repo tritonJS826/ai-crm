@@ -9,9 +9,9 @@ export type UserProfile = {
 };
 
 export async function getUserProfile(init?: { signal?: AbortSignal }): Promise<UserProfile> {
-  return apiClient.get<UserProfile>("/users/me", init);
+  return apiClient.get<UserProfile>("/br-general/users/me", init);
 }
 
 export async function patchUserProfile(update: Partial<Pick<UserProfile, "name" | "email">>): Promise<void> {
-  await apiClient.patch<void>("/users/me", update);
+  await apiClient.patch<void>("/br-general/users/me", update);
 }
