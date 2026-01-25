@@ -2,6 +2,7 @@
 Service for message business logic.
 """
 
+from time import sleep
 from typing import Optional
 
 from app.db import db
@@ -66,9 +67,6 @@ class MessageService:
             conversation_id=conversation.id,
         )
 
-        if inbound_count == 1 and not contact.optOut:
-            await self._send_auto_greeting(conversation.id)
-
         # 5. Update conversation timestamp
         await conversation_repo.update_last_message_at(db, conversation.id)
 
@@ -83,6 +81,10 @@ class MessageService:
                 "text": msg.text,
             },
         )
+
+        if inbound_count == 1 and not contact.optOut:
+            sleep(2)
+            await self._send_auto_greeting(conversation.id)
 
         return {
             "contact_id": contact.id,
