@@ -23,3 +23,5 @@
 #!docs/README.md
 
 apis/ConversationsApi.ts
+apis/UsersApi.ts
+apis/HealthApi.ts

@@ -40,8 +40,8 @@ async def lifespan(app: FastAPI):
                 logger.exception("DB disconnect failed")
 
 
+# For use the function name as the operationId in openapi.json
 def custom_generate_unique_id(route: APIRoute):
-    # This example uses the function name as the operationId
     return route.name
 
 
