@@ -5,15 +5,21 @@ import {
   patchUserProfile,
 } from "src/services/profileService";
 
-export const userProfileAtom = atom<UserOut | null>(null);
-export const userLoadingAtom = atom<boolean>(false);
-export const userErrorAtom = atom<string | null>(null);
+const userProfileAtom = atom<UserOut | null>(null);
+const userProfileLoadingAtom = atom<boolean>(false);
+const userProfileErrorAtom = atom<string | null>(null);
 
-export const loadUserDataAtom = atom(
+export const userProfileStateAtom = atom((get) => ({
+  userProfile: get(userProfileAtom),
+  userProfileLoading: get(userProfileLoadingAtom),
+  userProfileError: get(userProfileErrorAtom),
+}));
+
+export const loadUserProfileAtom = atom(
   null,
   async (_get, set): Promise<void> => {
-    set(userLoadingAtom, true);
-    set(userErrorAtom, null);
+    set(userProfileLoadingAtom, true);
+    set(userProfileErrorAtom, null);
 
     try {
       const profile = await getUserProfile();
@@ -21,12 +27,12 @@ export const loadUserDataAtom = atom(
       set(userProfileAtom, profile);
     } catch (error) {
       if (error instanceof Error) {
-        set(userErrorAtom, error.message);
+        set(userProfileErrorAtom, error.message);
       } else {
-        set(userErrorAtom, "Неизвестная ошибка загрузки данных");
+        set(userProfileErrorAtom, "Неизвестная ошибка загрузки данных");
       }
     } finally {
-      set(userLoadingAtom, false);
+      set(userProfileLoadingAtom, false);
     }
   },
 );
@@ -49,6 +55,6 @@ export const updateUserProfileAtom = atom(
 
 export const clearUserProfileAtom = atom(null, (_get, set) => {
   set(userProfileAtom, null);
-  set(userLoadingAtom, false);
-  set(userErrorAtom, null);
+  set(userProfileLoadingAtom, false);
+  set(userProfileErrorAtom, null);
 });
