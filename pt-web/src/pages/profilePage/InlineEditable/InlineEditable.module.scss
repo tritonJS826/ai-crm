@@ -1,0 +1,172 @@
+@use "src/styles/variables" as vars;
+
+.page {
+  max-width: vars.$container-max;
+  margin: 0 auto;
+  padding: vars.$pad-lg vars.$container-gap;
+  display: grid;
+  gap: vars.$gap-lg;
+}
+
+.grid {
+  display: grid;
+  gap: vars.$gap-lg;
+}
+
+.card {
+  background: vars.$color-bg;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 12%);
+  padding: vars.$pad-lg;
+  display: grid;
+  gap: vars.$gap-md;
+}
+
+.userHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cardTitle {
+  margin: 0;
+  color: vars.$color-primary;
+  font-weight: 800;
+  font-size: vars.$font-xl;
+  line-height: 1.1;
+}
+
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  font-weight: 700;
+  border-radius: vars.$radius-pill;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast,
+    color vars.$transition-fast;
+}
+
+.logoutBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+  color: #fff;
+}
+
+.userList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.userItem {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: #fff;
+}
+
+.userLabel {
+  color: vars.$color-text-secondary;
+  font-weight: 700;
+}
+
+.userValue {
+  color: vars.$color-primary;
+  justify-self: start;
+}
+
+.editPlaceholder {
+  width: 24px;
+  height: 24px;
+}
+
+.editBtn {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: vars.$radius-pill;
+  transition: background-color vars.$transition-fast;
+}
+
+.editBtn:hover {
+  background: #f3f4f6;
+}
+
+.editIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.userInput {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  font: inherit;
+  color: vars.$color-primary;
+  box-sizing: border-box;
+}
+
+.inlineActions {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.saveBtn,
+.cancelBtn {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: vars.$radius-pill;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid vars.$color-border;
+  background: #fff;
+  color: vars.$color-primary;
+  transition:
+    background-color vars.$transition-fast,
+    border-color vars.$transition-fast,
+    color vars.$transition-fast;
+}
+
+.saveBtn:hover,
+.cancelBtn:hover {
+  background: vars.$color-cta-bg;
+  border-color: vars.$color-cta-bg;
+  color: #fff;
+}
+
+@media (width <= 768px) {
+  .page {
+    padding-inline: vars.$container-gap;
+  }
+
+  .userItem {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .editBtn {
+    justify-self: start;
+  }
+}

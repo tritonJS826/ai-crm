@@ -1,11 +1,11 @@
 import type {ReactNode} from "react";
 import {Navigate, Outlet} from "react-router-dom";
-import {useAtom} from "jotai";
+import {useAtomValue} from "jotai";
 import {PATHS} from "src/routes/routes";
-import {userProfileAtom} from "src/state/userProfileAtoms";
+import {userProfileStateAtom} from "src/state/userProfileAtoms";
 
 export function PublicRoutes (): ReactNode {
-  const [userProfile] = useAtom(userProfileAtom);
+  const {userProfile} = useAtomValue(userProfileStateAtom);
 
   if (userProfile) {
     return <Navigate to={PATHS.HOME} />;

@@ -13,6 +13,7 @@
     "web:cypress:component:run": "pnpm --filter pt-web cypress:component:run",
     "web:cypress:e2e:run": "pnpm --filter pt-web cypress:e2e:run",
     "web:test": "pnpm --filter pt-web test",
+    "web:generate-api": "pnpm -filter pt-web run generate-api",
     "prepare": "husky",
     "br-general-python:prisma:migrate": "pnpm --filter br-general-python prisma:migrate",
     "br-general-python:prisma:migrate:dev": "pnpm --filter br-general-python prisma:migrate:dev",

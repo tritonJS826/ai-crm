@@ -51,6 +51,66 @@ class ApiClient {
     return this.request<T>("DELETE", url, undefined, init);
   }
 
+  public async request<T>(
+    method: string,
+    url: string,
+    body?: unknown,
+    init?: RequestInit,
+    retryOnUnauthorized: boolean = true,
+  ): Promise<T> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+
+    try {
+      const headers = this.buildHeaders(init, body);
+      const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
+      const response = await fetch(`${this.baseUrl}${url}`, {
+        method,
+        headers,
+        body:
+          body === undefined
+            ? undefined
+            : isFormData
+              ? (body as BodyInit)
+              : JSON.stringify(body),
+        signal: controller.signal,
+        ...init,
+      });
+
+      if (response.status === HTTP_STATUS.UNAUTHORIZED && retryOnUnauthorized) {
+        try {
+          await refreshTokens();
+          const retryHeaders = this.buildHeaders(init, body);
+          const retryResponse = await fetch(`${this.baseUrl}${url}`, {
+            method,
+            headers: retryHeaders,
+            body:
+              body === undefined
+                ? undefined
+                : isFormData
+                  ? (body as BodyInit)
+                  : JSON.stringify(body),
+            signal: controller.signal,
+            ...init,
+          });
+
+          await this.ensureOkOrThrow(retryResponse);
+
+          return this.parseJsonSafe<T>(retryResponse);
+        } catch {
+          await this.ensureOkOrThrow(response);
+        }
+      }
+
+      await this.ensureOkOrThrow(response);
+
+      return this.parseJsonSafe<T>(response);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
   private getAuthHeaders(): Record<string, string> {
     const accessObj = localStorageWorker.getItemByKey<LSToken>("accessToken");
 
@@ -118,66 +178,6 @@ class ApiClient {
     const error: ApiError = new Error(message);
     error.status = res.status;
     throw error;
-  }
-
-  private async request<T>(
-    method: string,
-    url: string,
-    body?: unknown,
-    init?: RequestInit,
-    retryOnUnauthorized: boolean = true,
-  ): Promise<T> {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
-
-    try {
-      const headers = this.buildHeaders(init, body);
-      const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
-
-      const response = await fetch(`${this.baseUrl}${url}`, {
-        method,
-        headers,
-        body:
-          body === undefined
-            ? undefined
-            : isFormData
-              ? (body as BodyInit)
-              : JSON.stringify(body),
-        signal: controller.signal,
-        ...init,
-      });
-
-      if (response.status === HTTP_STATUS.UNAUTHORIZED && retryOnUnauthorized) {
-        try {
-          await refreshTokens();
-          const retryHeaders = this.buildHeaders(init, body);
-          const retryResponse = await fetch(`${this.baseUrl}${url}`, {
-            method,
-            headers: retryHeaders,
-            body:
-              body === undefined
-                ? undefined
-                : isFormData
-                  ? (body as BodyInit)
-                  : JSON.stringify(body),
-            signal: controller.signal,
-            ...init,
-          });
-
-          await this.ensureOkOrThrow(retryResponse);
-
-          return this.parseJsonSafe<T>(retryResponse);
-        } catch {
-          await this.ensureOkOrThrow(response);
-        }
-      }
-
-      await this.ensureOkOrThrow(response);
-
-      return this.parseJsonSafe<T>(response);
-    } finally {
-      clearTimeout(timeoutId);
-    }
   }
 
 }

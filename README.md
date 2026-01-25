@@ -7,6 +7,7 @@ requirements:
 * docker 28.1.1
 * docker-compose 2.33.1
 * ruff 0.13.2
+* java 17.0.17 (for openapi-generator-cli only)
 
 *Note:*
 

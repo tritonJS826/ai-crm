@@ -1,16 +1,16 @@
 import type {ReactNode} from "react";
 import {Navigate, Outlet} from "react-router-dom";
-import {useAtom} from "jotai";
+import {useAtomValue} from "jotai";
 import {Footer} from "src/components/Footer/Footer";
 import {Header} from "src/components/Header/Header";
 import {Navbar} from "src/components/Navbar/Navbar";
 import {ScrollToTop} from "src/components/ScrollToTop/ScrollToTop";
 import {PATHS} from "src/routes/routes";
-import {userProfileAtom} from "src/state/userProfileAtoms";
+import {userProfileStateAtom} from "src/state/userProfileAtoms";
 import "src/styles/_globals.scss";
 
 export function PrivateRoutes (): ReactNode {
-  const [userProfile] = useAtom(userProfileAtom);
+  const {userProfile} = useAtomValue(userProfileStateAtom);
 
   if (!userProfile) {
     return <Navigate to={PATHS.AUTH.PAGE} />;
