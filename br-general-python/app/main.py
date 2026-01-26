@@ -45,11 +45,13 @@ def custom_generate_unique_id(route: APIRoute):
     return route.name
 
 
+API_PREFIX = settings.api_prefix
+
 app = FastAPI(
     lifespan=lifespan,
-    docs_url="/br-general/docs",
-    redoc_url="/br-general/redoc",
-    openapi_url="/br-general/openapi.json",
+    docs_url=f"{API_PREFIX}/docs",
+    redoc_url=f"{API_PREFIX}/redoc",
+    openapi_url=f"{API_PREFIX}/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
 )
 
@@ -66,4 +68,4 @@ app.add_middleware(
     ],
 )
 
-app.include_router(api_router)
+app.include_router(api_router, prefix=f"{API_PREFIX}")
