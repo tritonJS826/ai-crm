@@ -40,7 +40,7 @@ export class CheckApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/check/broadcast`;
+        let urlPath = `/check/broadcast`;
 
         return await apiClient.request(
           "POST",
@@ -63,7 +63,7 @@ export class CheckApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/check/inbound-message`;
+        let urlPath = `/check/inbound-message`;
 
         return await apiClient.request(
           "POST",
@@ -86,7 +86,7 @@ export class CheckApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/check/ping`;
+        let urlPath = `/check/ping`;
 
         return await apiClient.request(
           "POST",

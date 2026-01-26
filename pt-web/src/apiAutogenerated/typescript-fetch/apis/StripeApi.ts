@@ -50,7 +50,7 @@ export class StripeApi {
             queryParameters['contact_id'] = String(contactId);
         }
         
-        let urlPath = `/br-general/stripe/checkout`;
+        let urlPath = `/stripe/checkout`;
 
         return await apiClient.request(
           "GET",

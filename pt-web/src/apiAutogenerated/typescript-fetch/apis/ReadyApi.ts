@@ -27,7 +27,7 @@ export class ReadyApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/ready-db`;
+        let urlPath = `/ready-db`;
 
         return await apiClient.request(
           "GET",

@@ -53,7 +53,7 @@ export class ProductsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/products`;
+        let urlPath = `/products`;
 
         return await apiClient.request(
           "POST",
@@ -77,7 +77,7 @@ export class ProductsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/products/{product_id}`;
+        let urlPath = `/products/{product_id}`;
         urlPath = urlPath.replace(`{${"product_id"}}`, encodeURIComponent(String(productId)));
 
         return await apiClient.request(
@@ -101,7 +101,7 @@ export class ProductsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/products/{product_id}`;
+        let urlPath = `/products/{product_id}`;
         urlPath = urlPath.replace(`{${"product_id"}}`, encodeURIComponent(String(productId)));
 
         return await apiClient.request(
@@ -125,7 +125,7 @@ export class ProductsApi {
             queryParameters['search'] = String(search);
         }
         
-        let urlPath = `/br-general/products`;
+        let urlPath = `/products`;
 
         return await apiClient.request(
           "GET",
@@ -154,7 +154,7 @@ export class ProductsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/products/{product_id}`;
+        let urlPath = `/products/{product_id}`;
         urlPath = urlPath.replace(`{${"product_id"}}`, encodeURIComponent(String(productId)));
 
         return await apiClient.request(

@@ -25,6 +25,26 @@ import type {
   SendMessageResponse,
   SuggestionOut,
 } from '../models/index';
+import {
+    ContactOptOutUpdateFromJSON,
+    ContactOptOutUpdateToJSON,
+    ConversationListResponseFromJSON,
+    ConversationListResponseToJSON,
+    ConversationStatusFromJSON,
+    ConversationStatusToJSON,
+    ConversationWithContactFromJSON,
+    ConversationWithContactToJSON,
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
+    MessageOutFromJSON,
+    MessageOutToJSON,
+    SendMessageRequestFromJSON,
+    SendMessageRequestToJSON,
+    SendMessageResponseFromJSON,
+    SendMessageResponseToJSON,
+    SuggestionOutFromJSON,
+    SuggestionOutToJSON,
+} from '../models/index';
 
 /**
  * 
@@ -45,7 +65,7 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/{conversation_id}/close`;
+        let urlPath = `/conversations/{conversation_id}/close`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -68,7 +88,7 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/{conversation_id}/suggestions`;
+        let urlPath = `/conversations/{conversation_id}/suggestions`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -92,7 +112,7 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/{conversation_id}`;
+        let urlPath = `/conversations/{conversation_id}`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -122,7 +142,7 @@ export class ConversationsApi {
             queryParameters['cursor'] = String(cursor);
         }
         
-        let urlPath = `/br-general/conversations/{conversation_id}/messages`;
+        let urlPath = `/conversations/{conversation_id}/messages`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -146,7 +166,7 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/{conversation_id}/suggestions`;
+        let urlPath = `/conversations/{conversation_id}/suggestions`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -173,7 +193,7 @@ export class ConversationsApi {
             queryParameters['offset'] = String(offset);
         }
         
-        let urlPath = `/br-general/conversations`;
+        let urlPath = `/conversations`;
 
         return await apiClient.request(
           "GET",
@@ -196,12 +216,12 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/send`;
+        let urlPath = `/conversations/send`;
 
         return await apiClient.request(
           "POST",
           urlPath,
-          sendMessageRequest,
+          SendMessageRequestToJSON(sendMessageRequest),
           initOverrides);
 
     }
@@ -229,7 +249,7 @@ export class ConversationsApi {
             queryParameters['product_id'] = String(productId);
         }
         
-        let urlPath = `/br-general/conversations/{conversation_id}/send-product`;
+        let urlPath = `/conversations/{conversation_id}/send-product`;
         urlPath = urlPath.replace(`{${"conversation_id"}}`, encodeURIComponent(String(conversationId)));
 
         return await apiClient.request(
@@ -259,13 +279,13 @@ export class ConversationsApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/conversations/contacts/{contact_id}/optout`;
+        let urlPath = `/conversations/contacts/{contact_id}/optout`;
         urlPath = urlPath.replace(`{${"contact_id"}}`, encodeURIComponent(String(contactId)));
 
         return await apiClient.request(
           "PATCH",
           urlPath,
-          contactOptOutUpdate,
+          ContactOptOutUpdateToJSON(contactOptOutUpdate),
           initOverrides);
 
     }

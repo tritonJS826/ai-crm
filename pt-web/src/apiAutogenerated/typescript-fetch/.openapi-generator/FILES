@@ -1,6 +1,7 @@
 apis/AiApi.ts
 apis/AuthApi.ts
 apis/CheckApi.ts
+apis/ConversationsApi.ts
 apis/EmailApi.ts
 apis/HealthApi.ts
 apis/ProductsApi.ts
