@@ -1,12 +1,10 @@
-import {MessageDirection} from "src/constants/messageDirection";
-import {PlatformOld} from "src/constants/platform";
+import {Platform} from "src/models/Contact";
 
 // Schema for new_message data in incoming ws event.
 export type NewMessage = {
     conversation_id: string;
     message_id: string;
-    direction: MessageDirection;
     from_user_id?: string;
-    platform: PlatformOld;
+    platform: Platform;
     text?: string;
 }
