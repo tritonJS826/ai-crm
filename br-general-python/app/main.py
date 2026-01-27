@@ -49,9 +49,10 @@ API_PREFIX = settings.api_prefix
 
 app = FastAPI(
     lifespan=lifespan,
-    docs_url=f"{API_PREFIX}/docs",
-    redoc_url=f"{API_PREFIX}/redoc",
-    openapi_url=f"{API_PREFIX}/openapi.json",
+    root_path=API_PREFIX,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     generate_unique_id_function=custom_generate_unique_id,
 )
 
@@ -68,4 +69,4 @@ app.add_middleware(
     ],
 )
 
-app.include_router(api_router, prefix=f"{API_PREFIX}")
+app.include_router(api_router)
