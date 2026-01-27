@@ -6,6 +6,7 @@ export async function getUserProfile(init?: { signal?: AbortSignal }): Promise<U
   return userProfileModelFromUserOut(await usersApi.getCurrentUserProfile(init));
 }
 
+// TODO: Is required replace generated payload model UserProfileUpdate to own model?
 export async function patchUserProfile(update: Partial<Pick<UserProfileUpdate, "name" | "email">>): Promise<void> {
   await usersApi.updateCurrentUserProfile(update);
 }
