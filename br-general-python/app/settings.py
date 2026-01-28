@@ -11,8 +11,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from pathlib import Path
 
-from urllib.parse import urlparse
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = BASE_DIR / ".env"
 
@@ -132,17 +130,6 @@ class Settings(BaseSettings):
         if v and starttls:
             raise ValueError("Only one of SMTP_SSL or SMTP_STARTTLS can be true.")
         return v
-
-    @property
-    def api_prefix(self) -> str:
-        parsed = urlparse(self.app_base_url)
-
-        if not parsed.path:
-            raise ValueError(
-                f"APP_BASE_URL must contain a path prefix (e.g. /br-general), got: {self.app_base_url}"
-            )
-
-        return parsed.path.rstrip("/")
 
 
 settings = Settings()
