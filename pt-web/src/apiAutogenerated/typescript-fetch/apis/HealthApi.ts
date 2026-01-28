@@ -27,7 +27,7 @@ export class HealthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/health/`;
+        let urlPath = `/health/`;
 
         return await apiClient.request(
           "GET",

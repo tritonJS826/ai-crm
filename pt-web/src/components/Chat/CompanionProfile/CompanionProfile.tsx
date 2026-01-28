@@ -2,15 +2,15 @@
 import {useAtomValue} from "jotai";
 import {DictionaryKey} from "src/dictionary/dictionaryLoader";
 import {useDictionary} from "src/dictionary/useDictionary";
-import {conversationWithContactStateAtom} from "src/state/conversationWithContactAtom";
+import {conversationStateAtom} from "src/state/conversationAtom";
 import styles from "src/components/Chat/CompanionProfile/CompanionProfile.module.scss";
 
 const DEFAULT_AVATAR_SYMBOL = "?";
 
 export function CompanionProfile() {
   const dictionary = useDictionary(DictionaryKey.CHAT);
-  const {conversationWithContact, conversationWithContactLoading, conversationWithContactError}
-  = useAtomValue(conversationWithContactStateAtom);
+  const {conversation, conversationLoading, conversationError}
+  = useAtomValue(conversationStateAtom);
 
   if (!dictionary) {
     return (
@@ -32,16 +32,16 @@ export function CompanionProfile() {
         <div className={styles.profile}>
           <div className={styles.avatarWrapper}>
             <p className={styles.avatar}>
-              {conversationWithContact?.contact.name
-                ? conversationWithContact?.contact.name[0].toUpperCase()
+              {conversation?.contact.name
+                ? conversation?.contact.name[0].toUpperCase()
                 : DEFAULT_AVATAR_SYMBOL}
             </p>
           </div>
           <p className={styles.name}>
-            {conversationWithContact?.contact.name}
+            {conversation?.contact.name}
           </p>
           <p className={styles.phone}>
-            {conversationWithContact?.contact.phone}
+            {conversation?.contact.phone}
           </p>
         </div>
 
@@ -72,13 +72,13 @@ export function CompanionProfile() {
         </div>
       </div>
 
-      {(conversationWithContactLoading) && <p>
+      {(conversationLoading) && <p>
         loading...
       </p>}
-      {conversationWithContactError && <p>
+      {conversationError && <p>
         ERROR
         {" "}
-        {conversationWithContactError}
+        {conversationError}
       </p>}
     </div>
   );

@@ -41,7 +41,7 @@ export class UsersApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/users/me`;
+        let urlPath = `/users/me`;
 
         return await apiClient.request(
           "GET",
@@ -64,7 +64,7 @@ export class UsersApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/users/me`;
+        let urlPath = `/users/me`;
 
         return await apiClient.request(
           "PATCH",

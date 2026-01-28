@@ -34,7 +34,7 @@ export class WebhooksApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/webhooks/meta`;
+        let urlPath = `/webhooks/meta`;
 
         return await apiClient.request(
           "POST",
@@ -51,7 +51,7 @@ export class WebhooksApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/webhooks/stripe`;
+        let urlPath = `/webhooks/stripe`;
 
         return await apiClient.request(
           "POST",
@@ -95,7 +95,7 @@ export class WebhooksApi {
             queryParameters['hub.challenge'] = String(hubChallenge);
         }
         
-        let urlPath = `/br-general/webhooks/meta`;
+        let urlPath = `/webhooks/meta`;
 
         return await apiClient.request(
           "GET",

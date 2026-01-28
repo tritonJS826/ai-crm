@@ -25,3 +25,5 @@
 apis/ConversationsApi.ts
 apis/UsersApi.ts
 apis/HealthApi.ts
+
+models/*

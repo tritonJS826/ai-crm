@@ -46,7 +46,7 @@ export class EmailApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/email/send`;
+        let urlPath = `/email/send`;
 
         return await apiClient.request(
           "POST",

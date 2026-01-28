@@ -58,7 +58,7 @@ export class AuthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/auth/login/full`;
+        let urlPath = `/auth/login/full`;
 
         return await apiClient.request(
           "POST",
@@ -86,7 +86,7 @@ export class AuthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/auth/login`;
+        let urlPath = `/auth/login`;
 
         return await apiClient.request(
           "POST",
@@ -103,7 +103,7 @@ export class AuthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/auth/logout`;
+        let urlPath = `/auth/logout`;
 
         return await apiClient.request(
           "POST",
@@ -125,7 +125,7 @@ export class AuthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/auth/refresh`;
+        let urlPath = `/auth/refresh`;
 
         return await apiClient.request(
           "POST",
@@ -149,7 +149,7 @@ export class AuthApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/auth/register`;
+        let urlPath = `/auth/register`;
 
         return await apiClient.request(
           "POST",

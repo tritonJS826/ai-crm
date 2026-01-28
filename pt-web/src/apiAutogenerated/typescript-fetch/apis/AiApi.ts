@@ -47,7 +47,7 @@ export class AiApi {
             queryParameters['style'] = String(style);
         }
         
-        let urlPath = `/br-general/ai/draft`;
+        let urlPath = `/ai/draft`;
 
         return await apiClient.request(
           "POST",
@@ -64,7 +64,7 @@ export class AiApi {
         const queryParameters: Record<string, string> = {};
 
         
-        let urlPath = `/br-general/ai/prompts`;
+        let urlPath = `/ai/prompts`;
 
         return await apiClient.request(
           "GET",
